@@ -9,8 +9,8 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
       res.status(401);
       return res.json({
         success: false,
-        message: 'Unauthorized',
-        error: 'Please login'
+        message: 'Please login to continue',
+        error: 'No token provided'
       });
     }
 

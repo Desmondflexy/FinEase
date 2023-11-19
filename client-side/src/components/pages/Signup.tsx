@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import './Signup.css';
+// import './styles/Signup.css';
 import { Link, useNavigate } from 'react-router-dom'
 import Api from '../../api.config';
-import {ToastContainer, toast} from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Form } from './styles/Signup.css';
 
 function Signup() {
   const [inputs, setInputs] = useState({
@@ -41,7 +42,7 @@ function Signup() {
   }
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <h1>Signup</h1>
 
         <input type="text" id="first" name="first" placeholder="First Name" value={inputs.first} onChange={handleChange} required />
@@ -59,7 +60,8 @@ function Signup() {
         <p>Already have an account? <Link to="/login">Log In</Link></p>
 
         <button type="submit">Signup</button>
-      </form>
+      </Form>
+      
       <ToastContainer />
     </>
   )

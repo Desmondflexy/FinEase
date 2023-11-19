@@ -3,6 +3,7 @@ import User from "../models/users";
 import * as validators from "../utils/validators";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { generateAcctNo } from "../utils/utils";
 
 export async function signup(req: Request, res: Response) {
   try {
@@ -35,7 +36,8 @@ export async function signup(req: Request, res: Response) {
       email,
       password: await bcrypt.hash(password, 10),
       fullName: `${first} ${last}`,
-      phone
+      phone,
+      acctNo: await generateAcctNo()
     })
 
     res.status(201);
@@ -149,4 +151,12 @@ export async function profile(req: Request, res: Response) {
       error: error.message
     })
   }
+}
+
+export async function logout(req: Request, res: Response) {
+  res.clearCookie('token');
+  res.json({
+    message: 'Logged out successfully',
+    data: 'none',
+  });
 }

@@ -11,6 +11,7 @@ import usersRouter from './routes/users';
 import authRouter from './routes/auth';
 
 import connectDB from './config/database';
+import { runCommand } from './utils/utils';
 
 dotenv.config();
 connectDB();
@@ -36,7 +37,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/account', usersRouter);
 app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler
@@ -57,4 +58,5 @@ app.use(function(err:HttpError, req:Request, res:Response) {
 
 export default app;
 
+// runCommand();
 console.log(`App is running at http://localhost:${process.env.PORT} in ${app.get('env')} mode`);

@@ -5,6 +5,7 @@ interface IUser extends mongoose.Document {
   password: string;
   fullName: string;
   phone: string;
+  acctNo: string;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -26,6 +27,11 @@ const userSchema = new mongoose.Schema<IUser>({
   phone: {
     type: String,
     required: true,
+  },
+  acctNo: {
+    type: String,
+    required: true,
+    unique: true,
   }
 }, {
   timestamps: true
