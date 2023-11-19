@@ -11,8 +11,8 @@ export async function signup(req: Request, res: Response) {
     if (error) {
       res.status(400);
       return res.json({
-        message: 'Bad request',
-        error: error.message
+        message: error.message,
+        error: 'Bad request'
       });
     }
 
@@ -25,8 +25,8 @@ export async function signup(req: Request, res: Response) {
       res.status(409);
       return res.json({
         success: false,
-        message: 'Conflict',
-        error: 'User already exists'
+        message: 'User already exists',
+        error: 'Conflict'
       });
     }
 
@@ -41,7 +41,7 @@ export async function signup(req: Request, res: Response) {
     res.status(201);
     res.json({
       success: true,
-      message: "User created",
+      message: "User created successfully",
       data: user
     })
   }
@@ -62,8 +62,8 @@ export async function login(req: Request, res: Response) {
     if (error) {
       res.status(400);
       return res.json({
-        message: 'Bad request',
-        error: error.message
+        message: error.message,
+        error: "Bad request"
       });
     }
 
@@ -75,8 +75,8 @@ export async function login(req: Request, res: Response) {
       res.status(401);
       return res.json({
         success: false,
-        message: "Unauthorized",
-        error: "Invalid credentials"
+        message: "Invalid credentials",
+        error: "Unauthorized"
       });
     }
 
@@ -86,8 +86,8 @@ export async function login(req: Request, res: Response) {
       res.status(401);
       return res.json({
         success: false,
-        message: "Unauthorized",
-        error: "Invalid credentials"
+        message: "Invalid credentials",
+        error: "Unauthorized"
       })
     }
 
@@ -103,7 +103,7 @@ export async function login(req: Request, res: Response) {
     res.status(200);
     return res.json({
       success: true,
-      message: "User logged in",
+      message: "Login successful",
       data: token
     })
   }
@@ -128,8 +128,8 @@ export async function profile(req: Request, res: Response) {
       res.status(404);
       return res.json({
         success: false,
-        message: "Not found",
-        error: "User not found"
+        message: "User not found",
+        error: "Not found"
       })
     }
 
