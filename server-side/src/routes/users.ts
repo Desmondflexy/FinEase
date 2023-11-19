@@ -1,9 +1,9 @@
 import express from 'express';
+import { authenticate } from '../controllers/middleware/auth';
+import * as user from '../controllers/users'
 const router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.get('/', authenticate, user.profile);
 
 export default router;
