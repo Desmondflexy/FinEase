@@ -12,6 +12,7 @@ export async function signup(req: Request, res: Response) {
     if (error) {
       res.status(400);
       return res.json({
+        success: false,
         message: error.message,
         error: 'Bad request'
       });
@@ -83,8 +84,8 @@ export async function login(req: Request, res: Response) {
     }
 
     // check if password matches
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       res.status(401);
       return res.json({
         success: false,
@@ -94,13 +95,14 @@ export async function login(req: Request, res: Response) {
     }
 
     // grant user a token
-    const secretKey = process.env.JWT_SECRET as string;
-    const expiresIn = Number(process.env.JWT_EXPIRES_IN);
-    const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: expiresIn * 3600 });
+    const secretKey = String(process.env.JWT_SECRET);
+    const expiresIn = Number(process.env.JWT_EXPIRES_IN) * 3600;
+    const payload = { id: user._id };
+    const token = jwt.sign(payload, secretKey, { expiresIn });
 
     // attach the token to the headers; save in cookies
     res.setHeader('Authorization', `Bearer ${token}`);
-    res.cookie('token', token, { maxAge: expiresIn * 3600 * 1000, httpOnly: true });
+    res.cookie('token', token, { maxAge: expiresIn * 1000, httpOnly: true });
 
     res.status(200);
     return res.json({
