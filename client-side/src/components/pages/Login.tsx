@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import Api from "../../api.config";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 import { Form } from './styles/Signup.css';
 
 function Login() {
@@ -10,6 +10,7 @@ function Login() {
     email: '',
     password: ''
   });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -19,19 +20,27 @@ function Login() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(inputs);
+    setLoading(true);
+    const delay = 2000;
     Api.post('/auth/login', inputs)
       .then(res => {
-        console.log(res.data);
         localStorage.setItem('token', res.data.data);
         toast.success(res.data.message);
         setTimeout(() => {
           navigate('/profile');
-        }, 2000);
+        }, delay);
       })
       .catch(err => {
-        console.log(err.response.data);
-        toast.error(err.response.data.message);
+        if (err.response) {
+          toast.error(err.response.data.message);
+        } else {
+          toast.error(err.message);
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setLoading(false);
+        }, delay);
       })
   }
   return (
@@ -45,10 +54,8 @@ function Login() {
 
         <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
 
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>
       </Form>
-
-      <ToastContainer />
     </>
   )
 }

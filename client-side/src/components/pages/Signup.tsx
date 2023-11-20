@@ -1,12 +1,11 @@
 import { useState } from 'react';
-// import './styles/Signup.css';
 import { Link, useNavigate } from 'react-router-dom'
 import Api from '../../api.config';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import { Form } from './styles/Signup.css';
 
 function Signup() {
+  const [loading, setLoading] = useState(false);
   const [inputs, setInputs] = useState({
     first: '',
     last: '',
@@ -25,19 +24,27 @@ function Signup() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(inputs);
+    setLoading(true);
+    const delay = 3000;
     Api
       .post('/auth/signup', inputs)
       .then(res => {
-        console.log(res.data);
         toast.success(res.data.message);
         setTimeout(() => {
           navigate('/login');
-        }, 3000);
+        }, delay);
       })
       .catch(err => {
-        console.log(err.response.data);
-        toast.error(err.response.data.message);
+        if (err.response) {
+          toast.error(err.response.data.message);
+        } else {
+          toast.error(err.message);
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setLoading(false);
+        }, delay);
       })
   }
   return (
@@ -59,10 +66,8 @@ function Signup() {
 
         <p>Already have an account? <Link to="/login">Log In</Link></p>
 
-        <button type="submit">Signup</button>
+        <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
       </Form>
-      
-      <ToastContainer />
     </>
   )
 }

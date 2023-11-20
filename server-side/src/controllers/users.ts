@@ -77,7 +77,7 @@ export async function login(req: Request, res: Response) {
       res.status(401);
       return res.json({
         success: false,
-        message: "Invalid credentials",
+        message: "Email not found",
         error: "Unauthorized"
       });
     }

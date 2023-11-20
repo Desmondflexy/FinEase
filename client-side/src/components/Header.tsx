@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import Api from "../api.config";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 
 const HeaderStyle = styled.header `
   display: flex;
@@ -48,18 +50,16 @@ function Logout(){
   const navigate = useNavigate();
 
   function handleLogout(){
-    console.log("Logout");
     Api.post('/auth/logout')
-      .then(res => {
-        console.log(res.data);
+      .then(() => {
         localStorage.removeItem('token');
         navigate('/login');
       })
       .catch(err => {
-        console.log(err.response.data);
+        toast.error(err.message);
       })
   }
-  
+
   return (
     <button onClick={handleLogout}>
       Logout

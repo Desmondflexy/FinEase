@@ -3,9 +3,12 @@ import Api from "../../api.config";
 import { ProfileStyle } from './styles/Profile.css';
 import Layout from "../Layout";
 import { useNavigate } from "react-router-dom";
+import Error from "./Error";
+import Loading from "./Loading";
 
 function Profile() {
   const [status, setStatus] = useState('loading'); // loading, error, success
+  const [error, setError] = useState({ status: 0, statusText: '' })
   const [user, setUser] = useState({
     fullName: '',
     email: '',
@@ -18,29 +21,29 @@ function Profile() {
 
   useEffect(() => {
     Api.get('/account')
-
       .then(res => {
-        console.log(res.data);
+        setStatus('success');
         const { fullName, email, phone, createdAt, acctNo } = res.data.data;
         setUser({ ...user, fullName, email, phone, createdAt, acctNo });
-        setStatus('success');
       })
-
       .catch(err => {
-        console.log(err.response);
-        setStatus(err.response.statusText);
-        if (err.response.status === 401) {
-          setTimeout(() => {
-            navigate('/login');
-          }, 2000);
+        setStatus('error');
+        if (err.response) {
+          const { status, statusText } = err.response;
+          setError({ ...error, status, statusText });
+
+          if (status >= 400 && status <= 499) {
+            setTimeout(() => navigate('/login'), 4000);
+          }
+
+        } else {
+          setError({ ...error, status: 500, statusText: err.message });
         }
       });
-
   }, [])
 
-
   if (status === 'loading') {
-    return <h2>Loading...</h2>
+    return <Loading />
   }
 
   if (status === 'success') {
@@ -58,7 +61,8 @@ function Profile() {
     )
   }
 
-  return <h2>{status}</h2>
+  // otherwise, render the error screen
+  return <Error code={error.status} message={error.statusText} />
 }
 
 export default Profile;
