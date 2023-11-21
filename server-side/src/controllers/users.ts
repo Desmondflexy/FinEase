@@ -95,7 +95,7 @@ export async function login(req: Request, res: Response) {
     }
 
     // grant user a token
-    const secretKey = String(process.env.JWT_SECRET);
+    const secretKey = process.env.JWT_SECRET as string;
     const expiresIn = Number(process.env.JWT_EXPIRES_IN) * 3600;
     const payload = { id: user._id };
     const token = jwt.sign(payload, secretKey, { expiresIn });

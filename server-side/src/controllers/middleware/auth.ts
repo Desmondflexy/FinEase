@@ -14,8 +14,10 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-    req.user = decoded;
+    const secretKey = process.env.JWT_SECRET as string;
+
+    const decodedPayload = jwt.verify(token, secretKey);
+    req.user = decodedPayload;
     next();
   }
 

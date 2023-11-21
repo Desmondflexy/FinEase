@@ -4,10 +4,12 @@ const withoutInternet = false;
 
 export default function connectDB() {
 
-  const databaseUrl = withoutInternet ? process.env.DATABASE_URL_LOCAL : process.env.DATABASE_URL;
+  const databaseUrl = withoutInternet
+    ? process.env.DATABASE_URL_LOCAL as string
+    : process.env.DATABASE_URL as string;
 
   function connectWithRetry() {
-    connect(databaseUrl as string)
+    connect(databaseUrl)
       .then(() => {
         console.log("Database is connected");
       })
