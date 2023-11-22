@@ -12,10 +12,15 @@ export async function generateAcctNo(){
 
 
 export async function runCommand(){
-  const users = await User.find();
-  for (const user of users) {
-    if (user.acctNo) continue;
-    user.acctNo = await generateAcctNo();
-    await user.save();
-  }
+  // try{
+  //   const users = await User.find();
+  //   for (const user of users) {
+  //     if (user.isAdmin) continue;
+  //     user.isAdmin = false;
+  //     await user.save();
+  //   }
+  // }
+  // catch(error:any){
+  //   console.log(error);
+  // }
 }

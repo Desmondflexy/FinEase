@@ -38,7 +38,7 @@ export async function signup(req: Request, res: Response) {
       password: await bcrypt.hash(password, 10),
       fullName: `${first} ${last}`,
       phone,
-      acctNo: await generateAcctNo()
+      acctNo: await generateAcctNo(),
     })
 
     res.status(201);
@@ -97,7 +97,12 @@ export async function login(req: Request, res: Response) {
     // grant user a token
     const secretKey = process.env.JWT_SECRET as string;
     const expiresIn = Number(process.env.JWT_EXPIRES_IN) * 3600;
-    const payload = { id: user._id };
+    
+    const payload = {
+      id: user._id,
+      isAdmin: user.isAdmin
+    };
+
     const token = jwt.sign(payload, secretKey, { expiresIn });
 
     // attach the token to the headers; save in cookies
@@ -161,4 +166,70 @@ export async function logout(req: Request, res: Response) {
     message: 'Logged out successfully',
     data: 'none',
   });
+}
+
+
+export async function adminSignup(req: Request, res: Response) {
+  try {
+    const { error } = validators.adminSignup.validate(req.body, validators.options);
+
+    if (error) {
+      res.status(400);
+      return res.json({
+        success: false,
+        message: error.message,
+        error: 'Bad request'
+      });
+    }
+
+    const { first, last, email, phone, password, adminKey } = req.body;
+
+    // check if user already exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      res.status(409);
+      return res.json({
+        success: false,
+        message: 'User already exists',
+        error: 'Conflict'
+      });
+    }
+
+    // check if admin key is valid
+    if (adminKey !== process.env.ADMIN_KEY) {
+      res.status(401);
+      return res.json({
+        success: false,
+        message: 'Invalid admin key',
+        error: 'Unauthorized'
+      });
+    }
+
+    // create user
+    user = await User.create({
+      email,
+      password: await bcrypt.hash(password, 10),
+      fullName: `${first} ${last}`,
+      phone,
+      acctNo: await generateAcctNo(),
+      isAdmin: true
+    })
+
+    res.status(201);
+    res.json({
+      success: true,
+      message: "User created successfully",
+      data: user
+    })
+  }
+
+  catch (error: any) {
+    res.status(500)
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    })
+  }
 }

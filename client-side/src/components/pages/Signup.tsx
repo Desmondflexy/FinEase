@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import Api from '../../api.config';
 import { toast } from 'react-toastify';
-import { Form } from './styles/Signup.css';
 
 function Signup() {
   const [loading, setLoading] = useState(false);
@@ -25,7 +24,7 @@ function Signup() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    const delay = 3000;
+    const delay = 2000;
     Api
       .post('/auth/signup', inputs)
       .then(res => {
@@ -48,27 +47,25 @@ function Signup() {
       })
   }
   return (
-    <>
-      <Form onSubmit={handleSubmit}>
-        <h1>Signup</h1>
+    <form className='form' onSubmit={handleSubmit}>
+      <h1>Signup</h1>
 
-        <input type="text" id="first" name="first" placeholder="First Name" value={inputs.first} onChange={handleChange} required />
+      <input autoComplete="on" type="text" id="first" name="first" placeholder="First Name" value={inputs.first} onChange={handleChange} required />
 
-        <input type="text" id="last" name="last" placeholder="Last Name" value={inputs.last} onChange={handleChange} required />
+      <input autoComplete='on' type="text" id="last" name="last" placeholder="Last Name" value={inputs.last} onChange={handleChange} required />
 
-        <input type="email" id="email" name="email" placeholder="Email" value={inputs.email} onChange={handleChange} required />
+      <input autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={inputs.email} onChange={handleChange} required />
 
-        <input type="tel" id="phone" name="phone" placeholder="Phone Number" value={inputs.phone} onChange={handleChange} required />
+      <input autoComplete='on' type="tel" id="phone" name="phone" placeholder="Phone Number" value={inputs.phone} onChange={handleChange} required />
 
-        <input type="password" id="password" name="password" placeholder="Password" value={inputs.password} onChange={handleChange} required />
+      <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={inputs.password} onChange={handleChange} required />
 
-        <input type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={inputs.confirm} onChange={handleChange} required />
+      <input autoComplete='off' type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={inputs.confirm} onChange={handleChange} required />
 
-        <p>Already have an account? <Link to="/login">Log In</Link></p>
+      <p>Already have an account? <Link to="/login">Log In</Link></p>
 
-        <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
-      </Form>
-    </>
+      <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
+    </form>
   )
 }
 

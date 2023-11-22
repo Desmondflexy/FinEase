@@ -6,6 +6,7 @@ interface IUser extends mongoose.Document {
   fullName: string;
   phone: string;
   acctNo: string;
+  isAdmin: boolean;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -32,6 +33,10 @@ const userSchema = new mongoose.Schema<IUser>({
     type: String,
     required: true,
     unique: true,
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

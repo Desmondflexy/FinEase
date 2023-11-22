@@ -1,26 +1,17 @@
-import styled from "styled-components";
+import { Link } from "react-router-dom";
 
-const ErrorLayout = styled.div `
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-  text-align: center;
-  font-size: 2.5em
-`
-
-export default function Error({code, message}: ErrorProps){
+export default function Error({code, message, goto}: ErrorProps){
   return (
-    <ErrorLayout>
+    <div id="error-screen">
       <h1>Error {code}</h1>
       <p>{message}</p>
-    </ErrorLayout>
+      <Link to={goto}>{goto==='/login'? 'Login': 'Home' }</Link>
+    </div>
   )
 }
 
 interface ErrorProps{
   code: number;
   message: string;
+  goto: string
 }

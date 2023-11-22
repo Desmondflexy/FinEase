@@ -58,5 +58,5 @@ app.use(function(err:HttpError, req:Request, res:Response) {
 
 export default app;
 
-// runCommand();
+runCommand().then(() => console.log('Command run')).catch(err => console.log(err));
 console.log(`App is running at http://localhost:${process.env.PORT} in ${app.get('env')} mode`);

@@ -2,8 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import Api from "../../api.config";
 import { toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-import { Form } from './styles/Signup.css';
 
 function Login() {
   const [inputs, setInputs] = useState({
@@ -45,17 +43,17 @@ function Login() {
   }
   return (
     <>
-      <Form className="Signup" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={handleSubmit}>
         <h1>Login</h1>
 
-        <input type="email" id="email" name="email" placeholder="Email" value={inputs.email} onChange={handleChange} required />
+        <input autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={inputs.email} onChange={handleChange} required />
 
-        <input type="password" id="password" name="password" placeholder="Password" value={inputs.password} onChange={handleChange} required />
+        <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={inputs.password} onChange={handleChange} required />
 
         <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
 
         <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>
-      </Form>
+      </form>
     </>
   )
 }
