@@ -52,6 +52,9 @@ export default function Layout({ children }: LayoutProps) {
   }, []);
 
   if (status === 'success') {
+    if (location.pathname === '/admin-area' && !user.isAdmin) {
+      return <Error code={403} message="Forbidden" goto='/login' />
+    }
     return (
       <div id="app-layout">
         <div id="header">
@@ -63,8 +66,6 @@ export default function Layout({ children }: LayoutProps) {
           <li className={activeMenu === 'profile' ? 'active' : ''}><Link to='/profile'>Profile</Link></li>
           {user.isAdmin &&
             <li className={activeMenu === 'admin-area' ? 'active' : ''}><Link to='/admin-area'>Admin Area</Link></li>}
-          <li className={activeMenu === '/' ? 'active' : ''}><Link to='#'>Menu Item3</Link></li>
-          <li className={activeMenu === '/' ? 'active' : ''}><Link to='#'>Menu Item4</Link></li>
           <li><LogoutButton /></li>
         </ul>
         <div id="main">{children}</div>

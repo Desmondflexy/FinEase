@@ -1,22 +1,27 @@
 import Api from "../../api.config";
-import Layout from "../Layout";
 import { useState, useEffect } from "react";
+import Error from "./Error";
 
 export default function UsersList() {
   const [users, setUsers] = useState([]);
+  const [error, setError] = useState({ status: 0, statusText: "", goto: "/" });
+  const [status, setStatus] = useState('loading');
 
   useEffect(() => {
     Api.get('/account/all-users')
       .then(res => {
+        setStatus('success');
         setUsers(res.data.users);
       })
       .catch(err => {
-        console.log(err);
+        setStatus('error');
+        const { status, statusText } = err.response;
+        setError(e => ({ ...e, status, statusText, goto: '/' }));
       })
   }, []);
 
-  return (
-    <Layout>
+  if (status === 'success')
+    return (
       <div id="all-users">
         <h2>List of all active users of FinEase</h2>
         <hr />
@@ -43,9 +48,13 @@ export default function UsersList() {
           </tbody>
         </table>
       </div>
-    </Layout>
-  )
+    )
+
+  if (status === 'error') {
+    return <Error code={error.status} message={error.statusText} goto={error.goto} />
+  }
 }
+
 
 interface IUser {
   _id: string;

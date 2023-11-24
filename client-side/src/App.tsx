@@ -10,8 +10,7 @@ import Error from './components/pages/Error';
 import UsersList from './components/pages/AllUsers';
 import AdminArea from './components/pages/AdminArea';
 
-function App() {
-
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -21,12 +20,13 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/profile' element={<Profile />} />
-        <Route path='/admin-area' element={<AdminArea />} />
-        <Route path='/admin-area/users' element={<UsersList />} />
+        <Route path='/admin-area' element={<AdminArea />} >
+          <Route path='users' element={<UsersList />} />
+        </Route>
+
         <Route path='*' element={<Error message={'Page Not Found'} code={404} goto={'/'} />} />
       </Routes>
       <ToastContainer />
-    </BrowserRouter>)
+    </BrowserRouter>
+  )
 }
-
-export default App

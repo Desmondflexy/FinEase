@@ -1,7 +1,8 @@
 import Layout from "../Layout";
-import { Link } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 export default function AdminArea(){
+
   return (
     <Layout>
       <div id="admin-area">
@@ -9,6 +10,7 @@ export default function AdminArea(){
         <ul>
           <li><Link to='/admin-area/users'>All Users</Link></li>
         </ul>
+        <Outlet />
       </div>
     </Layout>
   )
