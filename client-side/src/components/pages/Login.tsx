@@ -1,9 +1,9 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import Api from "../../api.config";
 import { toast } from 'react-toastify';
 
-function Login() {
+export default function Login() {
   const [inputs, setInputs] = useState({
     email: '',
     password: ''
@@ -19,13 +19,13 @@ function Login() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    const delay = 2000;
+    const delay = 1500;
     Api.post('/auth/login', inputs)
       .then(res => {
-        localStorage.setItem('token', res.data.data);
+        localStorage.setItem('token', res.data.token);
         toast.success(res.data.message);
         setTimeout(() => {
-          navigate('/profile');
+          navigate('/dashboard');
         }, delay);
       })
       .catch(err => {
@@ -42,9 +42,9 @@ function Login() {
       })
   }
   return (
-    <>
+    <div className="form-container">
+      <FormNav />
       <form className="form" onSubmit={handleSubmit}>
-        <h1>Login</h1>
 
         <input autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={inputs.email} onChange={handleChange} required />
 
@@ -54,8 +54,25 @@ function Login() {
 
         <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>
       </form>
-    </>
+    </div>
   )
 }
 
-export default Login;
+export function FormNav() {
+
+  let active = '';
+  const location = useLocation();
+
+  if (location.pathname === '/signup' || location.pathname === '/admin-signup') {
+    active = 'signup';
+  } else if (location.pathname === '/login') {
+    active = 'login';
+  }
+
+  return (
+    <div className="form-nav">
+      <div className={active === 'signup' ? 'active' : ''}><Link to={'/signup'}>Signup</Link></div>
+      <div className={active === 'login' ? 'active' : ''}><Link to={'/login'}>Login</Link></div>
+    </div>
+  )
+}

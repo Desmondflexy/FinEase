@@ -1,5 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Api from "../api.config";
+import { useState, useEffect } from "react";
+import Error from "./pages/Error";
+import Loading from "./pages/Loading";
 
 function LogoutButton() {
   const navigate = useNavigate();
@@ -19,19 +22,61 @@ function LogoutButton() {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  return (
-    <div id="app-layout">
-      <div id="header">
-        <h3><Link to='/'>FinEase</Link></h3>
+  const location = useLocation();
+  const activeMenu = location.pathname.split('/')[1];
+
+  const [status, setStatus] = useState('loading'); // loading, error, success
+  const [error, setError] = useState({ status: 0, statusText: '', goto: '/' })
+  const [user, setUser] = useState({ initials: '', isAdmin: false });
+
+  useEffect(() => {
+    Api.get('/account/me')
+      .then(res => {
+        setStatus('success');
+        const { initials, isAdmin } = res.data.me;
+        setUser(u => ({ ...u, initials, isAdmin }));
+      })
+      .catch(err => {
+        setStatus('error');
+        if (err.response) {
+          const { status, statusText } = err.response;
+          setError(e => ({ ...e, status, statusText }));
+
+          if (status >= 400 && status <= 499) {
+            setError(e => ({ ...e, status, statusText, goto: '/login' }));
+          }
+        } else {
+          setError(e => ({ ...e, status: 500, statusText: err.message, goto: '/' }));
+        }
+      });
+  }, []);
+
+  if (status === 'success') {
+    return (
+      <div id="app-layout">
+        <div id="header">
+          <h3><Link to='/'>FinEase</Link></h3>
+          <p>{user.initials}</p>
+        </div>
+        <ul id="side-menu">
+          <li className={activeMenu === 'dashboard' ? 'active' : ''}><Link to='/dashboard'>Dashboard</Link></li>
+          <li className={activeMenu === 'profile' ? 'active' : ''}><Link to='/profile'>Profile</Link></li>
+          {user.isAdmin &&
+            <li className={activeMenu === 'admin-area' ? 'active' : ''}><Link to='/admin-area'>Admin Area</Link></li>}
+          <li className={activeMenu === '/' ? 'active' : ''}><Link to='#'>Menu Item3</Link></li>
+          <li className={activeMenu === '/' ? 'active' : ''}><Link to='#'>Menu Item4</Link></li>
+          <li><LogoutButton /></li>
+        </ul>
+        <div id="main">{children}</div>
       </div>
-      <ul id="side-menu">
-        <li><Link to='/dashboard'>Dashboard</Link></li>
-        <li><Link to='/profile'>Profile</Link></li>
-        <li><LogoutButton /></li>
-      </ul>
-      <div id="user-area">{children}</div>
-    </div>
-  )
+    )
+
+  } else if (status === 'error') {
+    return <Error code={error.status} message={error.statusText} goto={error.goto} />
+
+  } else {
+    return <Loading />
+  }
 }
 
 interface LayoutProps {

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-export async function authenticate(req: Request, res: Response, next: NextFunction){
+export function authenticate(req: Request, res: Response, next: NextFunction){
   try {
     const token = req.headers.authorization?.split(' ')[1] || req.cookies.token;
 
@@ -9,7 +9,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
       res.status(401);
       return res.json({
         success: false,
-        message: 'Please login to continue',
+        message: 'Please login',
         error: 'No token provided'
       });
     }
@@ -29,6 +29,41 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
       error: error.message
     });
   }
+}
+
+export function authorize(req: Request, res: Response, next: NextFunction){
+  try {
+    if(!req.user){
+      res.status(401);
+      return res.json({
+        success: false,
+        message: 'Unauthorized',
+        error: 'Please login'
+      });
+    }
+
+    const { isAdmin } = req.user;
+    if(!isAdmin){
+      res.status(403);
+      return res.json({
+        success: false,
+        message: 'Forbidden',
+        error: 'You are not authorized to perform this action'
+      });
+    }
+
+    next();
+  }
+
+  catch(error: any){
+    res.status(401);
+    return res.json({
+      success: false,
+      message: 'Unauthorized',
+      error: error.message
+    });
+  }
+
 }
 
 

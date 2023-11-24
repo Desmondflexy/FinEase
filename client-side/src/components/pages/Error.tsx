@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function Error({code, message, goto}: ErrorProps){
+export default function Error({code, message, goto}: IError){
   return (
     <div id="error-screen">
       <h1>Error {code}</h1>
@@ -10,7 +10,7 @@ export default function Error({code, message, goto}: ErrorProps){
   )
 }
 
-interface ErrorProps{
+interface IError{
   code: number;
   message: string;
   goto: string

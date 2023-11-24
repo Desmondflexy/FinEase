@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 import Api from "../../api.config";
 import Layout from "../Layout";
-import Error from "./Error";
-import Loading from "./Loading";
 
 function Profile() {
-  const [status, setStatus] = useState('loading'); // loading, error, success
-  const [error, setError] = useState({ status: 0, statusText: '', goto: '/' })
   const [user, setUser] = useState({
     fullName: '',
     email: '',
@@ -19,31 +15,14 @@ function Profile() {
   useEffect(() => {
     Api.get('/account')
       .then(res => {
-        setStatus('success');
-        const { fullName, email, phone, createdAt, acctNo, isAdmin } = res.data.data;
-        setUser({ ...user, fullName, email, phone, createdAt, acctNo, isAdmin });
+        const { fullName, email, phone, createdAt, acctNo, isAdmin } = res.data.user;
+        setUser(u => ({ ...u, fullName, email, phone, createdAt, acctNo, isAdmin }));
       })
       .catch(err => {
-        setStatus('error');
-        if (err.response) {
-          const { status, statusText } = err.response;
-          setError({ ...error, status, statusText });
-
-          if (status >= 400 && status <= 499) {
-            setError({ ...error, status, statusText, goto: '/login' })
-          }
-
-        } else {
-          setError({ ...error, status: 500, statusText: err.message, goto: '/' });
-        }
+        console.log(err.message);
       });
   }, [])
 
-  if (status === 'loading') {
-    return <Loading />
-  }
-
-  if (status === 'success') {
     return (
       <Layout>
         <div id="profile-screen">
@@ -56,10 +35,6 @@ function Profile() {
         </div>
       </Layout>
     )
-  }
-
-  // otherwise, render the error screen
-  return <Error code={error.status} message={error.statusText} goto={error.goto} />
 }
 
 export default Profile;

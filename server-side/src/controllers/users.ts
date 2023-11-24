@@ -33,7 +33,7 @@ export async function signup(req: Request, res: Response) {
     }
 
     // create user
-    user = await User.create({
+    await User.create({
       email,
       password: await bcrypt.hash(password, 10),
       fullName: `${first} ${last}`,
@@ -45,7 +45,6 @@ export async function signup(req: Request, res: Response) {
     res.json({
       success: true,
       message: "User created successfully",
-      data: user
     })
   }
 
@@ -97,13 +96,14 @@ export async function login(req: Request, res: Response) {
     // grant user a token
     const secretKey = process.env.JWT_SECRET as string;
     const expiresIn = Number(process.env.JWT_EXPIRES_IN) * 3600;
-    
-    const payload = {
+
+    const jwtPayload = {
       id: user._id,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
+      initials: user.fullName.split(' ').map((name: string) => name[0]).join('')
     };
 
-    const token = jwt.sign(payload, secretKey, { expiresIn });
+    const token = jwt.sign(jwtPayload, secretKey, { expiresIn });
 
     // attach the token to the headers; save in cookies
     res.setHeader('Authorization', `Bearer ${token}`);
@@ -113,7 +113,7 @@ export async function login(req: Request, res: Response) {
     return res.json({
       success: true,
       message: "Login successful",
-      data: token
+      token
     })
   }
 
@@ -130,8 +130,7 @@ export async function login(req: Request, res: Response) {
 export async function profile(req: Request, res: Response) {
   try {
     const userId = req.user.id;
-
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select('-password -__v -updatedAt');
 
     if (!user) {
       res.status(404);
@@ -146,7 +145,7 @@ export async function profile(req: Request, res: Response) {
     return res.json({
       success: true,
       message: "User profile",
-      data: user
+      user
     })
   }
 
@@ -160,11 +159,10 @@ export async function profile(req: Request, res: Response) {
   }
 }
 
-export async function logout(req: Request, res: Response) {
+export function logout(req: Request, res: Response) {
   res.clearCookie('token');
   res.json({
     message: 'Logged out successfully',
-    data: 'none',
   });
 }
 
@@ -207,7 +205,7 @@ export async function adminSignup(req: Request, res: Response) {
     }
 
     // create user
-    user = await User.create({
+    await User.create({
       email,
       password: await bcrypt.hash(password, 10),
       fullName: `${first} ${last}`,
@@ -220,10 +218,38 @@ export async function adminSignup(req: Request, res: Response) {
     res.json({
       success: true,
       message: "User created successfully",
-      data: user
     })
   }
 
+  catch (error: any) {
+    res.status(500)
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    })
+  }
+}
+
+export function me(req: Request, res: Response) {
+  return res.json({
+    success: true,
+    message: "Logged in user",
+    me: req.user
+  })
+}
+
+export async function allUsers(req: Request, res: Response) {
+  try {
+    const users = await User.find();
+    res.status(200);
+    return res.json({
+      success: true,
+      message: "All registered users",
+      users
+    })
+
+  }
   catch (error: any) {
     res.status(500)
     return res.json({
