@@ -21,7 +21,7 @@ function LogoutButton() {
   return <button onClick={handleLogout}>Logout</button>
 }
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children }: ILayout) {
   const location = useLocation();
   const activeMenu = location.pathname.split('/')[1];
 
@@ -55,6 +55,7 @@ export default function Layout({ children }: LayoutProps) {
     if (location.pathname === '/admin-area' && !user.isAdmin) {
       return <Error code={403} message="Forbidden" goto='/login' />
     }
+
     return (
       <div id="app-layout">
         <div id="header">
@@ -80,6 +81,6 @@ export default function Layout({ children }: LayoutProps) {
   }
 }
 
-interface LayoutProps {
+interface ILayout {
   children: React.ReactNode;
 }

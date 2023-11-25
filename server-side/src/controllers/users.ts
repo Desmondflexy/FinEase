@@ -4,6 +4,7 @@ import * as validators from "../utils/validators";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { generateAcctNo } from "../utils/utils";
+import { calcBalance } from "../utils/utils";
 
 export async function signup(req: Request, res: Response) {
   try {
@@ -252,6 +253,27 @@ export async function allUsers(req: Request, res: Response) {
   }
   catch (error: any) {
     res.status(500)
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    })
+  }
+}
+
+export async function getBalance(req: Request, res: Response){
+  try{
+    const user = req.user.id;
+    const balance = await calcBalance(user);
+    return res.json(
+      {
+        success: true,
+        balance
+      }
+    )
+  }
+  catch(error: any){
+    res.status(500);
     return res.json({
       success: false,
       message: "Internal Server Error",

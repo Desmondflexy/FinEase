@@ -12,7 +12,6 @@ export const signup = joi.object().keys({
   phone: joi.string().required(),
   password: joi.string().min(6).required(),
   confirm: joi.string().valid(joi.ref('password')).required(),
-  adminKey: joi.string().empty('')
 });
 
 export const login = joi.object().keys({
