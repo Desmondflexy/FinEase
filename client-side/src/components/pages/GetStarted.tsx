@@ -202,7 +202,7 @@ export function Login() {
   )
 }
 
-export function FormNav() {
+function FormNav() {
 
   let active = '';
   const location = useLocation();

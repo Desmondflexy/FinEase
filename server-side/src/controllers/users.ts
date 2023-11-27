@@ -50,6 +50,7 @@ export async function signup(req: Request, res: Response) {
   }
 
   catch (error: any) {
+    console.error(error.message);
     res.status(500)
     return res.json({
       success: false,
@@ -119,6 +120,7 @@ export async function login(req: Request, res: Response) {
   }
 
   catch (error: any) {
+    console.error(error.message);
     res.status(500)
     return res.json({
       success: false,
@@ -151,6 +153,7 @@ export async function profile(req: Request, res: Response) {
   }
 
   catch (error: any) {
+    console.error(error.message);
     res.status(500)
     return res.json({
       success: false,
@@ -223,6 +226,7 @@ export async function adminSignup(req: Request, res: Response) {
   }
 
   catch (error: any) {
+    console.error(error.message);
     res.status(500)
     return res.json({
       success: false,
@@ -252,6 +256,7 @@ export async function allUsers(req: Request, res: Response) {
 
   }
   catch (error: any) {
+    console.error(error.message);
     res.status(500)
     return res.json({
       success: false,
@@ -273,6 +278,7 @@ export async function getBalance(req: Request, res: Response){
     )
   }
   catch(error: any){
+    console.error(error.message);
     res.status(500);
     return res.json({
       success: false,

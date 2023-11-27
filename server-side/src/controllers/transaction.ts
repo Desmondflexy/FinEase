@@ -50,6 +50,7 @@ export async function fundWallet(req: Request, res: Response) {
   }
 
   catch (error: any) {
+    console.error(error.message);
     res.status(500);
     return res.json({
       success: false,

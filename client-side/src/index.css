@@ -15,7 +15,7 @@ body {
 
 /* signup and login forms */
 
-.form-container{
+.form-container {
   max-width: 500px;
   margin: 20px auto;
   border-radius: 8px;
@@ -24,12 +24,12 @@ body {
   border-bottom: 8px solid darkred;
 }
 
-.form-nav{
+.form-nav {
   display: flex;
   justify-content: space-around;
   border-bottom: 1px solid darkred;
 
-  &>div{
+  &>div {
     flex: 1;
     text-align: center;
   }
@@ -142,6 +142,13 @@ body {
       color: rgb(13, 13, 16);
     }
   }
+
+  & p {
+    font-weight: bold;
+    border: 2px solid brown;
+    padding: 10px;
+    border-radius: 40%;
+  }
 }
 
 #side-menu {
@@ -191,7 +198,7 @@ body {
     }
   }
 
-  & .active{
+  & .active {
     background-color: yellow;
   }
 }
@@ -221,9 +228,133 @@ table {
   border-collapse: collapse;
   width: 100%;
 
-  & th, td {
+  & th,
+  td {
     text-align: left;
     border-bottom: 2px solid grey;
     padding: 10px;
+  }
+}
+
+/* Dashboard */
+
+#dashboard {
+  & .card.balance {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    position: relative;
+    margin: 10px 0;
+    max-width: 400px;
+
+    & .dropdown {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+
+      & .dropdown-btn {
+        float: right;
+        font-weight: 700;
+        font-size: 1.5em;
+        cursor: pointer;
+        border-radius: 50%;
+
+        &:active {
+          box-shadow: 0 0 2px 2px darkred;
+          scale: 0.8;
+        }
+      }
+
+      & .dropdown-content {
+        position: absolute;
+        right: -12px;
+        top: 12px;
+        background-color: #f1f1f1;
+        color: black;
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, .2);
+        z-index: 1;
+        list-style: none;
+        padding: 0;
+        font-size: 0.8em;
+        min-width: 100px;
+
+        & li {
+          padding: 8px;
+          margin: 5px 0;
+          cursor: pointer;
+
+          &:hover {
+            background-color: #ddd;
+            color: darkred;
+            text-shadow: 0 0 1px darkred;
+          }
+        }
+      }
+
+      & .hidden {
+        display: none;
+      }
+    }
+  }
+}
+
+.rotate {
+  animation: rotateAnimation 4s linear infinite;
+}
+
+/* fullscreen overlay for form input */
+.overlay {
+  position: absolute;
+  background-color: rgba(0, 0, 0, .6);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: background-color 1s ease;
+
+  & form {
+    position: relative;
+    background-color: #fff;
+    max-width: 500px;
+    margin: 0 auto;
+    margin-top: 50px;
+    border-radius: 5px;
+    padding: 20px;
+    border-top: 10px solid darkgreen;
+
+    &>input,
+    &>button {
+      width: 100%;
+      margin: 20px 0;
+      padding: 15px;
+      font-size: 16px;
+    }
+
+    & .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 20px;
+      color: darkred;
+      cursor: pointer;
+      border: 1px solid darkred;
+
+      &:active {
+        box-shadow: 0 0 2px 2px darkred;
+        scale: 0.8;
+      }
+    }
+  }
+}
+
+
+@keyframes rotateAnimation {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
