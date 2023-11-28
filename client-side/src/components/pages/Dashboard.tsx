@@ -4,11 +4,29 @@ import Layout from "../Layout";
 import { useEffect, useState } from "react";
 import { CiSettings } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
+import { formatNumber, payWithPaystack } from "../../utils";
 
 export default function Dashboard() {
   const [user, setUser] = useState({ email: '' });
   const [balance, setBalance] = useState('NGN ------');
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [fwOpen, setFwOpen] = useState(false); // fund wallet modal not open
+  const [twOpen, setTwOpen] = useState(false); // transfer wallet modal not open
+
+  const openModal = (setModalOpen: (isOpen: boolean) => void) => setModalOpen(true)
+  const closeDropdown = (e: MouseEvent) => {
+    const dropdownBtn = document.querySelector('.dropdown-btn');
+    if (dropdownBtn && !dropdownBtn.contains(e.target as Node)) {
+      setDropdownOpen(false);
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', closeDropdown);
+    return () => {
+      document.removeEventListener('click', closeDropdown);
+    };
+  }, []);
 
   useEffect(() => {
     Api.get('/account')
@@ -39,54 +57,30 @@ export default function Dashboard() {
         <div className="card balance">
           <h2>{balance}</h2>
           <p>Current Wallet Balance</p>
-          <OptionsButton onToggle={() => setIsFormOpen(!isFormOpen)} />
+          <div className="dropdown">
+            <CiSettings className="dropdown-btn rotate" onClick={() => setDropdownOpen(!dropdownOpen)} />
+            <ul className={`dropdown-content ${dropdownOpen ? '' : 'hidden'}`}>
+              <li onClick={() => openModal(setFwOpen)}>Load Wallet</li>
+              <li onClick={() => openModal(setTwOpen)}>Transfer</li>
+            </ul>
+          </div>
         </div>
 
-        <FundWalletModal setBalance={setBalance} onToggle={() => setIsFormOpen(!isFormOpen)} isFormOpen={isFormOpen} email={user.email} />
-
+        <FundWalletModal setBalance={setBalance} closeModal={() => setFwOpen(false)} isOpen={fwOpen} email={user.email} />
+        <TransferWalletModal closeModal={() => setTwOpen(false)} isOpen={twOpen} />
       </div>
     </Layout>
   )
 }
 
-// dropdown button component that shows options to fund wallet, withdraw, transfer
-function OptionsButton({ onToggle }: IOptionsButton) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  function closeDropdown(e: MouseEvent) {
-    const dropdownBtn = document.querySelector('.dropdown-btn');
-    if (dropdownBtn && !dropdownBtn.contains(e.target as Node)) {
-      setDropdownOpen(false);
-    }
-  }
-
-  useEffect(() => {
-    document.addEventListener('click', closeDropdown);
-    return () => {
-      document.removeEventListener('click', closeDropdown);
-    };
-  }, []);
-
-  return (
-    <div className="dropdown">
-      <CiSettings className="dropdown-btn rotate" onClick={() => setDropdownOpen(!dropdownOpen)} />
-      <ul className={`dropdown-content ${dropdownOpen ? '' : 'hidden'}`}>
-        <li onClick={onToggle}>Load Wallet</li>
-        <li>Withdraw</li>
-        <li>Transfer</li>
-      </ul>
-    </div>
-  )
-}
-
-function FundWalletModal({ onToggle, isFormOpen, email, setBalance }: IFundWalletModal) {
+function FundWalletModal({ closeModal, isOpen, email, setBalance }: IFwModal) {
   const [fundAmount, setFundAmount] = useState('');
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     payWithPaystack(email, Number(fundAmount) * 100, handleTransactionCallback);
     setFundAmount('');
-    onToggle();
+    closeModal();
   }
 
   function handleTransactionCallback(response: { reference: string }) {
@@ -102,78 +96,60 @@ function FundWalletModal({ onToggle, isFormOpen, email, setBalance }: IFundWalle
   }
 
   return (
-    <OverLay isFormOpen={isFormOpen}>
+    <OverLay isActive={isOpen}>
       <form className="fund-wallet" onSubmit={handleSubmit}>
         <h2>Load Wallet</h2>
         <input placeholder="amount" autoComplete="off" type="number" min={100} name="amount" id="amount" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} required />
         <button>Proceed</button>
-        <IoMdClose className="close-btn" onClick={onToggle} />
+        <IoMdClose className="close-btn" onClick={closeModal} />
       </form>
     </OverLay>
   )
 }
 
-function OverLay({ children, isFormOpen }: IOverLay) {
+function TransferWalletModal({ closeModal, isOpen }: IModal) {
+  const [acctNo, setAcctNo] = useState('');
+  const [fundAmount, setFundAmount] = useState('');
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    alert('wallet transfer - not yet implemented');
+    closeModal();
+  }
   return (
-    <div className={`overlay ${isFormOpen ? '' : 'hidden'}`}>
-      {children}
-    </div>
+    <OverLay isActive={isOpen}>
+      <form className="fund-wallet" onSubmit={handleSubmit}>
+        <h2>Wallet to Wallet Transfer</h2>
+        <input placeholder="Recipient account number" autoComplete="on" name="acctNo" id="acctNo" value={acctNo} onChange={(e) => setAcctNo(e.target.value)} required />
+        <input placeholder="Transfer amount" autoComplete="off" type="number" min={1} name="amount" id="amount" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} required />
+        <button>Proceed</button>
+        <IoMdClose className="close-btn" onClick={closeModal} />
+      </form>
+    </OverLay>
   )
 }
 
-
-
-// PaystackPop is a global object from paystack.js
-declare const PaystackPop: {
-  setup: (options: {
-    key: string;
-    email: string;
-    amount: number;
-    onClose: () => void;
-    callback: (response: { reference: string }) => void;
-    ref?: string;
-  }) => {
-    openIframe: () => void;
-  };
-};
-
-/** Formats num from kobo to naira. */
-function formatNumber(num: number) {
-  num /= 100;
-  const formattedNumber = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'NGN',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(num);
-
-  return formattedNumber;
+function OverLay({ children, isActive }: IOverLay) {
+  if (isActive)
+    return (
+      <div className={`overlay`}>
+        {children}
+      </div>
+    )
 }
 
-/**Show paystack payment window */
-function payWithPaystack(email: string, amount: number, callback: (response: { reference: string }) => void) {
-  const handler = PaystackPop.setup({
-    key: import.meta.env.VITE_APP_PAYSTACK_PUBLIC,
-    email,
-    amount,
-    onClose: () => console.log('window closed!'),
-    callback
-  });
-  handler.openIframe();
-}
 
-interface IFundWalletModal {
-  onToggle: () => void;
-  isFormOpen: boolean;
+interface IFwModal extends IModal {
   email: string;
   setBalance: React.Dispatch<React.SetStateAction<string>>;
 }
 
-interface IOptionsButton {
-  onToggle: () => void
+interface IOverLay {
+  isActive: boolean;
+  children: React.ReactNode;
 }
 
-interface IOverLay {
-  isFormOpen: boolean;
-  children: React.ReactNode;
+interface IModal {
+  closeModal: () => void;
+  isOpen: boolean;
 }

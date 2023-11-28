@@ -272,12 +272,13 @@ table {
         top: 12px;
         background-color: #f1f1f1;
         color: black;
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, .2);
+        box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, .2);
         z-index: 1;
         list-style: none;
         padding: 0;
         font-size: 0.8em;
         min-width: 100px;
+        border-radius: 3px;
 
         & li {
           padding: 8px;
