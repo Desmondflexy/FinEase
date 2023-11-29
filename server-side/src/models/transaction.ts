@@ -4,7 +4,7 @@ interface ITransaction extends mongoose.Document{
   amount: number;
   isCredit: boolean;
   user: mongoose.Types.ObjectId;
-  reference: string;
+  reference?: string;
   type: string;
 }
 
@@ -24,7 +24,6 @@ const transactionSchema = new mongoose.Schema<ITransaction>({
   },
   reference: {
     type: String,
-    required: true,
     unique: true
   },
   type: {

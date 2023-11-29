@@ -5,5 +5,6 @@ import { authenticate } from "../controllers/middleware/auth";
 const router = Router();
 
 router.post("/fund-wallet", authenticate, transaction.fundWallet);
+router.post("/fund-transfer", authenticate, transaction.transferFunds);
 
 export default router;

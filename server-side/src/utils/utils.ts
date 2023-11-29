@@ -12,6 +12,16 @@ export async function generateAcctNo() {
   return String(acctNo);
 }
 
+export async function generateReference(prefix: string){
+  let ref = Math.floor(Math.random() * 10000000000);
+  let trx = await Transaction.findOne({reference: prefix + ref});
+  while (trx){
+    ref = Math.floor(Math.random() * 10000000000);
+    trx = await Transaction.findOne({reference: prefix + ref});
+  }
+  return prefix + ref;
+}
+
 export async function calcBalance(user: string) {
   try {
     const transactions = await Transaction.find({ user });

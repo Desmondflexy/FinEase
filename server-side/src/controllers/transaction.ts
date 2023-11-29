@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import Transaction from "../models/transaction";
 import * as validators from "../utils/validators";
-import { calcBalance, verifyTransaction } from "../utils/utils";
+import { calcBalance, verifyTransaction, generateReference } from "../utils/utils";
+import User, { IUser } from "../models/users";
 
 export async function fundWallet(req: Request, res: Response) {
   try {
@@ -12,6 +13,7 @@ export async function fundWallet(req: Request, res: Response) {
     if (processed) {
       res.status(409);
       return res.json({
+        success: false,
         message: 'Stale transaction',
         error: 'This transaction has already been processed',
       });
@@ -28,7 +30,7 @@ export async function fundWallet(req: Request, res: Response) {
       })
     }
 
-    const {amount} = response.data;
+    const { amount } = response.data;
 
     await Transaction.create({
       amount,
@@ -56,6 +58,92 @@ export async function fundWallet(req: Request, res: Response) {
       success: false,
       message: "Internal Server Error",
       error: error.message
+    })
+  }
+}
+
+export async function transferFunds(req: Request, res: Response) {
+  const user = req.user.id;
+
+  try {
+    const { error } = validators.transferFunds.validate(req.body, validators.options);
+
+    if (error) {
+      res.status(400);
+      return res.json({
+        success: false,
+        message: error.message,
+        error: 'Bad request'
+      });
+    }
+
+    let { acctNo, amount } = req.body;
+    amount *= 100;  // convert to kobo
+    const recipient = await User.findOne({ acctNo });
+
+    // check if recipient exists
+    if (!recipient) {
+      res.status(404);
+      return res.json({
+        success: false,
+        message: 'Recipient not found!',
+        error: 'Not found'
+      });
+    }
+
+    // check if sender has sufficient balance
+    const userBalance = await calcBalance(user);
+    if (userBalance < amount) {
+      res.status(402);
+      return res.json({
+        success: false,
+        message: 'You do not have enough funds',
+        error: 'Insufficient funds'
+      });
+    }
+
+    if(recipient.id === user){
+      res.status(409);
+      return res.json({
+        success: false,
+        message: 'Cannot transfer funds to self',
+        error: 'Conflict'
+      })
+    }
+
+    // debit user
+    await Transaction.create({
+      amount: amount,
+      isCredit: false,
+      user,
+      reference: await generateReference('WTR'),
+      type: 'fund transfer'
+    });
+
+    // credit recipient
+    await Transaction.create({
+      amount: amount,
+      isCredit: true,
+      user: recipient._id,
+      reference: await generateReference('RW'),
+      type: 'fund transfer'
+    });
+
+    return res.json({
+      success: true,
+      message: 'Funds sent to user successfully!',
+      balance: await calcBalance(user)
+    });
+
+  }
+
+  catch (err: any) {
+    console.error(err.message)
+    res.status(500);
+    return res.json({
+      success: false,
+      message: 'Internal Server Error',
+      error: err.message
     })
   }
 }

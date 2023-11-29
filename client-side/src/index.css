@@ -330,6 +330,7 @@ table {
       margin: 20px 0;
       padding: 15px;
       font-size: 16px;
+      border-radius: 4px;
     }
 
     & .close-btn {
@@ -344,6 +345,15 @@ table {
       &:active {
         box-shadow: 0 0 2px 2px darkred;
         scale: 0.8;
+      }
+    }
+
+    & button{
+      background-color: lightgreen;
+      cursor: pointer;
+      &:hover{
+        background-color: darkgreen;
+        color: white;
       }
     }
   }

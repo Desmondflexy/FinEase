@@ -28,3 +28,8 @@ export const adminSignup = joi.object().keys({
   confirm: joi.string().valid(joi.ref('password')).required(),
   adminKey: joi.string().required()
 });
+
+export const transferFunds = joi.object().keys({
+  acctNo: joi.string().required(),
+  amount: joi.number().required()
+})
