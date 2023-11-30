@@ -349,11 +349,16 @@ table {
     }
 
     & button{
-      background-color: lightgreen;
+      background-color: green;
+      color: white;
       cursor: pointer;
       &:hover{
         background-color: darkgreen;
-        color: white;
+      }
+      &:disabled{
+        background-color: lightgreen;
+        color: grey;
+        cursor:progress;
       }
     }
   }

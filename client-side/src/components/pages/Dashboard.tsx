@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { CiSettings } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
 import { formatNumber, payWithPaystack } from "../../utils";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [user, setUser] = useState({ email: '' });
@@ -35,7 +36,7 @@ export default function Dashboard() {
         setUser(u => ({ ...u, email }));
       })
       .catch(err => {
-        toast.error(err.response.data.message)
+        console.error(err.response.data.message)
       })
   }, []);
 
@@ -44,7 +45,9 @@ export default function Dashboard() {
       .then(res => {
         setBalance(formatNumber(res.data.balance));
       })
-      .catch(err => toast.error(err.response.data.message))
+      .catch(err => {
+        console.error(err.response.data.message)
+      })
   }, []);
 
   return (
@@ -77,13 +80,25 @@ function FundWalletModal({ closeModal, isOpen, email, setBalance }: IFwModal) {
   const [fundAmount, setFundAmount] = useState('');
   const [processing, setProcessing] = useState(false);
 
+  function handleCloseModal(){
+    closeModal();
+    setFundAmount('');
+    setProcessing(false);
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setProcessing(true);
-    payWithPaystack(email, Number(fundAmount) * 100, handleTransactionCallback);
-    setFundAmount('');
-    setProcessing(false);
-    closeModal();
+    setTimeout(() => {
+      try {
+        payWithPaystack(email, Number(fundAmount) * 100, handleTransactionCallback);
+        handleCloseModal();
+      } catch {
+        console.error('Paystack could not initiate')
+      }
+      setProcessing(false);
+    }, 2000);
+
   }
 
   function handleTransactionCallback(response: { reference: string }) {
@@ -102,25 +117,25 @@ function FundWalletModal({ closeModal, isOpen, email, setBalance }: IFwModal) {
     <OverLay isActive={isOpen}>
       <form className="fund-wallet" onSubmit={handleSubmit}>
         <h2>Load Wallet</h2>
-        <input placeholder="amount" autoComplete="off" type="number" min={100} name="amount" id="amount" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} required />
-        <button disabled={processing}>{processing? 'Processing':'Proceed'}</button>
-        <IoMdClose className="close-btn" onClick={closeModal} />
+        <input disabled={processing} placeholder="amount" autoComplete="off" type="number" min={100} name="amount" id="amount" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} required />
+        <button disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
+        <IoMdClose className="close-btn" onClick={handleCloseModal} />
       </form>
     </OverLay>
   )
 }
 
 function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal) {
-  const [acctNo, setAcctNo] = useState('');
-  const [amount, setAmount] = useState('');
+  // const [acctNoOrEmail, setAcctNoOrEmail] = useState('');
+  // const [amount, setAmount] = useState('');
+  const [input, setInput] = useState({acctNoOrEmail: '', amount: ''});
   const [processing, setProcessing] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    Api.post('transaction/fund-transfer', {acctNo, amount})
+    setProcessing(true);
+    Api.post('transaction/fund-transfer', {acctNoOrEmail: input.acctNoOrEmail, amount: input.amount })
       .then(res => {
-        setProcessing(true);
-        console.log(res.data);
         setBalance(formatNumber(res.data.balance));
         setTimeout(() => {
           toast.success(res.data.message);
@@ -131,16 +146,20 @@ function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal) {
       .catch(err => {
         toast.error(err.response.data.message);
       })
+  }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInput(i => ({...i, [name]: value}));
   }
 
   return (
     <OverLay isActive={isOpen}>
       <form className="fund-wallet" onSubmit={handleSubmit}>
         <h2>Wallet to Wallet Transfer</h2>
-        <input placeholder="Recipient account number" autoComplete="on" name="acctNo" id="acctNo" value={acctNo} onChange={(e) => setAcctNo(e.target.value)} required />
-        <input placeholder="Transfer amount" autoComplete="off" type="number" min={1} name="amount" id="amount" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-        <button disabled={processing}>{processing? 'Processing':'Proceed'}</button>
+        <input placeholder="Recipient email or account number" autoComplete="on" name="acctNoOrEmail" id="acctNo" value={input.acctNoOrEmail} onChange={handleChange} required />
+        <input placeholder="Transfer amount" autoComplete="off" type="number" min={1} name="amount" id="amount" value={input.amount} onChange={handleChange} required />
+        <button disabled={processing}>{processing ? 'Processing' : 'Proceed'}</button>
         <IoMdClose className="close-btn" onClick={closeModal} />
       </form>
     </OverLay>
@@ -148,6 +167,8 @@ function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal) {
 }
 
 function OverLay({ children, isActive }: IOverLay) {
+  const navigate = useNavigate();
+  Api.get('account/me').then(() => { }).catch(() => navigate('/login'))
   if (isActive)
     return (
       <div className={`overlay`}>
@@ -162,7 +183,7 @@ interface IFwModal extends IModal {
   setBalance: React.Dispatch<React.SetStateAction<string>>;
 }
 
-interface ITwModal extends IModal{
+interface ITwModal extends IModal {
   setBalance: React.Dispatch<React.SetStateAction<string>>;
 }
 

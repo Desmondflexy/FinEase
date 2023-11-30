@@ -30,6 +30,6 @@ export const adminSignup = joi.object().keys({
 });
 
 export const transferFunds = joi.object().keys({
-  acctNo: joi.string().required(),
-  amount: joi.number().required()
-})
+  acctNoOrEmail: joi.string().required(),
+  amount: joi.number().min(1).required()
+});

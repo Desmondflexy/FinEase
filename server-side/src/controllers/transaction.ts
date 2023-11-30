@@ -77,9 +77,9 @@ export async function transferFunds(req: Request, res: Response) {
       });
     }
 
-    let { acctNo, amount } = req.body;
+    let { acctNoOrEmail, amount } = req.body;
     amount *= 100;  // convert to kobo
-    const recipient = await User.findOne({ acctNo });
+    let recipient = await User.findOne({ acctNo: acctNoOrEmail }) || await User.findOne({ email: acctNoOrEmail });
 
     // check if recipient exists
     if (!recipient) {
@@ -132,7 +132,14 @@ export async function transferFunds(req: Request, res: Response) {
     return res.json({
       success: true,
       message: 'Funds sent to user successfully!',
-      balance: await calcBalance(user)
+      balance: await calcBalance(user),
+      amount: amount / 100,
+      recipient: {
+        name: recipient.fullName,
+        email: recipient.email,
+        phone: recipient.phone,
+        accountNumber: recipient.acctNo
+      }
     });
 
   }
