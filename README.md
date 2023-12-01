@@ -6,5 +6,16 @@ FinEase is a personal project that I am working on. It is an innovative applicat
 
 ## Tech Stack
 - Nodejs
-- React
+- Express
+- React + Typescript
 - MongoDB
+
+## Technologies Used
+- Typescript
+- Axios
+- Joi
+- Toastify
+- CSS3
+- Bcrypt
+- JWT
+- Mongoose
