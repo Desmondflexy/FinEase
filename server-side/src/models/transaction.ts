@@ -4,7 +4,7 @@ interface ITransaction extends mongoose.Document{
   amount: number;
   isCredit: boolean;
   user: mongoose.Types.ObjectId;
-  reference?: string;
+  reference: string;
   type: string;
 }
 

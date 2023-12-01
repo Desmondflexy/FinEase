@@ -9,13 +9,14 @@ export const signup = joi.object().keys({
   first: joi.string().required(),
   last: joi.string().required(),
   email: joi.string().email().required(),
+  username: joi.string().required(),
   phone: joi.string().required(),
   password: joi.string().min(6).required(),
-  confirm: joi.string().valid(joi.ref('password')).required(),
+  confirm: joi.string().valid(joi.ref('password')).required().messages({'any.only': 'Passwords do not match'}),
 });
 
 export const login = joi.object().keys({
-  email: joi.string().email().required().trim(),
+  emailOrUsername: joi.string().required().trim(),
   password: joi.string().required(),
 });
 
@@ -23,13 +24,14 @@ export const adminSignup = joi.object().keys({
   first: joi.string().required(),
   last: joi.string().required(),
   email: joi.string().email().required(),
+  username: joi.string().required(),
   phone: joi.string().required(),
   password: joi.string().min(6).required(),
-  confirm: joi.string().valid(joi.ref('password')).required(),
+  confirm: joi.string().valid(joi.ref('password')).required().messages({'any.only': 'Passwords do not match'}),
   adminKey: joi.string().required()
 });
 
 export const transferFunds = joi.object().keys({
-  acctNoOrEmail: joi.string().required(),
+  acctNoOrUsername: joi.string().required(),
   amount: joi.number().min(1).required()
 });

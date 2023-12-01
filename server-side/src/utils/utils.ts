@@ -1,3 +1,4 @@
+import { boolean } from "joi";
 import Transaction from "../models/transaction";
 import User from "../models/users";
 import axios from "axios";
@@ -12,12 +13,12 @@ export async function generateAcctNo() {
   return String(acctNo);
 }
 
-export async function generateReference(prefix: string){
+export async function generateReference(prefix: string) {
   let ref = Math.floor(Math.random() * 10000000000);
-  let trx = await Transaction.findOne({reference: prefix + ref});
-  while (trx){
+  let trx = await Transaction.findOne({ reference: prefix + ref });
+  while (trx) {
     ref = Math.floor(Math.random() * 10000000000);
-    trx = await Transaction.findOne({reference: prefix + ref});
+    trx = await Transaction.findOne({ reference: prefix + ref });
   }
   return prefix + ref;
 }
@@ -38,11 +39,11 @@ export async function calcBalance(user: string) {
 export async function runCommand() {
   try {
     const users = await User.find();
-    // for (const user of users) {
-    //   if (user.balance) continue;
-    //   user.balance = 0;
-    //   await user.save();
-    // }
+    for (const user of users) {
+      if (user.username) continue;
+      user.username = user.email.split("@")[0];
+      await user.save();
+    }
   }
   catch (error: any) {
     console.log(error);
@@ -62,4 +63,10 @@ export async function verifyTransaction(ref: string) {
   catch {
     throw new Error("Error verifying transaction");
   }
+}
+
+/**Used during user registration to check if the value of a given field has not been taken. */
+export async function isFieldAvailable(field: string, value: string) {
+  const found = Boolean(await User.findOne({ [field]: value }));
+  return !found;
 }

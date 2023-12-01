@@ -27,14 +27,14 @@ export default function Layout({ children }: ILayout) {
 
   const [status, setStatus] = useState('loading'); // loading, error, success
   const [error, setError] = useState({ status: 0, statusText: '', goto: '/' })
-  const [user, setUser] = useState({ initials: '', isAdmin: false });
+  const [user, setUser] = useState({ username: '', isAdmin: false });
 
   useEffect(() => {
     Api.get('/account/me')
       .then(res => {
         setStatus('success');
-        const { initials, isAdmin } = res.data.me;
-        setUser(u => ({ ...u, initials, isAdmin }));
+        const { username, isAdmin } = res.data.me;
+        setUser(u => ({ ...u, username, isAdmin }));
       })
       .catch(err => {
         setStatus('error');
@@ -60,11 +60,12 @@ export default function Layout({ children }: ILayout) {
       <div id="app-layout">
         <div id="header">
           <h3><Link to='/'>FinEase</Link></h3>
-          <p>{user.initials}</p>
+          <p>{user.username}</p>
         </div>
         <ul id="side-menu">
           <li className={activeMenu === 'dashboard' ? 'active' : ''}><Link to='/dashboard'>Dashboard</Link></li>
           <li className={activeMenu === 'profile' ? 'active' : ''}><Link to='/profile'>Profile</Link></li>
+          <li className={activeMenu === 'transactions' ? 'active' : ''}><Link to='/transactions'>Transactions</Link></li>
           {user.isAdmin &&
             <li className={activeMenu === 'admin-area' ? 'active' : ''}><Link to='/admin-area'>Admin Area</Link></li>}
           <li><LogoutButton /></li>

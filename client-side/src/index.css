@@ -13,6 +13,32 @@ body {
   margin: 0;
 }
 
+a {
+  text-decoration: none;
+  color: darkblue;
+  text-decoration: underline;
+
+  &:hover{
+    text-decoration: none;
+  }
+  &:active{
+    color: darkred;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.feedback {
+  color: red;
+  font-size: 0.9em;
+}
+
+.good.feedback {
+  color: green;
+}
+
 /* signup and login forms */
 
 .form-container {
@@ -74,10 +100,6 @@ body {
     border-radius: 4px;
     min-width: 200px;
   }
-}
-
-.hidden {
-  display: none;
 }
 
 #error-screen,

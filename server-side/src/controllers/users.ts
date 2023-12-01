@@ -3,12 +3,19 @@ import User from "../models/users";
 import * as validators from "../utils/validators";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { generateAcctNo } from "../utils/utils";
+import { generateAcctNo, isFieldAvailable } from "../utils/utils";
 import { calcBalance } from "../utils/utils";
 
 export async function signup(req: Request, res: Response) {
+  const isAdmin = req.url === '/admin-signup';
+  console.log(req.url)
   try {
-    const { error } = validators.signup.validate(req.body, validators.options);
+    let error;
+    if (isAdmin) {
+      error = validators.adminSignup.validate(req.body, validators.options).error;
+    } else {
+      error = validators.signup.validate(req.body, validators.options).error;
+    }
 
     if (error) {
       res.status(400);
@@ -19,7 +26,19 @@ export async function signup(req: Request, res: Response) {
       });
     }
 
-    const { first, last, email, phone, password } = req.body;
+    if (isAdmin) {
+      // check if admin key is valid
+      if (req.body.adminKey !== process.env.ADMIN_KEY) {
+        res.status(401);
+        return res.json({
+          success: false,
+          message: 'Invalid admin key',
+          error: 'Unauthorized'
+        });
+      }
+    }
+
+    const { first, last, username, email, phone, password } = req.body;
 
     // check if user already exists
     let user = await User.findOne({ email });
@@ -28,18 +47,31 @@ export async function signup(req: Request, res: Response) {
       res.status(409);
       return res.json({
         success: false,
-        message: 'User already exists',
+        message: 'Email already exists',
+        error: 'Conflict'
+      });
+    }
+
+    user = await User.findOne({ username });
+
+    if (user) {
+      res.status(409);
+      return res.json({
+        success: false,
+        message: 'Username already exists',
         error: 'Conflict'
       });
     }
 
     // create user
     await User.create({
+      username,
       email,
       password: await bcrypt.hash(password, 10),
       fullName: `${first} ${last}`,
       phone,
       acctNo: await generateAcctNo(),
+      isAdmin
     })
 
     res.status(201);
@@ -71,15 +103,15 @@ export async function login(req: Request, res: Response) {
       });
     }
 
-    const { email, password } = req.body;
+    const { emailOrUsername, password } = req.body;
 
     // check if user exists
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: emailOrUsername }) || await User.findOne({ username: emailOrUsername });
     if (!user) {
       res.status(401);
       return res.json({
         success: false,
-        message: "Email not found",
+        message: "Invalid credentials",
         error: "Unauthorized"
       });
     }
@@ -102,7 +134,7 @@ export async function login(req: Request, res: Response) {
     const jwtPayload = {
       id: user._id,
       isAdmin: user.isAdmin,
-      initials: user.fullName.split(' ').map((name: string) => name[0]).join('')
+      username: user.username
     };
 
     const token = jwt.sign(jwtPayload, secretKey, { expiresIn });
@@ -133,7 +165,8 @@ export async function login(req: Request, res: Response) {
 export async function profile(req: Request, res: Response) {
   try {
     const userId = req.user.id;
-    const user = await User.findById(userId).select('-password -__v -updatedAt');
+    const requiredInfo = '_id username fullName email phone acctNo createdAt';
+    const user = await User.findById(userId).select(requiredInfo);
 
     if (!user) {
       res.status(404);
@@ -170,72 +203,6 @@ export function logout(req: Request, res: Response) {
   });
 }
 
-
-export async function adminSignup(req: Request, res: Response) {
-  try {
-    const { error } = validators.adminSignup.validate(req.body, validators.options);
-
-    if (error) {
-      res.status(400);
-      return res.json({
-        success: false,
-        message: error.message,
-        error: 'Bad request'
-      });
-    }
-
-    const { first, last, email, phone, password, adminKey } = req.body;
-
-    // check if user already exists
-    let user = await User.findOne({ email });
-
-    if (user) {
-      res.status(409);
-      return res.json({
-        success: false,
-        message: 'User already exists',
-        error: 'Conflict'
-      });
-    }
-
-    // check if admin key is valid
-    if (adminKey !== process.env.ADMIN_KEY) {
-      res.status(401);
-      return res.json({
-        success: false,
-        message: 'Invalid admin key',
-        error: 'Unauthorized'
-      });
-    }
-
-    // create user
-    await User.create({
-      email,
-      password: await bcrypt.hash(password, 10),
-      fullName: `${first} ${last}`,
-      phone,
-      acctNo: await generateAcctNo(),
-      isAdmin: true
-    })
-
-    res.status(201);
-    res.json({
-      success: true,
-      message: "User created successfully",
-    })
-  }
-
-  catch (error: any) {
-    console.error(error.message);
-    res.status(500)
-    return res.json({
-      success: false,
-      message: "Internal Server Error",
-      error: error.message
-    })
-  }
-}
-
 export function me(req: Request, res: Response) {
   return res.json({
     success: true,
@@ -246,7 +213,8 @@ export function me(req: Request, res: Response) {
 
 export async function allUsers(req: Request, res: Response) {
   try {
-    const users = await User.find();
+    const requiredInfo = '_id username fullName email phone acctNo createdAt';
+    const users = await User.find().select(requiredInfo);
     res.status(200);
     return res.json({
       success: true,
@@ -266,8 +234,8 @@ export async function allUsers(req: Request, res: Response) {
   }
 }
 
-export async function getBalance(req: Request, res: Response){
-  try{
+export async function getBalance(req: Request, res: Response) {
+  try {
     const user = req.user.id;
     const balance = await calcBalance(user);
     return res.json(
@@ -277,7 +245,7 @@ export async function getBalance(req: Request, res: Response){
       }
     )
   }
-  catch(error: any){
+  catch (error: any) {
     console.error(error.message);
     res.status(500);
     return res.json({
@@ -286,4 +254,31 @@ export async function getBalance(req: Request, res: Response){
       error: error.message
     })
   }
+}
+
+export async function isAvailable(req: Request, res: Response) {
+  try {
+    const { field, value } = req.params;
+    const available = await isFieldAvailable(field, value);
+
+    if (available) {
+      return res.json({ message: `${field} is available` });
+    } else {
+      return res.status(409).json({ message: `${field} is not available` });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function getUserFullName(req: Request, res: Response) {
+  try {
+    const {acctNoOrUsername} = req.query;
+    const user = await User.findOne({ acctNo: acctNoOrUsername }).select('fullName') || await User.findOne({ username: acctNoOrUsername }).select('fullName');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    return res.send(user.fullName);
+
+  } catch (error) { }
 }

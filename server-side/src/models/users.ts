@@ -7,6 +7,7 @@ export interface IUser extends mongoose.Document {
   phone: string;
   acctNo: string;
   isAdmin: boolean;
+  username: string;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -36,8 +37,14 @@ const userSchema = new mongoose.Schema<IUser>({
   },
   isAdmin: {
     type: Boolean,
-    default: false
   },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true
+  }
 }, {
   timestamps: true
 })

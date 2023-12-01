@@ -8,6 +8,7 @@ import Error from './components/pages/Error';
 import UsersList from './components/pages/AllUsers';
 import AdminArea from './components/pages/AdminArea';
 import {AdminSignup, Signup, Login } from './components/pages/GetStarted';
+import Transactions from './components/pages/Transactions';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path='/admin-area' element={<AdminArea />} >
           <Route path='users' element={<UsersList />} />
         </Route>
+        <Route path='transactions' element={<Transactions/>} />
 
         <Route path='*' element={<Error message={'Page Not Found'} code={404} goto={'/'} />} />
       </Routes>

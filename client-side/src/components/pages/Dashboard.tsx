@@ -1,11 +1,9 @@
-import { toast } from "react-toastify";
 import Api from "../../api.config";
 import Layout from "../Layout";
 import { useEffect, useState } from "react";
 import { CiSettings } from "react-icons/ci";
-import { IoMdClose } from "react-icons/io";
-import { formatNumber, payWithPaystack } from "../../utils";
-import { useNavigate } from "react-router-dom";
+import { formatNumber } from "../../utils";
+import { FundWalletModal, TransferWalletModal } from "../Funds";
 
 export default function Dashboard() {
   const [user, setUser] = useState({ email: '' });
@@ -74,125 +72,4 @@ export default function Dashboard() {
       </div>
     </Layout>
   )
-}
-
-function FundWalletModal({ closeModal, isOpen, email, setBalance }: IFwModal) {
-  const [fundAmount, setFundAmount] = useState('');
-  const [processing, setProcessing] = useState(false);
-
-  function handleCloseModal(){
-    closeModal();
-    setFundAmount('');
-    setProcessing(false);
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setProcessing(true);
-    setTimeout(() => {
-      try {
-        payWithPaystack(email, Number(fundAmount) * 100, handleTransactionCallback);
-        handleCloseModal();
-      } catch {
-        console.error('Paystack could not initiate')
-      }
-      setProcessing(false);
-    }, 2000);
-
-  }
-
-  function handleTransactionCallback(response: { reference: string }) {
-    const { reference } = response;
-    Api.post('/transaction/fund-wallet', { reference })
-      .then(res => {
-        setBalance(formatNumber(res.data.balance));
-        toast.success('Wallet funded successfully!');
-      })
-      .catch(err => {
-        console.log(err.response.data);
-      });
-  }
-
-  return (
-    <OverLay isActive={isOpen}>
-      <form className="fund-wallet" onSubmit={handleSubmit}>
-        <h2>Load Wallet</h2>
-        <input disabled={processing} placeholder="amount" autoComplete="off" type="number" min={100} name="amount" id="amount" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} required />
-        <button disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
-        <IoMdClose className="close-btn" onClick={handleCloseModal} />
-      </form>
-    </OverLay>
-  )
-}
-
-function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal) {
-  // const [acctNoOrEmail, setAcctNoOrEmail] = useState('');
-  // const [amount, setAmount] = useState('');
-  const [input, setInput] = useState({acctNoOrEmail: '', amount: ''});
-  const [processing, setProcessing] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setProcessing(true);
-    Api.post('transaction/fund-transfer', {acctNoOrEmail: input.acctNoOrEmail, amount: input.amount })
-      .then(res => {
-        setBalance(formatNumber(res.data.balance));
-        setTimeout(() => {
-          toast.success(res.data.message);
-          setProcessing(false)
-          closeModal();
-        }, 1500)
-      })
-      .catch(err => {
-        toast.error(err.response.data.message);
-      })
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setInput(i => ({...i, [name]: value}));
-  }
-
-  return (
-    <OverLay isActive={isOpen}>
-      <form className="fund-wallet" onSubmit={handleSubmit}>
-        <h2>Wallet to Wallet Transfer</h2>
-        <input placeholder="Recipient email or account number" autoComplete="on" name="acctNoOrEmail" id="acctNo" value={input.acctNoOrEmail} onChange={handleChange} required />
-        <input placeholder="Transfer amount" autoComplete="off" type="number" min={1} name="amount" id="amount" value={input.amount} onChange={handleChange} required />
-        <button disabled={processing}>{processing ? 'Processing' : 'Proceed'}</button>
-        <IoMdClose className="close-btn" onClick={closeModal} />
-      </form>
-    </OverLay>
-  )
-}
-
-function OverLay({ children, isActive }: IOverLay) {
-  const navigate = useNavigate();
-  Api.get('account/me').then(() => { }).catch(() => navigate('/login'))
-  if (isActive)
-    return (
-      <div className={`overlay`}>
-        {children}
-      </div>
-    )
-}
-
-
-interface IFwModal extends IModal {
-  email: string;
-  setBalance: React.Dispatch<React.SetStateAction<string>>;
-}
-
-interface ITwModal extends IModal {
-  setBalance: React.Dispatch<React.SetStateAction<string>>;
-}
-
-interface IOverLay {
-  isActive: boolean;
-  children: React.ReactNode;
-}
-
-interface IModal {
-  closeModal: () => void;
-  isOpen: boolean;
 }
