@@ -18,22 +18,17 @@ export function FundWalletModal({ closeModal, isOpen, email, setBalance }: IFwMo
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setProcessing(true);
-    setTimeout(() => {
-      try {
-        payWithPaystack(email, Number(fundAmount) * 100, handleTransactionCallback);
-        handleCloseModal();
-      } catch {
-        toast.error('Paystack could not initiate')
-      }
-      setProcessing(false);
-    }, 2000);
-
+    try {
+      payWithPaystack(email, Number(fundAmount) * 100, fundWalletApi);
+      handleCloseModal();
+    } catch {
+      toast.error('Paystack could not initiate')
+    }
+    setProcessing(false);
   }
 
-  function handleTransactionCallback(response: { reference: string }) {
-    const { reference } = response;
-    const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
-    Api.post('/transaction/fund-wallet', { reference }, { headers })
+  function fundWalletApi(response: { reference: string }) {
+    Api.post('/transaction/fund-wallet', { reference: response.reference })
       .then(res => {
         setBalance(formatNumber(res.data.balance));
         toast.success('Wallet funded successfully!');
@@ -72,7 +67,7 @@ export function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setProcessing(true);
-    setTimeout(() => transferFunds(), 1500);
+    transferFunds();
   }
 
   function transferFunds() {

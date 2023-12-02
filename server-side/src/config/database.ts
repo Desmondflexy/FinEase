@@ -17,7 +17,7 @@ export default function connectDB() {
         console.error("Error connecting to Database: ", err.code);
         setTimeout(connectWithRetry, 5000);
       });
-  };
+  }
 
   // Event listeners for disconnection
   connection.on("disconnected", () => {

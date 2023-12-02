@@ -12,7 +12,7 @@ import authRouter from './routes/auth';
 import transactionRouter from './routes/transaction';
 
 import connectDB from './config/database';
-import { runCommand } from './utils/utils';
+// import { runCommand } from './utils/utils';
 
 dotenv.config();
 connectDB();

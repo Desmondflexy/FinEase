@@ -25,25 +25,24 @@ export function AdminSignup() {
     e.preventDefault();
     setLoading(true);
     const inputs = { username, first, last, email, phone, password, confirm, adminKey };
-    Api.post('/auth/admin-signup', inputs)
-      .then(res => {
-        toast.success(res.data.message);
-        setTimeout(() => {
+    signup();
+
+    function signup() {
+      Api.post('/auth/admin-signup', inputs)
+        .then(res => {
+          toast.success(res.data.message);
           navigate('/login');
-        }, 2000);
-      })
-      .catch(err => {
-        if (err.response) {
-          toast.error(err.response.data.message);
-        } else {
-          toast.error(err.message);
-        }
-      })
-      .finally(() => {
-        setTimeout(() => {
           setLoading(false);
-        }, 2000);
-      })
+        })
+        .catch(err => {
+          if (err.response) {
+            toast.error(err.response.data.message);
+          } else {
+            toast.error(err.message);
+          }
+          setLoading(false)
+        });
+    }
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -53,7 +52,7 @@ export function AdminSignup() {
         setUsername(value);
         if (e.target.validity.valid) {
           Api.get(`/auth/check/username/${value}`)
-            .then(() => {setUsernameErrorFeedback('')})
+            .then(() => { setUsernameErrorFeedback('') })
             .catch(err => setUsernameErrorFeedback(err.response.data.message));
         }
         break;
@@ -67,7 +66,7 @@ export function AdminSignup() {
         setEmail(value);
         if (e.target.validity.valid) {
           Api.get(`/auth/check/email/${value}`)
-            .then(() => {setEmailErrorFeedback('')})
+            .then(() => { setEmailErrorFeedback('') })
             .catch(err => setEmailErrorFeedback(err.response.data.message));
         }
         break;
@@ -137,35 +136,33 @@ export function Signup() {
   const [emailErrorFeedback, setEmailErrorFeedback] = useState('');
   const [usernameErrorFeedback, setUsernameErrorFeedback] = useState('');
 
-
   const navigate = useNavigate();
-
   const location = useLocation();
+
   const adminSignup = location.pathname === '/admin-signup';
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     const inputs = { username, first, last, email, phone, password, confirm };
-    Api.post(adminSignup ? '/auth/admin-signup' : '/auth/signup', inputs)
-      .then(res => {
-        toast.success(res.data.message);
-        setTimeout(() => {
+    signup();
+
+    function signup() {
+      Api.post(adminSignup ? '/auth/admin-signup' : '/auth/signup', inputs)
+        .then(res => {
+          toast.success(res.data.message);
           navigate('/login');
-        }, 2000);
-      })
-      .catch(err => {
-        if (err.response) {
-          toast.error(err.response.data.message);
-        } else {
-          toast.error(err.message);
-        }
-      })
-      .finally(() => {
-        setTimeout(() => {
           setLoading(false);
-        }, 2000);
-      })
+        })
+        .catch(err => {
+          if (err.response) {
+            toast.error(err.response.data.message);
+          } else {
+            toast.error(err.message);
+          }
+          setLoading(false)
+        });
+    }
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -174,9 +171,7 @@ export function Signup() {
       case 'username':
         setUsername(value);
         if (e.target.validity.valid) {
-          Api.get(`/auth/check/username/${value}`)
-            .then(() => {setUsernameErrorFeedback('')})
-            .catch(err => setUsernameErrorFeedback(err.response.data.message));
+          checkUsername();
         }
         break;
       case 'first':
@@ -188,9 +183,7 @@ export function Signup() {
       case 'email':
         setEmail(value);
         if (e.target.validity.valid) {
-          Api.get(`/auth/check/email/${value}`)
-            .then(() => {setEmailErrorFeedback('')})
-            .catch(err => setEmailErrorFeedback(err.response.data.message));
+          checkEmail();
         }
         break;
       case 'phone':
@@ -204,6 +197,18 @@ export function Signup() {
         break;
       default:
         break;
+    }
+
+    function checkUsername() {
+      Api.get(`/auth/check/username/${value}`)
+        .then(() => { setUsernameErrorFeedback('') })
+        .catch(err => setUsernameErrorFeedback(err.response.data.message));
+    }
+
+    function checkEmail() {
+      Api.get(`/auth/check/email/${value}`)
+        .then(() => { setEmailErrorFeedback('') })
+        .catch(err => setEmailErrorFeedback(err.response.data.message));
     }
   }
 
@@ -248,20 +253,24 @@ export function Login() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    Api.post('/auth/login', { emailOrUsername, password })
-      .then(res => {
-        localStorage.setItem('token', res.data.token);
-        navigate('/dashboard');
-        setLoading(false);
-      })
-      .catch(err => {
-        if (err.response) {
-          toast.error(err.response.data.message);
-        } else {
-          toast.error(err.message);
-        }
-        setLoading(false)
-      });
+    login();
+
+    function login() {
+      Api.post('/auth/login', { emailOrUsername, password })
+        .then(res => {
+          localStorage.setItem('token', res.data.token);
+          navigate('/dashboard');
+          setLoading(false);
+        })
+        .catch(err => {
+          if (err.response) {
+            toast.error(err.response.data.message);
+          } else {
+            toast.error(err.message);
+          }
+          setLoading(false)
+        });
+    }
   }
 
   return (

@@ -280,5 +280,5 @@ export async function getUserFullName(req: Request, res: Response) {
     }
     return res.send(user.fullName);
 
-  } catch (error) { }
+  } catch (error) { /* empty */ }
 }

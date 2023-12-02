@@ -1,4 +1,3 @@
-import { boolean } from "joi";
 import Transaction from "../models/transaction";
 import User from "../models/users";
 import axios from "axios";
@@ -27,7 +26,7 @@ export async function calcBalance(user: string) {
   try {
     const transactions = await Transaction.find({ user });
     const balance = transactions.reduce((acc, curr) => {
-      if (curr.isCredit) return acc + curr.amount;
+      if (curr.type === 'credit') return acc + curr.amount;
       return acc - curr.amount;
     }, 0);
     return balance;
@@ -38,11 +37,10 @@ export async function calcBalance(user: string) {
 
 export async function runCommand() {
   try {
-    const users = await User.find();
-    for (const user of users) {
-      if (user.username) continue;
-      user.username = user.email.split("@")[0];
-      await user.save();
+    const trxs = await Transaction.find();
+    for (const trx of trxs) {
+      // if (trx.description && trx.type !== 'fund wallet') continue;
+      await trx.deleteOne();
     }
   }
   catch (error: any) {

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Transaction from "../models/transaction";
 import * as validators from "../utils/validators";
 import { calcBalance, verifyTransaction, generateReference } from "../utils/utils";
-import User, { IUser } from "../models/users";
+import User from "../models/users";
 
 export async function fundWallet(req: Request, res: Response) {
   try {
@@ -33,13 +33,13 @@ export async function fundWallet(req: Request, res: Response) {
     const { amount } = response.data;
 
     await Transaction.create({
-      amount,
-      reference,
-      bankName: 'Sure Banker',
-      accountName: 'FinEase',
-      isCredit: true,
       user,
-      type: 'fund wallet',
+      amount,
+      type: 'credit',
+      service: 'funding',
+      description: 'Funding via Paystack',
+      reference,
+      serviceProvider: 'Paystack',
     });
 
     res.status(201);
@@ -77,6 +77,7 @@ export async function transferFunds(req: Request, res: Response) {
       });
     }
 
+    // eslint-disable-next-line prefer-const
     let { acctNoOrUsername, amount } = req.body;
     amount *= 100;  // convert to kobo
 
@@ -104,7 +105,7 @@ export async function transferFunds(req: Request, res: Response) {
       });
     }
 
-    if(recipient.id === user){
+    if (recipient.id === user) {
       res.status(409);
       return res.json({
         success: false,
@@ -113,31 +114,36 @@ export async function transferFunds(req: Request, res: Response) {
       })
     }
 
-    // debit user
+    // create debit transaction
     const transaction = await Transaction.create({
-      amount: amount,
-      isCredit: false,
       user,
+      amount,
+      type: 'debit',
+      service: 'wallet transfer',
+      description: `Wallet transfer to ${recipient.username}`,
       reference: await generateReference('WTR'),
-      type: 'fund transfer'
+      serviceProvider: 'Wallet2Wallet',
+      recipient: recipient._id,
     });
 
-    // credit recipient
+    // create credit transaction
     await Transaction.create({
-      amount: amount,
-      isCredit: true,
       user: recipient._id,
+      amount,
+      type: 'credit',
+      service: 'wallet transfer',
+      description: `Wallet transfer from ${req.user.username}`,
       reference: await generateReference('RW'),
-      type: 'fund transfer'
+      serviceProvider: 'Wallet2Wallet',
+      sender: user,
     });
 
     return res.json({
       success: true,
-      message: 'Funds sent to user successfully!',
+      message: `Funds sent to ${recipient.username} successfully!`,
       balance: await calcBalance(user),
       amount: amount / 100,
       reference: transaction.reference,
-      recipient,
     });
 
   }
@@ -150,5 +156,29 @@ export async function transferFunds(req: Request, res: Response) {
       message: 'Internal Server Error',
       error: err.message
     })
+  }
+}
+
+export async function getTransactions(req: Request, res: Response) {
+  try {
+    const user = req.user.id;
+    const requiredInfo = 'amount type reference createdAt description';
+    const transactions = await Transaction.find({ user }).sort({ createdAt: -1 }).select(requiredInfo);
+
+    res.status(200);
+    return res.json({
+      success: true,
+      message: `Transaction history for ${req.user.username}`,
+      transactions
+    });
+
+  } catch (error: any) {
+    console.error(error.message);
+    res.status(500);
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 }
