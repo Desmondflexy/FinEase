@@ -31,6 +31,10 @@ export default function Layout({ children }: ILayout) {
   const [user, setUser] = useState({ username: '', isAdmin: false });
 
   useEffect(() => {
+    fetchUser();
+  }, []);
+
+  function fetchUser() {
     Api.get('/account/me')
       .then(res => {
         setStatus('success');
@@ -50,10 +54,10 @@ export default function Layout({ children }: ILayout) {
           setError(e => ({ ...e, status: 500, statusText: err.message, goto: '/' }));
         }
       });
-  }, []);
+  }
 
   if (status === 'success') {
-    if (location.pathname === '/admin-area' && !user.isAdmin) {
+    if (location.pathname === '/all-users' && !user.isAdmin) {
       return <Error code={403} message="Forbidden" goto='/login' />
     }
 

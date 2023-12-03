@@ -8,7 +8,6 @@ import { calcBalance } from "../utils/utils";
 
 export async function signup(req: Request, res: Response) {
   const isAdmin = req.url === '/admin-signup';
-  console.log(req.url)
   try {
     let error;
     if (isAdmin) {
@@ -82,7 +81,7 @@ export async function signup(req: Request, res: Response) {
   }
 
   catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500)
     return res.json({
       success: false,
@@ -152,7 +151,7 @@ export async function login(req: Request, res: Response) {
   }
 
   catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500)
     return res.json({
       success: false,
@@ -186,7 +185,7 @@ export async function profile(req: Request, res: Response) {
   }
 
   catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500)
     return res.json({
       success: false,
@@ -224,7 +223,7 @@ export async function allUsers(req: Request, res: Response) {
 
   }
   catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500)
     return res.json({
       success: false,
@@ -246,7 +245,7 @@ export async function getBalance(req: Request, res: Response) {
     )
   }
   catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500);
     return res.json({
       success: false,

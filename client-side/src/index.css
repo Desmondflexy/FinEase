@@ -371,27 +371,76 @@ table {
         scale: 0.8;
       }
     }
+  }
+}
 
-    & button {
-      background-color: green;
-      color: white;
-      cursor: pointer;
+#recharge {
+  &>form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
 
-      &:hover {
-        background-color: darkgreen;
+  &>div>form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    max-width: 500px;
+
+    &>div {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid darkgrey;
+
+      & label {
+        min-width: 120px;
+        background-color: darkgrey;
+        font-size: .8em;
+        padding: 10px;
+        font-weight: bold;
       }
 
-      &:disabled {
-        background-color: lightgreen;
-        color: grey;
-        cursor: progress;
+
+      &>input,
+      &>select {
+        flex: 1;
+        padding-left: 5px;
       }
+
+      &>input:invalid:not(:placeholder-shown) {
+        box-shadow: 0 0 5px 1px red;
+      }
+
+    }
+
+    &>button {
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    & .small-network-logo{
+      display: inline-block;
+      width: 36px;
+      height: 36px;
     }
   }
 }
 
-#recharge{
+button.form-submit {
+  background-color: green;
+  color: white;
+  cursor: pointer;
 
+  &:hover {
+    background-color: darkgreen;
+  }
+
+  &:disabled {
+    background-color: lightgreen;
+    color: grey;
+    cursor: progress;
+  }
 }
 
 

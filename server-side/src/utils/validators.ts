@@ -1,4 +1,5 @@
 import joi from "joi";
+import { phoneNumberRegex } from "./constants";
 
 export const options = {
   abortEarly: false,
@@ -36,8 +37,9 @@ export const transferFunds = joi.object().keys({
   amount: joi.number().min(1).required(),
 });
 
+
 export const rechargeAirtime = joi.object().keys({
   operatorId: joi.string().required(),
-  phone: joi.string().required(),
+  phone: joi.string().required().regex(phoneNumberRegex).messages({'string.pattern.base': 'Invalid phone number'}),
   amount: joi.number().integer().min(1).required(),
 });

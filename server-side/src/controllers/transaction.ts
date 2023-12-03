@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import Transaction from "../models/transaction";
 import * as validators from "../utils/validators";
-import { calcBalance, verifyTransaction, generateReference, getOperators, buyAirtimeBlochq, verifyNetwork } from "../utils/utils";
+import { calcBalance, verifyTransaction, generateReference, getOperators, buyAirtimeBlochq, verifyNetwork, getDataPlansFromBloc } from "../utils/utils";
 import User from "../models/users";
+import { phoneNetworks } from "../utils/constants";
 
 export async function fundWallet(req: Request, res: Response) {
   try {
@@ -52,7 +53,7 @@ export async function fundWallet(req: Request, res: Response) {
   }
 
   catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500);
     return res.json({
       success: false,
@@ -147,7 +148,7 @@ export async function transferFunds(req: Request, res: Response) {
   }
 
   catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500);
     return res.json({
       success: false,
@@ -171,7 +172,7 @@ export async function getTransactions(req: Request, res: Response) {
     });
 
   } catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500);
     return res.json({
       success: false,
@@ -208,13 +209,13 @@ export async function buyAirtime(req: Request, res: Response) {
       });
     }
 
-    const isMatch = await verifyNetwork(phone, operatorId);
+    const { isMatch } = await verifyNetwork(phone, operatorId);
     if (!isMatch) {
-      res.status(422);
+      res.status(409);
       return res.json({
         success: false,
         message: 'Phone number and network do not match',
-        error: 'Unprocessable Entity'
+        error: 'Conflict'
       });
     }
 
@@ -241,7 +242,7 @@ export async function buyAirtime(req: Request, res: Response) {
     });
 
   } catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500);
     return res.json({
       success: false,
@@ -264,7 +265,7 @@ export async function getNetworks(req: Request, res: Response) {
     });
 
   } catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500);
     return res.json({
       success: false,
@@ -274,3 +275,45 @@ export async function getNetworks(req: Request, res: Response) {
   }
 }
 
+export function getPhoneNetwork(req: Request, res: Response) {
+  const phone = req.query.phone as string;
+  const network = phoneNetworks[phone.slice(0, 4)];
+
+  if (!network) {
+    res.status(404);
+    return res.json({
+      success: false,
+      message: `Cannot determine network for ${phone}`,
+      error: 'Network not found',
+    });
+  }
+
+  return res.json({
+    success: true,
+    network,
+    phone,
+  })
+}
+
+
+export async function getDataPlans(req: Request, res: Response) {
+  try {
+    const operatorId = req.query.operatorId as string;
+    const dataPlans = await getDataPlansFromBloc(operatorId);
+    res.json({
+      success: true,
+      message: 'Data plans',
+      dataPlans
+    });
+
+  } catch (error: any) {
+    res.status(500);
+    console.error(error);
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
+  }
+
+}

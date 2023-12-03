@@ -1,7 +1,13 @@
 import Transaction from "../models/transaction";
 import User from "../models/users";
 import axios from "axios";
-import phoneNetworksData from "../phoneNumbers.json";
+import { phoneNetworks } from "./constants";
+
+// constants from Blochq
+const dataCategoryId = 'pctg_ftZLPijqrVsTan5Ag7khQx';
+const airtimeCategoryId = 'pctg_xkf8nz3rFLjbooWzppWBG6';
+const blochqUrl = 'https://api.blochq.io/v1/bills';
+
 
 export async function generateAcctNo() {
   let acctNo = Math.floor(Math.random() * 10000000000);
@@ -45,7 +51,7 @@ export async function runCommand() {
   //   }
   // }
   // catch (error: any) {
-  //   console.log(error);
+  //   console.error(error);
   // }
 }
 
@@ -72,36 +78,33 @@ export async function isFieldAvailable(field: string, value: string) {
 
 /**Returns a list of operators of bill (telco and electricity) */
 export async function getOperators(bill: string) {
-  const headers = { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` };
-  const url = `https://api.blochq.io/v1/bills/operators?bill=${bill}`;
+  const url = `${blochqUrl}/operators?bill=${bill}`;
 
   try {
-    const response = await axios.get(url, { headers });
+    const response = await axios.get(url, { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } });
     return response.data.data;
 
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
     throw new Error('Error getting operators');
   }
 }
 
 export async function getProducts(operatorID: string) {
-  const headers = { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` };
-  const url = `https://api.blochq.io/v1/bills/operators/${operatorID}/products?bill=telco`;
+  const url = `${blochqUrl}/operators/${operatorID}/products?bill=telco`;
 
   try {
-    const response = await axios.get(url, { headers });
+    const response = await axios.get(url, { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } });
     return response.data.data;
 
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
     throw new Error('Error getting products');
   }
 }
 
 export async function buyAirtimeBlochq(amount: number, operatorId: string, phone: string) {
-  const url = 'https://api.blochq.io/v1/bills/payment?bill=telco';
-  const headers = { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` };
+  const url = `${blochqUrl}/payment?bill=telco`;
   const data = {
     amount,
     operator_id: operatorId,
@@ -112,17 +115,17 @@ export async function buyAirtimeBlochq(amount: number, operatorId: string, phone
   }
 
   try {
-    const response = await axios.post(url, data, { headers });
+    const response = await axios.post(url, data, { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } });
     return response.data.data;
 
   } catch (error: any) {
-    console.log(error)
+    console.error(error)
     throw new Error('Error buying airtime');
   }
 
   async function getAirtimeId() {
     const products = await getProducts(operatorId);
-    const airtimeProduct = products.find((product: { category: string }) => product.category === 'pctg_xkf8nz3rFLjbooWzppWBG6');
+    const airtimeProduct = products.find((product: { category: string }) => product.category === airtimeCategoryId);
     return airtimeProduct.id;
   }
 
@@ -130,13 +133,60 @@ export async function buyAirtimeBlochq(amount: number, operatorId: string, phone
 
 /**Returns true if phoneNumber matches selected network, otherwise false */
 export async function verifyNetwork(phone: string, operatorId: string) {
-  const phoneNetworks: IPhoneNetworks = phoneNetworksData;
-  const phoneNetwork = phoneNetworks[phone.slice(0, 4)].toLowerCase();
+  const phoneNetwork = phoneNetworks[phone.slice(0, 4)]?.toLowerCase();
   const operators = await getOperators('telco');
   const operator: { name: string } = operators.find((i: { id: string }) => i.id === operatorId);
-  return phoneNetwork.includes(operator.name.toLowerCase())
+  const response = {
+    isMatch: phoneNetwork?.includes(operator.name.toLowerCase()),
+    selectedOperator: operator.name,
+    numberOperator: phoneNetwork,
+  }
+  return response;
 }
 
-interface IPhoneNetworks {
-  [key: string]: string
+export async function getDataPlansFromBloc(operatorId: string) {
+  try {
+    const products = await getProducts(operatorId);
+    return products
+      .filter((product: { category: string }) => product.category === dataCategoryId)
+      .map((product: { id: string; meta: { fee: string; data_expiry: string; data_value: string }; name: string }) => {
+        const { id, meta } = product;
+        const { fee, data_value } = meta;
+        const dataPlanName = `${data_value} for ${getDataExpiry(meta)} at ₦${Number(fee)}`
+        return { id, name: dataPlanName, amount: Number(meta.fee) * 100, meta };
+      });
+  } catch (error) {
+    console.error(error);
+    throw new Error('Error getting data plans');
+  }
+
+  /**To normalize the keys in the meta object. Some keys had extra spaces */
+  function getDataExpiry(meta: { [key: string]: string }) {
+    // Find the key with 'age' in it, regardless of spaces
+    const dataExpiryKey = Object.keys(meta).find(key => key.trim() === 'data_expiry');
+
+    // Return the value if the key is found, otherwise return undefined
+    return dataExpiryKey ? meta[dataExpiryKey] : undefined;
+  }
 }
+
+// export async function buyDataBlochq(amount: number, operatorId: string, phone: string, dataPlanId: string) {
+//   const url = `${blochqUrl}/payment?bill=telco`;
+//   const data = {
+//     amount,
+//     operator_id: operatorId,
+//     product_id: dataPlanId,
+//     device_details: {
+//       "beneficiary_msisdn": phone
+//     },
+//   }
+
+//   try {
+//     const response = await axios.post(url, data, { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } });
+//     return response.data.data;
+
+//   } catch (error: any) {
+//     console.error(error)
+//     throw new Error('Error buying airtime');
+//   }
+// }

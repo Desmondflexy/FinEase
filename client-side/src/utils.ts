@@ -36,3 +36,5 @@ export function payWithPaystack(email: string, amount: number, callback: (respon
   });
   handler.openIframe();
 }
+
+export const phoneNumberRegex = /^(070[1234568]|080[2356789]|081[0-8]|090[1-9]|091[12356])\d{7}$/;

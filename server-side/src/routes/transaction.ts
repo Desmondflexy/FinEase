@@ -9,5 +9,7 @@ router.post("/fund-transfer", authenticate, transaction.transferFunds);
 router.get("/", authenticate, transaction.getTransactions);
 router.get('/networks', transaction.getNetworks);
 router.post('/airtime', authenticate, transaction.buyAirtime);
+router.get('/phone-network', authenticate, transaction.getPhoneNetwork);
+router.get('/data-plans', authenticate, transaction.getDataPlans);
 
 export default router;

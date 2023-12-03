@@ -43,7 +43,7 @@ export function FundWalletModal({ closeModal, isOpen, email, setBalance }: IFwMo
       <form className="fund-wallet" onSubmit={handleSubmit}>
         <h2>Load Wallet</h2>
         <input disabled={processing} placeholder="amount" autoComplete="off" type="number" min={100} name="amount" id="amount" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} required />
-        <button disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
+        <button className="form-submit" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
         <IoMdClose className="close-btn" onClick={handleCloseModal} />
       </form>
     </OverLay>
@@ -117,7 +117,7 @@ export function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal
         <input disabled={processing} onBlur={confirmUser} placeholder="Recipient username or account number" name="acctNoOrUsername" value={acctNoOrUsername} onChange={handleChange} required />
         <input disabled={processing} placeholder="Transfer amount" type="number" min={1} name="amount" id="amount" value={amount} onChange={handleChange} required />
         <p className={`${feedback.includes('Invalid') ? 'bad' : 'good'} feedback`}>{feedback}</p>
-        <button disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
+        <button className="form-submit" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
         <IoMdClose className="close-btn" onClick={handleCloseModal} />
       </form>
     </OverLay>
