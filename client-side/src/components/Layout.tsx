@@ -11,11 +11,12 @@ function LogoutButton() {
     Api.post('/auth/logout')
       .then(() => {
         localStorage.removeItem('token');
+        navigate('/login');
       })
       .catch(() => {
         console.log('warning: did not logout successfully');
-      })
-      .finally(() => navigate('/login'))
+        navigate('/login');
+      });
   }
 
   return <button onClick={handleLogout}>Logout</button>
@@ -66,8 +67,9 @@ export default function Layout({ children }: ILayout) {
           <li className={activeMenu === 'dashboard' ? 'active' : ''}><Link to='/dashboard'>Dashboard</Link></li>
           <li className={activeMenu === 'profile' ? 'active' : ''}><Link to='/profile'>Profile</Link></li>
           <li className={activeMenu === 'transactions' ? 'active' : ''}><Link to='/transactions'>Transactions</Link></li>
+          <li className={activeMenu === 'recharge' ? 'active' : ''}><Link to='/recharge'>Recharge</Link></li>
           {user.isAdmin &&
-            <li className={activeMenu === 'admin-area' ? 'active' : ''}><Link to='/admin-area'>Admin Area</Link></li>}
+            <li className={activeMenu === 'all-users' ? 'active' : ''}><Link to='/all-users'>Admin Area</Link></li>}
           <li><LogoutButton /></li>
         </ul>
         <div id="main">{children}</div>

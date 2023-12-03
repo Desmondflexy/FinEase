@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Transaction from "../models/transaction";
 import * as validators from "../utils/validators";
-import { calcBalance, verifyTransaction, generateReference } from "../utils/utils";
+import { calcBalance, verifyTransaction, generateReference, getOperators, buyAirtimeBlochq, verifyNetwork } from "../utils/utils";
 import User from "../models/users";
 
 export async function fundWallet(req: Request, res: Response) {
@@ -58,7 +58,7 @@ export async function fundWallet(req: Request, res: Response) {
       success: false,
       message: "Internal Server Error",
       error: error.message
-    })
+    });
   }
 }
 
@@ -77,9 +77,8 @@ export async function transferFunds(req: Request, res: Response) {
       });
     }
 
-    // eslint-disable-next-line prefer-const
-    let { acctNoOrUsername, amount } = req.body;
-    amount *= 100;  // convert to kobo
+    const { acctNoOrUsername } = req.body;
+    const amount = req.body.amount * 100;  // convert to kobo
 
     const requiredInfo = 'username fullName email phone';
     const recipient = await User.findOne({ acctNo: acctNoOrUsername }).select(requiredInfo) || await User.findOne({ username: acctNoOrUsername }).select(requiredInfo);
@@ -145,17 +144,16 @@ export async function transferFunds(req: Request, res: Response) {
       amount: amount / 100,
       reference: transaction.reference,
     });
-
   }
 
-  catch (err: any) {
-    console.error(err.message)
+  catch (error: any) {
+    console.error(error.message);
     res.status(500);
     return res.json({
       success: false,
-      message: 'Internal Server Error',
-      error: err.message
-    })
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 }
 
@@ -182,3 +180,97 @@ export async function getTransactions(req: Request, res: Response) {
     });
   }
 }
+
+export async function buyAirtime(req: Request, res: Response) {
+  try {
+    const user = req.user.id;
+    const { error } = validators.rechargeAirtime.validate(req.body, validators.options);
+
+    if (error) {
+      res.status(400);
+      return res.json({
+        success: false,
+        message: error.message,
+        error: 'Bad request'
+      });
+    }
+
+    const { operatorId, phone } = req.body;
+    const amount = req.body.amount * 100;
+
+    const userBalance = await calcBalance(user);
+    if (userBalance < amount) {
+      res.status(402);
+      return res.json({
+        success: false,
+        message: 'You do not have enough funds',
+        error: 'Insufficient funds'
+      });
+    }
+
+    const isMatch = await verifyNetwork(phone, operatorId);
+    if (!isMatch) {
+      res.status(422);
+      return res.json({
+        success: false,
+        message: 'Phone number and network do not match',
+        error: 'Unprocessable Entity'
+      });
+    }
+
+    const response = await buyAirtimeBlochq(amount, operatorId, phone);
+    const { operator_name } = response.meta_data;
+
+    await Transaction.create({
+      user,
+      amount,
+      type: 'debit',
+      service: 'airtime purchase',
+      description: `${operator_name} airtime purchase for ${phone}`,
+      reference: await generateReference('ATR'),
+      serviceProvider: operator_name,
+    });
+
+    res.status(201);
+    return res.json({
+      success: true,
+      message: 'Airtime purchased successfully!',
+      amount,
+      phone,
+      balance: await calcBalance(user),
+    });
+
+  } catch (error: any) {
+    console.error(error.message);
+    res.status(500);
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
+  }
+
+
+}
+
+export async function getNetworks(req: Request, res: Response) {
+  try {
+    const networks = await getOperators('telco');
+    res.status(200);
+    return res.json({
+      success: true,
+      message: 'Telecom operators',
+      networks
+    });
+
+  } catch (error: any) {
+    console.error(error.message);
+    res.status(500);
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
+  }
+}
+

@@ -6,7 +6,6 @@ import logger from 'morgan';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import authRouter from './routes/auth';
 import transactionRouter from './routes/transaction';
@@ -37,7 +36,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.use('/', indexRouter);
 app.use('/account', usersRouter);
 app.use('/auth', authRouter);
 app.use('/transaction', transactionRouter);

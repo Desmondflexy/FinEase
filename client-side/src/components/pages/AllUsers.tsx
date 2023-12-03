@@ -1,6 +1,7 @@
 import Api from "../../api.config";
 import { useState, useEffect } from "react";
 import Error from "./Error";
+import Layout from "../Layout";
 
 export default function UsersList() {
   const [users, setUsers] = useState([]);
@@ -22,7 +23,7 @@ export default function UsersList() {
 
   if (status === 'success')
     return (
-      <div id="all-users">
+      <Layout>
         <h2>List of all active users of FinEase</h2>
         <hr />
         <table>
@@ -47,11 +48,15 @@ export default function UsersList() {
             ))}
           </tbody>
         </table>
-      </div>
+      </Layout>
     )
 
   if (status === 'error') {
-    return <Error code={error.status} message={error.statusText} goto={error.goto} />
+    return (
+      <Layout>
+        <Error code={error.status} message={error.statusText} goto={error.goto} />
+      </Layout>
+    )
   }
 }
 

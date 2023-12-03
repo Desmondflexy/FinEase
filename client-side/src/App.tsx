@@ -5,10 +5,10 @@ import Home from './components/pages/Home'
 import Profile from './components/pages/Profile'
 import Dashboard from './components/pages/Dashboard';
 import Error from './components/pages/Error';
-import UsersList from './components/pages/AllUsers';
-import AdminArea from './components/pages/AdminArea';
+import AllUsers from './components/pages/AllUsers';
 import {AdminSignup, Signup, Login } from './components/pages/GetStarted';
 import Transactions from './components/pages/Transactions';
+import Recharge, { Airtime, Data, Electricity, Tv } from './components/pages/Recharge';
 
 export default function App() {
   return (
@@ -20,10 +20,13 @@ export default function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/profile' element={<Profile />} />
-        <Route path='/admin-area' element={<AdminArea />} >
-          <Route path='users' element={<UsersList />} />
-        </Route>
+        <Route path='/all-users' element={<AllUsers />} />
         <Route path='transactions' element={<Transactions/>} />
+        <Route path='recharge' element={<Recharge />}/>
+        <Route path='recharge/airtime' element={<Airtime />} />
+        <Route path='recharge/data' element={<Data />} />
+        <Route path='recharge/electricity' element={<Electricity />} />
+        <Route path='recharge/tv' element={<Tv />} />
 
         <Route path='*' element={<Error message={'Page Not Found'} code={404} goto={'/'} />} />
       </Routes>
