@@ -30,11 +30,7 @@ export default function Layout({ children }: ILayout) {
   const [error, setError] = useState({ status: 0, statusText: '', goto: '/' })
   const [user, setUser] = useState({ username: '', isAdmin: false });
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  function fetchUser() {
+  const fetchUser = () => {
     Api.get('/account/me')
       .then(res => {
         setStatus('success');
@@ -55,6 +51,8 @@ export default function Layout({ children }: ILayout) {
         }
       });
   }
+
+  useEffect(fetchUser, []);
 
   if (status === 'success') {
     if (location.pathname === '/all-users' && !user.isAdmin) {

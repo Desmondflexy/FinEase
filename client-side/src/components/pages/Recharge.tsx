@@ -51,11 +51,7 @@ export function Airtime() {
     return <option key={network.id} value={network.id}>{network.name}</option>
   });
 
-  useEffect(() => fetchNetworks(), []);
-
-
-
-  function fetchNetworks() {
+  const fetchNetworks = () => {
     Api.get('transaction/networks')
       .then(res => {
         const list = res.data.networks.map((network: { id: string; name: string }) => {
@@ -65,16 +61,10 @@ export function Airtime() {
       })
       .catch(err => {
         console.log(err.response);
-      })
+      });
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setProcessing(true)
-    buyAirtime();
-  }
-
-  function buyAirtime() {
+  const buyAirtime = () => {
     Api.post('transaction/airtime', { operatorId: network, amount, phone })
       .then(res => {
         toast.success(res.data.message);
@@ -86,7 +76,7 @@ export function Airtime() {
       });
   }
 
-  function determineNetwork() {
+  const determineNetwork = () => {
     Api.get(`transaction/phone-network?phone=${phone}`)
       .then(res => {
         const network = res.data.network.toLowerCase() as string;
@@ -94,8 +84,16 @@ export function Airtime() {
       })
       .catch(() => {
         setLogoUrl('');
-      })
+      });
   }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setProcessing(true)
+    buyAirtime();
+  }
+
+  useEffect(fetchNetworks, []);
 
   return (
     <div>
@@ -121,7 +119,7 @@ export function Airtime() {
       </form>
     </div>
 
-  )
+  );
 }
 
 export function Data() {
@@ -141,27 +139,21 @@ export function Data() {
     return <option key={plan.id} value={plan.id}>{plan.name}</option>
   });
 
-  useEffect(() => {
-    fetchNetworks();
+  const fetchNetworks = () => {
+    Api.get('transaction/networks')
+      .then(res => {
+        const list = res.data.networks.map((network: { id: string; name: string }) => {
+          return { id: network.id, name: network.name };
+        });
+        setNetworks(list);
+      })
+      .catch(err => {
+        console.log(err.response);
+      });
+  }
 
-    function fetchNetworks() {
-      Api.get('transaction/networks')
-        .then(res => {
-          const list = res.data.networks.map((network: { id: string; name: string }) => {
-            return { id: network.id, name: network.name };
-          });
-          setNetworks(list);
-        })
-        .catch(err => {
-          console.log(err.response);
-        })
-    }
-  }, []);
-
-  useEffect(() => {
-    if (operatorId) fetchDataPlans();
-
-    function fetchDataPlans() {
+  const fetchDataPlans = () => {
+    if (operatorId)
       Api.get(`transaction/data-plans?operatorId=${operatorId}`)
         .then(res => {
           setPlans(res.data.dataPlans);
@@ -169,10 +161,9 @@ export function Data() {
         .catch(err => {
           console.log(err.response);
         })
-    }
-  }, [operatorId]);
+  }
 
-  function determineNetwork() {
+  const determineNetwork = () => {
     Api.get(`transaction/phone-network?phone=${phone}`)
       .then(res => {
         const network = res.data.network.toLowerCase() as string;
@@ -182,6 +173,9 @@ export function Data() {
         setLogoUrl('');
       })
   }
+
+  useEffect(fetchNetworks, []);
+  useEffect(fetchDataPlans, [operatorId]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

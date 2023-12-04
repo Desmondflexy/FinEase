@@ -12,7 +12,7 @@ function Profile() {
     isAdmin: false
   });
 
-  useEffect(() => {
+  const fetchAcctInfo = () => {
     Api.get('/account')
       .then(res => {
         const { fullName, email, phone, createdAt, acctNo, isAdmin } = res.data.user;
@@ -21,7 +21,9 @@ function Profile() {
       .catch(err => {
         console.log(err.message);
       });
-  }, [])
+  }
+
+  useEffect(fetchAcctInfo, [])
 
   return (
     <Layout>

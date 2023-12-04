@@ -7,8 +7,10 @@ export default function UsersList() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState({ status: 0, statusText: "", goto: "/" });
   const [status, setStatus] = useState('loading');
+  const [searchTerm, setSearchTerm] = useState('');
+  // const [searchResults, setSearchResults] = useState([]);
 
-  useEffect(() => {
+  const fetchUsers = () => {
     Api.get('/account/all-users')
       .then(res => {
         setStatus('success');
@@ -18,13 +20,28 @@ export default function UsersList() {
         setStatus('error');
         const { status, statusText } = err.response;
         setError(e => ({ ...e, status, statusText, goto: '/' }));
-      })
-  }, []);
+      });
+  }
+
+  useEffect(() => {
+    console.log(searchTerm);
+  }, [searchTerm]);
+
+  useEffect(fetchUsers, []);
+
+
+  function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
+    setSearchTerm(e.target.value);
+
+  }
 
   if (status === 'success')
     return (
       <Layout>
         <h2>List of all active users of FinEase</h2>
+        <form className="searchbox">
+          <input type="search" placeholder="Search for user..." value={searchTerm} onChange={handleSearch} />
+        </form>
         <hr />
         <table>
           <thead>

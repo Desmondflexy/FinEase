@@ -20,14 +20,7 @@ export default function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    document.addEventListener('click', closeDropdown);
-    return () => {
-      document.removeEventListener('click', closeDropdown);
-    };
-  }, []);
-
-  useEffect(() => {
+  const fetchAccount = () => {
     Api.get('/account')
       .then(res => {
         const { email } = res.data.user;
@@ -35,10 +28,10 @@ export default function Dashboard() {
       })
       .catch(err => {
         console.error(err.response.data.message)
-      })
-  }, []);
+      });
+  }
 
-  useEffect(() => {
+  const fetchAccountBalance = () => {
     Api.get('/account/balance')
       .then(res => {
         setBalance(formatNumber(res.data.balance));
@@ -46,7 +39,17 @@ export default function Dashboard() {
       .catch(err => {
         console.error(err.response.data.message)
       })
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', closeDropdown);
+    return () => {
+      document.removeEventListener('click', closeDropdown);
+    };
   }, []);
+
+  useEffect(fetchAccount, []);
+  useEffect(fetchAccountBalance, []);
 
   return (
     <Layout>

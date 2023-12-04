@@ -23,11 +23,8 @@ export function AdminSignup() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
     const inputs = { username, first, last, email, phone, password, confirm, adminKey };
-    signup();
-
-    function signup() {
+    const signup = () => {
       Api.post('/auth/admin-signup', inputs)
         .then(res => {
           toast.success(res.data.message);
@@ -43,6 +40,9 @@ export function AdminSignup() {
           setLoading(false)
         });
     }
+
+    setLoading(true);
+    signup();
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -138,16 +138,12 @@ export function Signup() {
 
   const navigate = useNavigate();
   const location = useLocation();
-
   const adminSignup = location.pathname === '/admin-signup';
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
     const inputs = { username, first, last, email, phone, password, confirm };
-    signup();
-
-    function signup() {
+    const signup = () => {
       Api.post(adminSignup ? '/auth/admin-signup' : '/auth/signup', inputs)
         .then(res => {
           toast.success(res.data.message);
@@ -163,6 +159,9 @@ export function Signup() {
           setLoading(false)
         });
     }
+
+    setLoading(true);
+    signup();
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -252,10 +251,7 @@ export function Login() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
-    login();
-
-    function login() {
+    const login = () => {
       Api.post('/auth/login', { emailOrUsername, password })
         .then(res => {
           localStorage.setItem('token', res.data.token);
@@ -271,6 +267,9 @@ export function Login() {
           setLoading(false)
         });
     }
+
+    setLoading(true);
+    login();
   }
 
   return (
@@ -291,14 +290,12 @@ export function Login() {
 }
 
 function FormNav() {
-
-  let active = '';
   const location = useLocation();
-
-  if (location.pathname === '/signup' || location.pathname === '/admin-signup') {
-    active = 'signup';
-  } else if (location.pathname === '/login') {
+  let active = '';
+  if (location.pathname === '/login') {
     active = 'login';
+  } else {
+    active = 'signup';
   }
 
   return (
@@ -306,5 +303,5 @@ function FormNav() {
       <div className={active === 'signup' ? 'active' : ''}><Link to={'/signup'}>Signup</Link></div>
       <div className={active === 'login' ? 'active' : ''}><Link to={'/login'}>Login</Link></div>
     </div>
-  )
+  );
 }

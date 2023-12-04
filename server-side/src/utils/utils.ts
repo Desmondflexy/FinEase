@@ -43,16 +43,16 @@ export async function calcBalance(user: string) {
 }
 
 export async function runCommand() {
-  // try {
-  //   const trxs = await Transaction.find();
-  //   for (const trx of trxs) {
-  //     // if (trx.description && trx.type !== 'fund wallet') continue;
-  //     await trx.deleteOne();
-  //   }
-  // }
-  // catch (error: any) {
-  //   console.error(error);
-  // }
+  try {
+    const trxs = await Transaction.find();
+    for (const trx of trxs) {
+      // if (trx.description && trx.type !== 'fund wallet') continue;
+      await trx.deleteOne();
+    }
+  }
+  catch (error: any) {
+    console.error(error);
+  }
 }
 
 

@@ -11,7 +11,7 @@ import authRouter from './routes/auth';
 import transactionRouter from './routes/transaction';
 
 import connectDB from './config/database';
-// import { runCommand } from './utils/utils';
+import { runCommand } from './utils/utils';
 
 dotenv.config();
 connectDB();
@@ -58,5 +58,5 @@ app.use(function(err:HttpError, req:Request, res:Response) {
 
 export default app;
 
-// runCommand().then(() => console.log('Command run')).catch(err => console.log(err));
+runCommand().then(() => console.log('Command run')).catch(err => console.log(err));
 console.log(`App is running at http://localhost:${process.env.PORT} in ${app.get('env')} mode`);
