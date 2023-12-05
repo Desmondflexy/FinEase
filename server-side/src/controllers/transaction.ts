@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Transaction from "../models/transaction";
 import * as validators from "../utils/validators";
-import { calcBalance, verifyTransaction, generateReference, getOperators, buyAirtimeBlochq, verifyNetwork, getDataPlansFromBloc } from "../utils/utils";
+import { calcBalance, verifyTransaction, generateReference, blocApi } from "../utils/utils";
 import User from "../models/users";
 import { phoneNetworks } from "../utils/constants";
 
@@ -182,81 +182,9 @@ export async function getTransactions(req: Request, res: Response) {
   }
 }
 
-export async function buyAirtime(req: Request, res: Response) {
-  try {
-    const user = req.user.id;
-    const { error } = validators.rechargeAirtime.validate(req.body, validators.options);
-
-    if (error) {
-      res.status(400);
-      return res.json({
-        success: false,
-        message: error.message,
-        error: 'Bad request'
-      });
-    }
-
-    const { operatorId, phone } = req.body;
-    const amount = req.body.amount * 100;
-
-    const userBalance = await calcBalance(user);
-    if (userBalance < amount) {
-      res.status(402);
-      return res.json({
-        success: false,
-        message: 'You do not have enough funds',
-        error: 'Insufficient funds'
-      });
-    }
-
-    const { isMatch } = await verifyNetwork(phone, operatorId);
-    if (!isMatch) {
-      res.status(409);
-      return res.json({
-        success: false,
-        message: 'Phone number and network do not match',
-        error: 'Conflict'
-      });
-    }
-
-    const response = await buyAirtimeBlochq(amount, operatorId, phone);
-    const { operator_name } = response.meta_data;
-
-    await Transaction.create({
-      user,
-      amount,
-      type: 'debit',
-      service: 'airtime purchase',
-      description: `${operator_name} airtime purchase for ${phone}`,
-      reference: await generateReference('ATR'),
-      serviceProvider: operator_name,
-    });
-
-    res.status(201);
-    return res.json({
-      success: true,
-      message: 'Airtime purchased successfully!',
-      amount,
-      phone,
-      balance: await calcBalance(user),
-    });
-
-  } catch (error: any) {
-    console.error(error);
-    res.status(500);
-    return res.json({
-      success: false,
-      message: "Internal Server Error",
-      error: error.message
-    });
-  }
-
-
-}
-
 export async function getNetworks(req: Request, res: Response) {
   try {
-    const networks = await getOperators('telco');
+    const networks = await blocApi.getOperators('telco');
     res.status(200);
     return res.json({
       success: true,
@@ -299,7 +227,7 @@ export function getPhoneNetwork(req: Request, res: Response) {
 export async function getDataPlans(req: Request, res: Response) {
   try {
     const operatorId = req.query.operatorId as string;
-    const dataPlans = await getDataPlansFromBloc(operatorId);
+    const dataPlans = await blocApi.getDataPlans(operatorId);
     res.json({
       success: true,
       message: 'Data plans',
@@ -316,4 +244,142 @@ export async function getDataPlans(req: Request, res: Response) {
     });
   }
 
+}
+
+export async function buyAirtime(req: Request, res: Response) {
+  try {
+    const user = req.user.id;
+    const { error } = validators.rechargeAirtime.validate(req.body, validators.options);
+
+    if (error) {
+      res.status(400);
+      return res.json({
+        success: false,
+        message: error.message,
+        error: 'Bad request'
+      });
+    }
+
+    const { operatorId, phone } = req.body;
+    const amount = req.body.amount * 100;
+
+    const userBalance = await calcBalance(user);
+    if (userBalance < amount) {
+      res.status(402);
+      return res.json({
+        success: false,
+        message: 'You do not have enough funds',
+        error: 'Insufficient funds'
+      });
+    }
+
+    const { isMatch } = await blocApi.verifyNetwork(phone, operatorId);
+    if (!isMatch) {
+      res.status(409);
+      return res.json({
+        success: false,
+        message: 'Phone number and network do not match',
+        error: 'Conflict'
+      });
+    }
+
+    const response = await blocApi.buyAirtime(amount, operatorId, phone);
+    const { operator_name } = response.meta_data;
+
+    await Transaction.create({
+      user,
+      amount,
+      type: 'debit',
+      service: 'airtime purchase',
+      description: `${operator_name} airtime purchase for ${phone}`,
+      reference: await generateReference('ATR'),
+      serviceProvider: operator_name,
+    });
+
+    res.status(201);
+    return res.json({
+      success: true,
+      message: 'Airtime purchased successfully!',
+      amount,
+      phone,
+      balance: await calcBalance(user),
+    });
+
+  } catch (error: any) {
+    console.error(error);
+    res.status(500);
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
+  }
+}
+
+export async function buyData(req: Request, res: Response) {
+  try {
+    const user = req.user.id;
+    const { error } = validators.buyData.validate(req.body, validators.options);
+    if (error) {
+      res.status(400);
+      return res.json({
+        success: false,
+        message: error.message,
+        error: 'Bad request'
+      });
+    }
+
+    const { operatorId, phone, dataPlanId } = req.body;
+    const { amount, operator_name, data_value } = await blocApi.getDataPlanMeta(dataPlanId, operatorId);
+
+    const userBalance = await calcBalance(user);
+
+    if (userBalance < amount) {
+      res.status(402);
+      return res.json({
+        success: false,
+        message: 'You do not have enough funds',
+        error: 'Insufficient funds'
+      });
+    }
+
+    const { isMatch } = await blocApi.verifyNetwork(phone, operatorId);
+    if (!isMatch) {
+      res.status(409);
+      return res.json({
+        success: false,
+        message: 'Phone number and network do not match',
+        error: 'Conflict'
+      });
+    }
+
+    await blocApi.buyData(dataPlanId, amount, operatorId, phone);
+
+    await Transaction.create({
+      user,
+      amount,
+      type: 'debit',
+      service: 'data purchase',
+      description: `${operator_name} ${data_value} data purchase for ${phone}`,
+      reference: await generateReference('IDT'),
+      serviceProvider: operator_name,
+    });
+
+    res.status(201);
+    return res.json({
+      success: true,
+      message: 'Data purchased successfully!',
+      amount,
+      phone,
+      balance: await calcBalance(user),
+    });
+
+  } catch (error: any) {
+    res.status(500);
+    res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
+  }
 }

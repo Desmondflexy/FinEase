@@ -43,3 +43,9 @@ export const rechargeAirtime = joi.object().keys({
   phone: joi.string().required().regex(phoneNumberRegex).messages({'string.pattern.base': 'Invalid phone number'}),
   amount: joi.number().integer().min(1).required(),
 });
+
+export const buyData = joi.object().keys({
+  operatorId: joi.string().required(),
+  phone: joi.string().required().regex(phoneNumberRegex).messages({'string.pattern.base': 'Invalid phone number'}),
+  dataPlanId: joi.string().required(),
+});

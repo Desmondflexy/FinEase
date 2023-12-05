@@ -11,7 +11,8 @@ import authRouter from './routes/auth';
 import transactionRouter from './routes/transaction';
 
 import connectDB from './config/database';
-import { runCommand } from './utils/utils';
+import { blocApi } from './utils/utils';
+// import { runCommand } from './utils/utils';
 
 dotenv.config();
 connectDB();
@@ -41,12 +42,12 @@ app.use('/auth', authRouter);
 app.use('/transaction', transactionRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err:HttpError, req:Request, res:Response) {
+app.use(function (err: HttpError, req: Request, res: Response) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -58,5 +59,8 @@ app.use(function(err:HttpError, req:Request, res:Response) {
 
 export default app;
 
-runCommand().then(() => console.log('Command run')).catch(err => console.log(err));
+// runCommand().then(() => console.log('Command run')).catch(err => console.log(err));
 console.log(`App is running at http://localhost:${process.env.PORT} in ${app.get('env')} mode`);
+
+
+blocApi.getDataPlanMeta('prd_M5KwEwdYAeo3vou9SoJqeE', 'op_xoaaKAWhcZ3RwGfMKjpmag').then(res => console.log(res)).catch(err => console.log(err));

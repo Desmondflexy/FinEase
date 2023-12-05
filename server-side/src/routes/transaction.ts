@@ -11,5 +11,6 @@ router.get('/networks', transaction.getNetworks);
 router.post('/airtime', authenticate, transaction.buyAirtime);
 router.get('/phone-network', authenticate, transaction.getPhoneNetwork);
 router.get('/data-plans', authenticate, transaction.getDataPlans);
+router.post('/buy-data', authenticate, transaction.buyData);
 
 export default router;

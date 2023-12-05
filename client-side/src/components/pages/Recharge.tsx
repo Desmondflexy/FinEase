@@ -69,10 +69,13 @@ export function Airtime() {
       .then(res => {
         toast.success(res.data.message);
         setProcessing(false);
+        setAmount('');
+        setPhone('');
+        setNetwork('');
       })
       .catch(err => {
         toast.error(err.response.data.message);
-        setProcessing(false)
+        setProcessing(false);
       });
   }
 
@@ -174,22 +177,34 @@ export function Data() {
       })
   }
 
+  const buyData = () => {
+    const data = {
+      operatorId,
+      dataPlanId: planId,
+      phone,
+    };
+
+    Api.post('transaction/buy-data', data)
+      .then(res => {
+        toast.success(res.data.message);
+        setPlanId('');
+        setPhone('');
+        setOperatorId('');
+        setProcessing(false);
+      })
+      .catch(err => {
+        toast.error(err.response.data.message);
+        setProcessing(false);
+      });
+  }
+
   useEffect(fetchNetworks, []);
   useEffect(fetchDataPlans, [operatorId]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setProcessing(true);
-    setTimeout(() => {
-      const data = {
-        operatorId,
-        planId,
-        phone,
-      }
-      console.log(data);
-      setProcessing(false);
-      toast.success('Data bought successfully');
-    }, 1500);
+    buyData();
   }
 
   function handleNetworkChange(e: React.ChangeEvent<HTMLSelectElement>) {
