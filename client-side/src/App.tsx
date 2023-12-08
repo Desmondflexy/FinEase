@@ -9,6 +9,8 @@ import AllUsers from './components/pages/AllUsers';
 import {AdminSignup, Signup, Login } from './components/pages/GetStarted';
 import Transactions from './components/pages/Transactions';
 import Recharge, { Airtime, Data, Electricity, Tv } from './components/pages/Recharge';
+import Settings from './components/pages/Settings';
+import DropdownModal from './components/DropdownModal';
 
 export default function App() {
   return (
@@ -27,6 +29,8 @@ export default function App() {
         <Route path='recharge/data' element={<Data />} />
         <Route path='recharge/electricity' element={<Electricity />} />
         <Route path='recharge/tv' element={<Tv />} />
+        <Route path='settings' element={<Settings/>} />
+        <Route path='modal-test' element={<DropdownModal/>}/>
 
         <Route path='*' element={<Error message={'Page Not Found'} code={404} goto={'/'} />} />
       </Routes>

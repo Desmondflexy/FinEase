@@ -17,7 +17,7 @@ export default function Recharge() {
 
   return (
     <Layout>
-      <div id="recharge">
+      <section id="recharge">
         <h1>Recharge</h1>
         <form>
           <label htmlFor="service">What do you want to do?</label>
@@ -34,7 +34,7 @@ export default function Recharge() {
         {service === 'data' && <Data />}
         {service === 'electricity' && <Electricity />}
         {service === 'tv' && <Tv />}
-      </div>
+      </section>
     </Layout>
   )
 }

@@ -11,7 +11,6 @@ import authRouter from './routes/auth';
 import transactionRouter from './routes/transaction';
 
 import connectDB from './config/database';
-import { blocApi } from './utils/utils';
 // import { runCommand } from './utils/utils';
 
 dotenv.config();
@@ -61,6 +60,3 @@ export default app;
 
 // runCommand().then(() => console.log('Command run')).catch(err => console.log(err));
 console.log(`App is running at http://localhost:${process.env.PORT} in ${app.get('env')} mode`);
-
-
-blocApi.getDataPlanMeta('prd_M5KwEwdYAeo3vou9SoJqeE', 'op_xoaaKAWhcZ3RwGfMKjpmag').then(res => console.log(res)).catch(err => console.log(err));

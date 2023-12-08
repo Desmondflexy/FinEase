@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import Api from "../../api.config";
 import { toast } from 'react-toastify';
+import { FcGoogle } from "react-icons/fc";
 
 export function AdminSignup() {
   const [loading, setLoading] = useState(false);
@@ -88,36 +89,40 @@ export function AdminSignup() {
   }
 
   return (
-    <div className='form-container'>
-      <FormNav />
-      <form className='form' onSubmit={handleSubmit}>
+    <>
+      <Header />
+      <div className='form-container'>
+        <FormNav />
+        <form className='form' onSubmit={handleSubmit}>
 
-        <input autoComplete="on" type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
+          <input autoComplete="on" type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
 
-        <input autoComplete='on' type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
+          <input autoComplete='on' type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
 
-        <input autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
+          <input autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
 
-        <input autoComplete='on' type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
+          <input autoComplete='on' type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
 
-        <input autoComplete='on' type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
+          <input autoComplete='on' type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
 
-        <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
+          <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
 
-        <input autoComplete='off' type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
+          <input autoComplete='off' type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
 
-        <input autoComplete='off' type='password' id='admin-key' name='adminKey' placeholder='Admin Key' required value={adminKey} onChange={handleChange} />
+          <input autoComplete='off' type='password' id='admin-key' name='adminKey' placeholder='Admin Key' required value={adminKey} onChange={handleChange} />
 
-        <em className="feedback">{emailErrorFeedback}</em>
-        <em className="feedback">{usernameErrorFeedback}</em>
+          <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
 
-        <p style={{ color: 'red' }}>Admin Key is required to create an admin account</p>
+          <em className="feedback">{emailErrorFeedback}</em>
+          <em className="feedback">{usernameErrorFeedback}</em>
 
-        <p>Already have an account? <Link to="/login">Log In</Link></p>
+          <p style={{ color: 'red' }}>Admin Key is required to create an admin account</p>
 
-        <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
-      </form>
-    </div>
+          <p>Already have an account? <Link to="/login">Log In</Link></p>
+
+        </form>
+      </div>
+    </>
   )
 }
 
@@ -212,32 +217,39 @@ export function Signup() {
   }
 
   return (
-    <div className='form-container'>
-      <FormNav />
-      <form className='form' onSubmit={handleSubmit}>
+    <>
+      <Header />
+      <div className='form-container'>
+        <FormNav />
+        <form className='form' onSubmit={handleSubmit}>
 
-        <input autoComplete="on" type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
+          <input autoComplete="on" type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
 
-        <input autoComplete='on' type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
+          <input autoComplete='on' type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
 
-        <input autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
+          <input autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
 
-        <input autoComplete='on' type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
+          <input autoComplete='on' type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
 
-        <input autoComplete='on' type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
+          <input autoComplete='on' type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
 
-        <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
+          <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
 
-        <input autoComplete='off' type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
+          <input autoComplete='off' type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
 
-        <em className="feedback">{emailErrorFeedback}</em>
-        <em className="feedback">{usernameErrorFeedback}</em>
+          <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
 
-        <p>Already have an account? <Link to="/login">Log In</Link></p>
+          <GoogleBtn />
 
-        <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
-      </form>
-    </div>
+          <em className="feedback">{emailErrorFeedback}</em>
+          <em className="feedback">{usernameErrorFeedback}</em>
+
+          <p>Already have an account? <Link to="/login">Log In</Link></p>
+
+        </form>
+      </div>
+    </>
+
   )
 }
 
@@ -273,19 +285,25 @@ export function Login() {
   }
 
   return (
-    <div className="form-container">
-      <FormNav />
-      <form className="form" onSubmit={handleSubmit}>
+    <>
+      <Header />
+      <div className="form-container">
+        <FormNav />
+        <form className="form" onSubmit={handleSubmit}>
 
-        <input placeholder="Email or Username" value={emailOrUsername} onChange={e => setEmailOrUsername(e.target.value)} required />
+          <input placeholder="Email or Username" value={emailOrUsername} onChange={e => setEmailOrUsername(e.target.value)} required />
 
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
 
-        <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
+          <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>
 
-        <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>
-      </form>
-    </div>
+          <GoogleBtn />
+
+          <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
+
+        </form>
+      </div>
+    </>
   )
 }
 
@@ -304,4 +322,21 @@ function FormNav() {
       <div className={active === 'login' ? 'active' : ''}><Link to={'/login'}>Login</Link></div>
     </div>
   );
+}
+
+function GoogleBtn() {
+  function handleGoogleSSO() {
+    alert('Google SSO not yet implemented');
+  }
+  return (
+    <span onClick={handleGoogleSSO} className="google-btn"><FcGoogle className="logo" /><span>Continue with Google</span></span>
+  )
+}
+
+function Header() {
+  return (
+    <div id="header">
+      <h3><Link to='/'>FinEase</Link></h3>
+    </div>
+  )
 }

@@ -29,8 +29,8 @@ export default function Transactions() {
   if (status === 'success') {
     return (
       <Layout>
-        <h1>Transactions</h1>
-        <div id="all-transactions">
+        <section id="all-transactions">
+          <h1>Transactions</h1>
           <hr />
           <table>
             <thead>
@@ -56,7 +56,7 @@ export default function Transactions() {
               ))}
             </tbody>
           </table>
-        </div>
+        </section>
       </Layout>
     )
   }

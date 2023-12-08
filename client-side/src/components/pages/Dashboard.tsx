@@ -53,7 +53,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div id="dashboard">
+      <section id="dashboard">
         <h1>Dashboard</h1>
         <div>
           <p>Email: {user.email}</p>
@@ -72,7 +72,7 @@ export default function Dashboard() {
 
         <FundWalletModal setBalance={setBalance} closeModal={() => setFwOpen(false)} isOpen={fwOpen} email={user.email} />
         <TransferWalletModal closeModal={() => setTwOpen(false)} isOpen={twOpen} setBalance={setBalance} />
-      </div>
+      </section>
     </Layout>
   )
 }
