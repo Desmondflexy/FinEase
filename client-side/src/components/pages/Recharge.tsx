@@ -9,7 +9,7 @@ const networkLogo: { [key: string]: string } = {
   'airtel': 'images/airtel-logo.svg',
   'globacom': 'images/glo-logo.png',
   '9mobile': 'images/9mobile-logo.png'
-}
+};
 
 export default function Recharge() {
 
@@ -153,7 +153,7 @@ export function Data() {
       .catch(err => {
         console.log(err.response);
       });
-  }
+  };
 
   const fetchDataPlans = () => {
     if (operatorId)
@@ -164,7 +164,7 @@ export function Data() {
         .catch(err => {
           console.log(err.response);
         })
-  }
+  };
 
   const determineNetwork = () => {
     Api.get(`transaction/phone-network?phone=${phone}`)
@@ -175,7 +175,7 @@ export function Data() {
       .catch(() => {
         setLogoUrl('');
       })
-  }
+  };
 
   const buyData = () => {
     const data = {

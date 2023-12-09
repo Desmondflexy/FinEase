@@ -184,7 +184,7 @@ class Blochq {
     const { data_value, fee } = targetPlan.meta;
     const operators = await this.getOperators('telco');
     const operatorName = operators.find((i: { id: string }) => i.id === operatorId).name;
-    return { data_value, amount: fee*100, operator_name: operatorName }
+    return { data_value, amount: fee * 100, operator_name: operatorName }
   }
 }
 

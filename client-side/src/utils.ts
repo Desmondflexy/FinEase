@@ -38,3 +38,13 @@ export function payWithPaystack(email: string, amount: number, callback: (respon
 }
 
 export const phoneNumberRegex = /^(070[1234568]|080[2356789]|081[0-8]|090[1-9]|091[12356])\d{7}$/;
+
+export function formatDateTime(date: string) {
+  const dateObj = new Date(date);
+  const year = dateObj.getFullYear();
+  const month = dateObj.getMonth().toString().padStart(2, '0');
+  const day = dateObj.getDate().toString().padStart(2, '0');
+  const hour = dateObj.getHours().toString().padStart(2, '0');
+  const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+  return `${year}/${month}/${day} ${hour}:${minutes}`;
+}

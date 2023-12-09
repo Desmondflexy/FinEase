@@ -9,6 +9,7 @@ import cors from 'cors';
 import usersRouter from './routes/users';
 import authRouter from './routes/auth';
 import transactionRouter from './routes/transaction';
+import indexRouter from './routes/index';
 
 import connectDB from './config/database';
 // import { runCommand } from './utils/utils';
@@ -36,6 +37,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
+app.get('/', indexRouter);
 app.use('/account', usersRouter);
 app.use('/auth', authRouter);
 app.use('/transaction', transactionRouter);

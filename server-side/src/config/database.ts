@@ -11,7 +11,7 @@ export default function connectDB() {
   function connectWithRetry() {
     connect(databaseUrl)
       .then(() => {
-        console.log(`Database ${withoutInternet? '(offline)':"(online)"} is connected`);
+        console.log(`Database ${withoutInternet ? '(offline)' : "(online)"} is connected`);
       })
       .catch((err) => {
         console.error("Error connecting to Database: ", err.code);
