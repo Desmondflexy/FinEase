@@ -1,14 +1,13 @@
 import { toast } from "react-toastify";
 import Api from "../../api.config";
-import Layout from "../Layout";
 import { useEffect, useState } from "react";
 import { phoneNumberRegex } from "../../utils";
 
 const networkLogo: { [key: string]: string } = {
-  'mtn': 'images/mtn-logo.png',
-  'airtel': 'images/airtel-logo.svg',
-  'globacom': 'images/glo-logo.png',
-  '9mobile': 'images/9mobile-logo.png'
+  'mtn': '/src/assets/images/mtn-logo.png',
+  'airtel': '/src/assets/images/airtel-logo.svg',
+  'globacom': '/src/assets/images/glo-logo.png',
+  '9mobile': '/src/assets/images/9mobile-logo.png'
 };
 
 export default function Recharge() {
@@ -16,26 +15,24 @@ export default function Recharge() {
   const [service, setService] = useState('');
 
   return (
-    <Layout>
-      <section id="recharge">
-        <h1>Recharge</h1>
-        <form>
-          <label htmlFor="service">What do you want to do?</label>
-          <select id="service" value={service} onChange={(e) => setService(e.target.value)}>
-            <option value='' >--select--</option>
-            <option value="airtime">Buy Airtime</option>
-            <option value="data">Buy Data</option>
-            <option value="electricity">Buy Electricity</option>
-            <option value="tv">Tv Subscription</option>
-          </select>
-        </form>
+    <section id="recharge">
+      <h1>Recharge</h1>
+      <form>
+        <label htmlFor="service">What do you want to do?</label>
+        <select id="service" value={service} onChange={(e) => setService(e.target.value)}>
+          <option value='' >--select--</option>
+          <option value="airtime">Buy Airtime</option>
+          <option value="data">Buy Data</option>
+          <option value="electricity">Buy Electricity</option>
+          <option value="tv">Tv Subscription</option>
+        </select>
+      </form>
 
-        {service === 'airtime' && <Airtime />}
-        {service === 'data' && <Data />}
-        {service === 'electricity' && <Electricity />}
-        {service === 'tv' && <Tv />}
-      </section>
-    </Layout>
+      {service === 'airtime' && <Airtime />}
+      {service === 'data' && <Data />}
+      {service === 'electricity' && <Electricity />}
+      {service === 'tv' && <Tv />}
+    </section>
   )
 }
 

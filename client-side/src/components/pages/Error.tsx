@@ -7,7 +7,7 @@ export default function Error({ code, message, goto }: IError) {
   useEffect(() => {
     if (code === 401) {
       setTimeout(() => {
-        navigate('/login');
+        navigate('/auth/login');
       }, 1000);
     }
   })
@@ -17,7 +17,7 @@ export default function Error({ code, message, goto }: IError) {
     <div id="error-screen">
       <h1>Error {code}</h1>
       <p>{message}</p>
-      <Link to={goto}>{goto === '/login' ? 'Login' : 'Home'}</Link>
+      <Link to={goto}>{goto === '/auth/login' ? 'Login' : 'Home'}</Link>
     </div>
   )
 }

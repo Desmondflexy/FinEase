@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../Layout";
 import Api from "../../api.config";
 import Error from "./Error";
 import { formatDateTime, formatNumber } from "../../utils";
+import Loading from "./Loading";
+import { ITransaction } from "../../types";
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
@@ -46,26 +47,26 @@ export default function Transactions() {
 
   if (status === 'success') {
     return (
-      <Layout>
-        <section id="all-transactions">
-          <h1>Transactions</h1>
-          <form className="searchbox">
-            <input value={searchTerm} onChange={handleSearch} type="search" placeholder="Search transaction..." />
-          </form>
-          <hr />
-          <table>
-            <thead>
-              <tr>
-                <th>S/N</th>
-                <th>Amount</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Reference</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {searchResults.map((trx: ITransaction, index: number) => (
+      <section id="all-transactions">
+        <h1>Transactions</h1>
+        <form className="searchbox">
+          <input value={searchTerm} onChange={handleSearch} type="search" placeholder="Search transaction..." />
+        </form>
+        <hr />
+        <table>
+          <thead>
+            <tr>
+              <th>S/N</th>
+              <th>Amount</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Reference</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {searchResults.length
+              ? searchResults.map((trx: ITransaction, index: number) => (
                 <tr key={trx._id}>
                   <td>{index + 1}</td>
                   <td>{formatNumber(+trx.amount).slice(3)}</td>
@@ -74,24 +75,17 @@ export default function Transactions() {
                   <td>{trx.reference}</td>
                   <td>{formatDateTime(trx.createdAt)}</td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      </Layout>
+              ))
+              : <tr><td colSpan={6}>No transactions found</td></tr>}
+          </tbody>
+        </table>
+      </section>
     )
   }
 
   if (status === 'error') {
     return <Error code={error.status} message={error.statusText} goto={error.goto} />
   }
-}
 
-interface ITransaction {
-  _id: string;
-  amount: number;
-  type: string;
-  description: string;
-  reference: string;
-  createdAt: string;
+  return <Loading />
 }

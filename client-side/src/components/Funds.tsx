@@ -3,7 +3,6 @@ import { formatNumber, payWithPaystack } from "../utils";
 import Api from "../api.config";
 import { toast } from "react-toastify";
 import { IoMdClose } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
 
 export function FundWalletModal({ closeModal, isOpen, email, setBalance }: IFwModal) {
   const [fundAmount, setFundAmount] = useState('');
@@ -125,8 +124,6 @@ export function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal
 }
 
 export function OverLay({ children, isActive }: IOverLay) {
-  const navigate = useNavigate();
-  Api.get('account/me').then(() => { }).catch(() => navigate('/login'))
   if (isActive)
     return (
       <div className={`overlay`}>

@@ -1,10 +1,28 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
 import Api from "../../api.config";
 import { toast } from 'react-toastify';
 import { FcGoogle } from "react-icons/fc";
 
-export function AdminSignup() {
+const authRoute = {
+  login: '/auth/login',
+  signup: '/auth/signup',
+  adminSignup: '/auth/admin-signup'
+};
+
+export default function Auth() {
+  return (
+    <div className="get-started">
+      <Header />
+      <div className="form-container">
+        <FormNav />
+        <Outlet />
+      </div>
+    </div>
+  )
+}
+
+export function Signup({ admin }: { admin: boolean }) {
   const [loading, setLoading] = useState(false);
 
   // form inputs
@@ -24,12 +42,16 @@ export function AdminSignup() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const inputs = { username, first, last, email, phone, password, confirm, adminKey };
+    const endpoint = admin
+      ? { url: '/auth/admin-signup', inputs: { username, first, last, email, phone, password, confirm, adminKey } }
+      : { url: '/auth/signup', inputs: { username, first, last, email, phone, password, confirm } };
+    const { url, inputs } = endpoint;
+
     const signup = () => {
-      Api.post('/auth/admin-signup', inputs)
+      Api.post(url, inputs)
         .then(res => {
           toast.success(res.data.message);
-          navigate('/login');
+          navigate(authRoute.login);
           setLoading(false);
         })
         .catch(err => {
@@ -40,7 +62,7 @@ export function AdminSignup() {
           }
           setLoading(false)
         });
-    }
+    };
 
     setLoading(true);
     signup();
@@ -99,183 +121,42 @@ export function AdminSignup() {
   }
 
   return (
-    <div className="get-started">
-      <Header />
-      <div className='form-container'>
-        <FormNav />
-        <form className='form' onSubmit={handleSubmit}>
-          <div>
-            <input autoComplete="on" type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
-          </div>
-          <div>
-            <input autoComplete='on' type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
-          </div>
-          <div>
-            {emailErrorFeedback && <em className="feedback">{emailErrorFeedback}</em>}
-            <input onBlur={checkEmailAvailability} autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
-          </div>
-          <div>
-            <input autoComplete='on' type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
-          </div>
-          <div>
-            {usernameErrorFeedback && <em className="feedback">{usernameErrorFeedback}</em>}
-            <input onBlur={checkUsernameAvailability} autoComplete='on' type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
-          </div>
-          <div>
-            <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
-          </div>
-          <div>
-            <input autoComplete='off' type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
-          </div>
-          <div>
-            <input autoComplete='off' type='password' id='admin-key' name='adminKey' placeholder='Admin Key' required value={adminKey} onChange={handleChange} />
-          </div>
-          <div>
-            <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
-          </div>
-
-          <p style={{ color: 'darkred' }}>Admin Key is required to create an admin account</p>
-          <p>Already have an account? <Link to="/login">Log In</Link></p>
-
-        </form>
+    <form className='form' onSubmit={handleSubmit}>
+      <div>
+        <input autoComplete="on" type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
       </div>
-    </div>
-  )
-}
-
-export function Signup() {
-  const [loading, setLoading] = useState(false);
-
-  // form inputs
-  const [username, setUsername] = useState('');
-  const [first, setFirst] = useState('');
-  const [last, setLast] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-
-  const [emailErrorFeedback, setEmailErrorFeedback] = useState('');
-  const [usernameErrorFeedback, setUsernameErrorFeedback] = useState('');
-
-  const navigate = useNavigate();
-  const location = useLocation();
-  const adminSignup = location.pathname === '/admin-signup';
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const inputs = { username, first, last, email, phone, password, confirm };
-    const signup = () => {
-      Api.post(adminSignup ? '/auth/admin-signup' : '/auth/signup', inputs)
-        .then(res => {
-          toast.success(res.data.message);
-          navigate('/login');
-          setLoading(false);
-        })
-        .catch(err => {
-          if (err.response) {
-            toast.error(err.response.data.message);
-          } else {
-            toast.error(err.message);
-          }
-          setLoading(false)
-        });
-    }
-
-    setLoading(true);
-    signup();
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    switch (name) {
-      case 'username':
-        setUsername(value);
-        break;
-      case 'first':
-        setFirst(value);
-        break;
-      case 'last':
-        setLast(value);
-        break;
-      case 'email':
-        setEmail(value);
-        break;
-      case 'phone':
-        setPhone(value);
-        break;
-      case 'password':
-        setPassword(value);
-        break;
-      case 'confirm':
-        setConfirm(value);
-        break;
-      default:
-        break;
-    }
-  }
-
-  function checkUsernameAvailability() {
-    Api.get(`/auth/check/username/${username}`)
-      .then(() => {
-        setUsernameErrorFeedback('');
-      })
-      .catch(err => {
-        setUsernameErrorFeedback(err.response.data.message);
-      });
-  }
-
-  function checkEmailAvailability() {
-    Api.get(`/auth/check/email/${email}`)
-      .then(() => {
-        setEmailErrorFeedback('');
-      })
-      .catch(err => {
-        setEmailErrorFeedback(err.response.data.message);
-      });
-  }
-
-  return (
-    <div className="get-started">
-      <Header />
-      <div className='form-container'>
-        <FormNav />
-        <form className='form' onSubmit={handleSubmit}>
-          <div>
-            <input autoComplete="on" type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
-          </div>
-          <div>
-            <input autoComplete='on' type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
-          </div>
-          <div>
-            {emailErrorFeedback && <em className="feedback">{emailErrorFeedback}</em>}
-            <input onBlur={checkEmailAvailability} autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
-          </div>
-          <div>
-            <input autoComplete='on' type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
-          </div>
-          <div>
-            {usernameErrorFeedback && <em className="feedback">{usernameErrorFeedback}</em>}
-            <input onBlur={checkUsernameAvailability} autoComplete='on' type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
-          </div>
-          <div>
-            <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
-          </div>
-          <div>
-            <input autoComplete='off' type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
-          </div>
-          <div>
-            <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
-          </div>
-
-          <GoogleBtn />
-
-          <p>Already have an account? <Link to="/login">Log In</Link></p>
-
-        </form>
+      <div>
+        <input autoComplete='on' type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
       </div>
-    </div>
+      <div>
+        {emailErrorFeedback && <em className="feedback">{emailErrorFeedback}</em>}
+        <input onBlur={checkEmailAvailability} autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
+      </div>
+      <div>
+        <input autoComplete='on' type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
+      </div>
+      <div>
+        {usernameErrorFeedback && <em className="feedback">{usernameErrorFeedback}</em>}
+        <input onBlur={checkUsernameAvailability} autoComplete='on' type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
+      </div>
+      <div>
+        <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
+      </div>
+      <div>
+        <input autoComplete='off' type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
+      </div>
+      {admin &&
+        <div>
+          <input autoComplete='off' type='password' id='admin-key' name='adminKey' placeholder='Admin Key' required value={adminKey} onChange={handleChange} />
+        </div>}
+      <div>
+        <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
+      </div>
 
+      {admin && <p style={{ color: 'darkred' }}>Admin Key is required to create an admin account</p>}
+      <p>Already have an account? <Link to={authRoute.login}>Log In</Link></p>
+
+    </form>
   )
 }
 
@@ -293,7 +174,7 @@ export function Login() {
       Api.post('/auth/login', { emailOrUsername, password })
         .then(res => {
           localStorage.setItem('token', res.data.token);
-          navigate('/dashboard');
+          navigate('/account/dashboard');
           setLoading(false);
         })
         .catch(err => {
@@ -311,44 +192,41 @@ export function Login() {
   }
 
   return (
-    <div className="get-started">
-      <Header />
-      <div className="form-container">
-        <FormNav />
-        <form className="form" onSubmit={handleSubmit}>
-          <div>
-            <input placeholder="Email or Username" value={emailOrUsername} onChange={e => setEmailOrUsername(e.target.value)} required />
-          </div>
-          <div>
-            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-          </div>
-          <div>
-            <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>
-          </div>
-
-          <GoogleBtn />
-
-          <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
-
-        </form>
+    <form onSubmit={handleSubmit}>
+      <div>
+        <input name="username_email" placeholder="Email or Username" value={emailOrUsername} onChange={e => setEmailOrUsername(e.target.value)} required />
       </div>
-    </div>
+      <div>
+        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+      </div>
+      <div>
+        <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>
+      </div>
+
+      <GoogleBtn />
+
+      <p>Don't have an account? <Link to={authRoute.signup}>Sign Up</Link></p>
+
+    </form>
   )
 }
 
 function FormNav() {
+  const [active, setActive] = useState('');
   const location = useLocation();
-  let active = '';
-  if (location.pathname === '/login') {
-    active = 'login';
-  } else {
-    active = 'signup';
-  }
+  useEffect(() => {
+    if (location.pathname === authRoute.login) {
+      setActive(authRoute.login);
+    } else {
+      setActive(authRoute.signup);
+    }
+  }, [location.pathname]);
+
 
   return (
     <div className="form-nav">
-      <div className={active === 'signup' ? 'active' : ''}><Link to={'/signup'}>Signup</Link></div>
-      <div className={active === 'login' ? 'active' : ''}><Link to={'/login'}>Login</Link></div>
+      <div className={active === authRoute.signup ? 'active' : ''}><Link to={authRoute.signup}>Signup</Link></div>
+      <div className={active === authRoute.login ? 'active' : ''}><Link to={authRoute.login}>Login</Link></div>
     </div>
   );
 }

@@ -161,11 +161,10 @@ export async function login(req: Request, res: Response) {
   }
 }
 
-export async function profile(req: Request, res: Response) {
+export async function accountInfo(req: Request, res: Response) {
   try {
     const userId = req.user.id;
-    const requiredInfo = '_id username fullName email phone acctNo createdAt';
-    const user = await User.findById(userId).select(requiredInfo);
+    const user = await User.findById(userId).select('-password -__v -updatedAt');
 
     if (!user) {
       res.status(404);
@@ -176,11 +175,13 @@ export async function profile(req: Request, res: Response) {
       })
     }
 
-    res.status(200);
     return res.json({
       success: true,
       message: "User profile",
-      user
+      user: {
+        ...user.toJSON(),
+        balance: await calcBalance(userId)
+      }
     })
   }
 

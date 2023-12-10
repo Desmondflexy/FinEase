@@ -1,14 +1,15 @@
 import Api from "../../api.config";
 import { useState, useEffect } from "react";
+import { FaSort } from "react-icons/fa";
+import { IUser } from "../../types";
 import Error from "./Error";
-import Layout from "../Layout";
 
 export default function UsersList() {
   const [users, setUsers] = useState<IUser[]>([]);
-  const [error, setError] = useState({ status: 0, statusText: "", goto: "/" });
   const [status, setStatus] = useState('loading');
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState(users);
+  const [error, setError] = useState({ status: 0, statusText: '', goto: '/' });
 
   const fetchUsers = () => {
     Api.get('/account/all-users')
@@ -17,9 +18,19 @@ export default function UsersList() {
         setUsers(res.data.users);
       })
       .catch(err => {
+        console.error(err.message);
         setStatus('error');
-        const { status, statusText } = err.response;
-        setError(e => ({ ...e, status, statusText, goto: '/' }));
+        if (err.response) {
+          const { status, statusText } = err.response;
+          setError(e => ({
+            ...e,
+            status,
+            statusText,
+            goto: status >= 400 && status <= 499 ? '/auth/login' : e.goto
+          }));
+        } else {
+          setError(e => ({ ...e, status: 500, statusText: err.message }));
+        }
       });
   };
 
@@ -45,57 +56,42 @@ export default function UsersList() {
 
   if (status === 'success') {
     return (
-      <Layout>
-        <section id="admin">
-          <h2>List of all active users of FinEase</h2>
-          <form className="searchbox">
-            <input type="search" placeholder="Search for user..." onChange={handleSearch} value={searchTerm} />
-          </form>
-          <hr />
-          <table>
-            <thead>
-              <tr>
-                <th>S/N</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Date Registered</th>
+      <section id="admin">
+        <h2>List of all active users of FinEase</h2>
+        <form className="searchbox">
+          <input type="search" placeholder="Search for user..." onChange={handleSearch} value={searchTerm} />
+        </form>
+        <hr />
+        <table>
+          <thead>
+            <tr>
+              <th>S/N</th>
+              <th><span>Name</span><button><FaSort /></button></th>
+              <th><span>Email</span><button><FaSort /></button></th>
+              <th><span>Phone</span><button><FaSort /></button></th>
+              <th><span>Date Registered</span><button><FaSort /></button></th>
+            </tr>
+          </thead>
+          <tbody>
+            {searchResults.map((user: IUser, index: number) => (
+              <tr key={user._id}>
+                <td>{index + 1}</td>
+                <td>{user.fullName}</td>
+                <td>{user.email}</td>
+                <td>{user.phone}</td>
+                <td>{user.createdAt.split('T')[0]}</td>
               </tr>
-            </thead>
-            <tbody>
-              {searchResults.map((user: IUser, index: number) => (
-                <tr key={user._id}>
-                  <td>{index + 1}</td>
-                  <td>{user.fullName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td>{user.createdAt.split('T')[0]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      </Layout>
+            ))}
+          </tbody>
+        </table>
+      </section>
     )
   }
 
 
   if (status === 'error') {
     return (
-      <Layout>
-        <Error code={error.status} message={error.statusText} goto={error.goto} />
-      </Layout>
+      <Error code={error.status} message={error.statusText} goto={error.goto} />
     )
   }
-}
-
-
-interface IUser {
-  _id: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  createdAt: string;
-  acctNo: string;
-  isAdmin: boolean;
 }
