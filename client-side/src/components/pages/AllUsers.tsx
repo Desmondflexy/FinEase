@@ -67,6 +67,7 @@ export default function UsersList() {
             <tr>
               <th>S/N</th>
               <th><span>Name</span><button><FaSort /></button></th>
+              <th><span>Username</span><button><FaSort /></button></th>
               <th><span>Email</span><button><FaSort /></button></th>
               <th><span>Phone</span><button><FaSort /></button></th>
               <th><span>Date Registered</span><button><FaSort /></button></th>
@@ -77,6 +78,7 @@ export default function UsersList() {
               <tr key={user._id}>
                 <td>{index + 1}</td>
                 <td>{user.fullName}</td>
+                <td>{user.username}</td>
                 <td>{user.email}</td>
                 <td>{user.phone}</td>
                 <td>{user.createdAt.split('T')[0]}</td>

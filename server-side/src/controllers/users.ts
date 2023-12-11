@@ -273,7 +273,7 @@ export async function isAvailable(req: Request, res: Response) {
 
 export async function getUserFullName(req: Request, res: Response) {
   try {
-    const {acctNoOrUsername} = req.query;
+    const { acctNoOrUsername } = req.query;
     const user = await User.findOne({ acctNo: acctNoOrUsername }).select('fullName') || await User.findOne({ username: acctNoOrUsername }).select('fullName');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -281,4 +281,60 @@ export async function getUserFullName(req: Request, res: Response) {
     return res.send(user.fullName);
 
   } catch (error) { /* empty */ }
+}
+
+export async function updateUser(req: Request, res: Response) {
+  try {
+    const { error } = validators.updateUser.validate(req.body, validators.options);
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    const { first, last, phone, email, password, oldPassword } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (first || last) {
+      if (!first) {
+        user.fullName = `${user.fullName.split(' ')[0]} ${last}`;
+      } else if (!last) {
+        user.fullName = `${first} ${user.fullName.split(' ')[1]}`;
+      } else {
+        user.fullName = `${first} ${last}`;
+      }
+    }
+    user.phone = phone || user.phone;
+    if (email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+        return res.status(409).json({ message: 'Email already exists' });
+      } else {
+        user.email = email;
+      }
+    }
+    if (password) {
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Old password is incorrect!' });
+      }
+      user.password = await bcrypt.hash(password, 10);
+    }
+    await user.save();
+    return res.json({
+      message: 'User updated successfully',
+      user
+    });
+
+  } catch (error: any) {
+    console.error(error);
+    res.status(500);
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    })
+  }
 }

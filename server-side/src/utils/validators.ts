@@ -49,3 +49,13 @@ export const buyData = joi.object().keys({
   phone: joi.string().required().regex(phoneNumberRegex).messages({'string.pattern.base': 'Invalid phone number'}),
   dataPlanId: joi.string().required(),
 });
+
+export const updateUser = joi.object().keys({
+  first: joi.string().max(50),
+  last: joi.string().max(50),
+  email: joi.string().email(),
+  phone: joi.string().regex(phoneNumberRegex).messages({'string.pattern.base': 'Invalid phone number'}),
+  password: joi.string().min(6),
+  confirm: joi.string().valid(joi.ref('password')).messages({'any.only': 'Passwords do not match'}),
+  oldPassword: joi.string(),
+})
