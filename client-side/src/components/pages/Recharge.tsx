@@ -2,6 +2,8 @@ import { toast } from "react-toastify";
 import Api from "../../api.config";
 import { useEffect, useState } from "react";
 import { phoneNumberRegex } from "../../utils";
+import { useOutletContext } from "react-router-dom";
+import { OutletContextType } from "../../types";
 
 const networkLogo: { [key: string]: string } = {
   'mtn': '/src/assets/images/mtn-logo.png',
@@ -43,6 +45,7 @@ export function Airtime() {
   const [amount, setAmount] = useState('');
   const [processing, setProcessing] = useState(false);
   const [logoUrl, setLogoUrl] = useState('');
+  const [user, setUser] = useOutletContext() as OutletContextType
 
   const options = networks.map((network: { id: string; name: string }) => {
     return <option key={network.id} value={network.id}>{network.name}</option>
@@ -69,6 +72,10 @@ export function Airtime() {
         setAmount('');
         setPhone('');
         setNetwork('');
+        setUser({
+          ...user,
+          balance: res.data.balance
+        })
       })
       .catch(err => {
         toast.error(err.response.data.message);
@@ -130,6 +137,7 @@ export function Data() {
   const [plans, setPlans] = useState([]);
   const [processing, setProcessing] = useState(false);
   const [logoUrl, setLogoUrl] = useState('');
+  const [user, setUser] = useOutletContext() as OutletContextType;
 
   const options = networks.map((network: { id: string; name: string }) => {
     return <option key={network.id} value={network.id}>{network.name}</option>
@@ -188,6 +196,10 @@ export function Data() {
         setPhone('');
         setOperatorId('');
         setProcessing(false);
+        setUser({
+          ...user,
+          balance: res.data.balance
+        })
       })
       .catch(err => {
         toast.error(err.response.data.message);

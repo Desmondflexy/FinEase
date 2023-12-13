@@ -1,3 +1,4 @@
+// shape for user
 export interface IUser {
   _id: string;
   fullName: string;
@@ -10,6 +11,7 @@ export interface IUser {
   balance: number;
 }
 
+// shape for transaction
 export interface ITransaction {
   _id: string;
   amount: number;
@@ -18,3 +20,6 @@ export interface ITransaction {
   reference: string;
   createdAt: string;
 }
+
+// shape for [user, setUser] context
+export type OutletContextType = [IUser, React.Dispatch<React.SetStateAction<IUser>>];

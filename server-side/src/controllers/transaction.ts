@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import Transaction from "../models/transaction";
 import * as validators from "../utils/validators";
 import { calcBalance, verifyTransaction, generateReference, blocApi } from "../utils/utils";
-import User from "../models/users";
+import User, { IUser } from "../models/users";
 import { phoneNetworks } from "../utils/constants";
+import bcrypt from 'bcrypt';
 
 export async function fundWallet(req: Request, res: Response) {
   try {
@@ -64,7 +65,7 @@ export async function fundWallet(req: Request, res: Response) {
 }
 
 export async function transferFunds(req: Request, res: Response) {
-  const user = req.user.id;
+  const userId = req.user.id;
 
   try {
     const { error } = validators.transferFunds.validate(req.body, validators.options);
@@ -80,6 +81,7 @@ export async function transferFunds(req: Request, res: Response) {
 
     const { acctNoOrUsername } = req.body;
     const amount = req.body.amount * 100;  // convert to kobo
+    const password = req.body.password;
 
     const requiredInfo = 'username fullName email phone';
     const recipient = await User.findOne({ acctNo: acctNoOrUsername }).select(requiredInfo) || await User.findOne({ username: acctNoOrUsername }).select(requiredInfo);
@@ -95,7 +97,7 @@ export async function transferFunds(req: Request, res: Response) {
     }
 
     // check if sender has sufficient balance
-    const userBalance = await calcBalance(user);
+    const userBalance = await calcBalance(userId);
     if (userBalance < amount) {
       res.status(402);
       return res.json({
@@ -105,7 +107,7 @@ export async function transferFunds(req: Request, res: Response) {
       });
     }
 
-    if (recipient.id === user) {
+    if (recipient.id === userId) {
       res.status(409);
       return res.json({
         success: false,
@@ -114,9 +116,21 @@ export async function transferFunds(req: Request, res: Response) {
       })
     }
 
+    // authenticate transaction
+    const user = await User.findById(userId) as IUser;
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      res.status(401);
+      return res.json({
+        message: 'Password is incorrect',
+        error: 'Unauthorized'
+      });
+    }
+
     // create debit transaction
     const transaction = await Transaction.create({
-      user,
+      user: userId,
       amount,
       type: 'debit',
       service: 'wallet transfer',
@@ -135,13 +149,13 @@ export async function transferFunds(req: Request, res: Response) {
       description: `Wallet transfer from ${req.user.username}`,
       reference: await generateReference('RW'),
       serviceProvider: 'Wallet2Wallet',
-      sender: user,
+      sender: userId,
     });
 
     return res.json({
       success: true,
       message: `Funds sent to ${recipient.username} successfully!`,
-      balance: await calcBalance(user),
+      balance: await calcBalance(userId),
       amount: amount / 100,
       reference: transaction.reference,
     });
@@ -162,12 +176,19 @@ export async function getTransactions(req: Request, res: Response) {
   try {
     const user = req.user.id;
     const requiredInfo = 'amount type reference createdAt description';
-    const transactions = await Transaction.find({ user }).sort({ createdAt: -1 }).select(requiredInfo);
+    let transactions;
+    if (req.query.limit) {
+      const { limit } = req.query as { limit: string };
+      transactions = await Transaction.find({ user }).sort({ createdAt: -1 }).limit(+limit).select(requiredInfo);
+    } else {
+      transactions = await Transaction.find({ user }).sort({ createdAt: -1 }).select(requiredInfo);
+    }
 
     res.status(200);
     return res.json({
       success: true,
       message: `Transaction history for ${req.user.username}`,
+      'transaction count': transactions.length,
       transactions
     });
 

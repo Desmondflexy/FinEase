@@ -52,6 +52,7 @@ export function FundWalletModal({ closeModal, isOpen, email, setBalance }: IFwMo
 export function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal) {
   const [acctNoOrUsername, setAcctNoOrUsername] = useState('');
   const [amount, setAmount] = useState('');
+  const [password, setPassword] = useState('');
   const [processing, setProcessing] = useState(false);
   const [feedback, setFeedback] = useState('');
 
@@ -70,12 +71,13 @@ export function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal
   }
 
   function transferFunds() {
-    Api.post('transaction/fund-transfer', { acctNoOrUsername, amount })
+    Api.post('transaction/fund-transfer', { acctNoOrUsername, amount, password })
       .then(res => {
         setBalance(formatNumber(res.data.balance));
         toast.success(res.data.message);
         setAcctNoOrUsername('');
         setAmount('');
+        setPassword('');
         setFeedback('');
         setProcessing(false);
       })
@@ -104,6 +106,9 @@ export function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal
       case 'amount':
         setAmount(value);
         break;
+      case 'password':
+        setPassword(value);
+        break;
       default:
         break;
     }
@@ -115,6 +120,7 @@ export function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal
         <h2>Wallet to Wallet Transfer</h2>
         <input disabled={processing} onBlur={confirmUser} placeholder="Recipient username or account number" name="acctNoOrUsername" value={acctNoOrUsername} onChange={handleChange} required />
         <input disabled={processing} placeholder="Transfer amount" type="number" min={1} name="amount" id="amount" value={amount} onChange={handleChange} required />
+        <input placeholder="Enter your login password" type="password" name="password" disabled={processing} value={password} onChange={handleChange} required />
         <p className={`${feedback.includes('Invalid') ? 'bad' : 'good'} feedback`}>{feedback}</p>
         <button className="form-submit" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
         <IoMdClose className="close-btn" onClick={handleCloseModal} />

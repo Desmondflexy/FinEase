@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 export default function Settings() {
   const [loading, setLoading] = useState(false);
-  const user = useOutletContext() as IUser;
+  const [user] = useOutletContext() as [IUser];
   const [first, setFirst] = useState(user.fullName.split(' ')[0]);
   const [last, setLast] = useState(user.fullName.split(' ')[1]);
   const [email, setEmail] = useState(user.email);
@@ -85,8 +85,6 @@ export default function Settings() {
         </div>
         <button disabled={loading} >{loading ? 'Processing...' : 'Confirm Change Password'}</button>
       </form>
-
-      <h3>Change Theme</h3>
     </section>
   )
 }

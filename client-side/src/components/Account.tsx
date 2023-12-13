@@ -67,7 +67,7 @@ export default function Account() {
           <li><LogoutButton /></li>
         </ul>
         <div id="main">
-          <Outlet context={user} />
+          <Outlet context={[user, setUser]} />
         </div>
       </div>
     )

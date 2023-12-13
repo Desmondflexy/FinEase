@@ -2,7 +2,7 @@ import { useOutletContext } from "react-router-dom";
 import { IUser } from "../../types";
 
 export default function Profile() {
-  const user = useOutletContext() as IUser;
+  const [user] = useOutletContext() as [IUser];
 
   return (
     <section id="profile-screen">

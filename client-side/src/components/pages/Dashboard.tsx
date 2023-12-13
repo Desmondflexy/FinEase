@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { CiSettings } from "react-icons/ci";
-import { formatNumber } from "../../utils";
+import { formatDateTime, formatNumber } from "../../utils";
 import { FundWalletModal, TransferWalletModal } from "../Funds";
 import { useOutletContext } from "react-router-dom";
-import { IUser } from "../../types";
+import { ITransaction, IUser } from "../../types";
+import Api from "../../api.config";
 
 export default function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [fwOpen, setFwOpen] = useState(false); // fund wallet modal not open
   const [twOpen, setTwOpen] = useState(false); // transfer wallet modal not open
-  const user = useOutletContext() as IUser;
+  const [user] = useOutletContext() as [IUser];
   const [balance, setBalance] = useState(formatNumber(user.balance));
+  const [recent10, setRecent10] = useState<ITransaction[]>([]);
 
   const openModal = (setModalOpen: (isOpen: boolean) => void) => setModalOpen(true)
   const closeDropdown = (e: MouseEvent) => {
@@ -19,6 +21,19 @@ export default function Dashboard() {
       setDropdownOpen(false);
     }
   }
+
+  const getRecentTransactions = () => {
+    const limit = 10;
+    Api.get(`transaction?limit=${limit}`)
+      .then(res => {
+        setRecent10(res.data.transactions);
+      })
+      .catch(err => {
+        console.error(err.response.data);
+      })
+  }
+
+  useEffect(getRecentTransactions, []);
 
   useEffect(() => {
     document.addEventListener('click', closeDropdown);
@@ -43,6 +58,33 @@ export default function Dashboard() {
             <li onClick={() => openModal(setTwOpen)}>Transfer</li>
           </ul>
         </div>
+      </div>
+      <div>
+        <h3>Recent Transations</h3>
+      </div>
+      <div className="table">
+        <table>
+          <thead>
+            <tr>
+              <th>SN</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Description</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recent10.map((trx: ITransaction, index: number) => (
+              <tr key={trx._id}>
+                <td>{index + 1}</td>
+                <td>{trx.type}</td>
+                <td>{formatNumber(+trx.amount).slice(3)}</td>
+                <td>{trx.description}</td>
+                <td>{formatDateTime(trx.createdAt)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <FundWalletModal setBalance={setBalance} closeModal={() => setFwOpen(false)} isOpen={fwOpen} email={user.email} />
