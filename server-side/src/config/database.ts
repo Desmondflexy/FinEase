@@ -1,6 +1,6 @@
 import { connect, connection } from "mongoose";
 
-const withoutInternet = false;
+const withoutInternet = true;
 
 export default function connectDB() {
 

@@ -2,7 +2,6 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import Api from "../../api.config";
 import { toast } from 'react-toastify';
-import { FcGoogle } from "react-icons/fc";
 
 const authRoute = {
   login: '/auth/login',
@@ -203,8 +202,6 @@ export function Login() {
         <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>
       </div>
 
-      <GoogleBtn />
-
       <p>Don't have an account? <Link to={authRoute.signup}>Sign Up</Link></p>
 
     </form>
@@ -229,15 +226,6 @@ function FormNav() {
       <div className={active === authRoute.login ? 'active' : ''}><Link to={authRoute.login}>Login</Link></div>
     </div>
   );
-}
-
-function GoogleBtn() {
-  function handleGoogleSSO() {
-    alert('Google SSO not yet implemented');
-  }
-  return (
-    <span onClick={handleGoogleSSO} className="google-btn"><FcGoogle className="logo" /><span>Continue with Google</span></span>
-  )
 }
 
 function Header() {

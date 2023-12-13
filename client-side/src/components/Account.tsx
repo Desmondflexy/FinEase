@@ -47,7 +47,7 @@ export default function Account() {
   };
 
   // only fetch account info if token changes
-  useEffect(fetchAcctInfo, [token]);
+  useEffect(fetchAcctInfo, [token, location]);
 
   if (user && status === 'success') {
     return (
