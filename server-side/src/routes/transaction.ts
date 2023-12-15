@@ -12,5 +12,7 @@ router.post('/airtime', authenticate, transaction.buyAirtime);
 router.get('/phone-network', authenticate, transaction.getPhoneNetwork);
 router.get('/data-plans', authenticate, transaction.getDataPlans);
 router.post('/buy-data', authenticate, transaction.buyData);
+router.get('/customer-validate', authenticate, transaction.validateCustomer);
+router.post('/electricity', authenticate, transaction.buyElectricity);
 
 export default router;

@@ -36,27 +36,23 @@ export async function calcBalance(user: string) {
   }
 }
 
-export async function runCommand() {
-  // try {
-  //   const trxs = await Transaction.find();
-  //   for (const trx of trxs) {
-  //     // if (trx.description && trx.type !== 'fund wallet') continue;
-  //     await trx.deleteOne();
-  //   }
-  // }
-  // catch (error: any) {
-  //   console.error(error);
-  // }
+// 20 digit electricity token for testing, not real
+export function generateRandomToken() {
+  const arr = [];
+  for (let i = 0; i < 4; i++) {
+    const num = Math.floor(Math.random() * 10000);
+    const str = num.toString().padStart(4, '0');
+    arr.push(str);
+  }
+  return arr.join('-');
 }
 
 
 export async function verifyTransaction(ref: string) {
-  const headers = {
-    Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`,
-  }
+  const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` } }
   const url = `https://api.paystack.co/transaction/verify/${ref}`;
   try {
-    const response = await axios.get(url, { headers });
+    const response = await axios.get(url, authorizationHeaders);
     return response.data;
   }
   catch {
@@ -85,9 +81,10 @@ class Blochq {
 
   async getOperators(bill: string) {
     const url = `${this.baseUrl}/operators?bill=${bill}`;
+    const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
 
     try {
-      const response = await axios.get(url, { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } });
+      const response = await axios.get(url, authorizationHeaders);
       return response.data.data;
 
     } catch (error: any) {
@@ -96,11 +93,12 @@ class Blochq {
     }
   }
 
-  async getProducts(operatorID: string) {
-    const url = `${this.baseUrl}/operators/${operatorID}/products?bill=telco`;
+  async getProducts(operatorID: string, bill: string = 'telco') {
+    const url = `${this.baseUrl}/operators/${operatorID}/products?bill=${bill}`;
+    const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
 
     try {
-      const response = await axios.get(url, { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } });
+      const response = await axios.get(url, authorizationHeaders);
       return response.data.data;
 
     } catch (error: any) {
@@ -133,7 +131,6 @@ class Blochq {
     }
   }
 
-  /**Returns true if phoneNumber matches selected network, otherwise false */
   async verifyNetwork(phone: string, operatorId: string) {
     const phoneNetwork = phoneNetworks[phone.slice(0, 4)]?.toLowerCase();
     const operators = await this.getOperators('telco');
@@ -147,23 +144,27 @@ class Blochq {
   }
 
   async buyAirtime(amount: number, operatorId: string, phone: string) {
-    const url = `${this.baseUrl}/payment?bill=telco`;
-
-    const getAirtimeId = async () => {
-      const products = await this.getProducts(operatorId);
-      const airtimeProduct = products.find((product: { category: string }) => product.category === this.airtimeCategoryId);
-      return airtimeProduct.id;
-    }
-
-    const data = {
-      amount,
-      operator_id: operatorId,
-      product_id: await getAirtimeId(),
-      device_details: { "beneficiary_msisdn": phone },
-    }
-
     try {
-      const response = await axios.post(url, data, { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } });
+      const url = `${this.baseUrl}/payment?bill=telco`;
+      const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
+
+      const getAirtimeId = async () => {
+        const products = await this.getProducts(operatorId);
+        const airtimeProduct = products.find((product: { category: string }) => product.category === this.airtimeCategoryId);
+        return airtimeProduct.id;
+      }
+
+      const data = {
+        amount,
+        operator_id: operatorId,
+        product_id: await getAirtimeId(),
+        device_details: { "beneficiary_msisdn": phone },
+      }
+
+      const useBloc = false;
+      const response = useBloc
+        ? await axios.post(url, data, authorizationHeaders)
+        : { data: { data: { meta_data: { operator_name: await this.getOperatorNameById(data.operator_id) } } } };
       return response.data.data;
 
     } catch (error: any) {
@@ -173,19 +174,83 @@ class Blochq {
   }
 
   async buyData(dataPlanId: string, amount: number, operatorId: string, phone: string) {
-    console.log('buying data', dataPlanId, amount, operatorId, phone);
+    const url = `${this.baseUrl}/payment?bill=telco`;
+    const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
 
-    return { meta_data: await this.getDataPlanMeta(dataPlanId, operatorId) };
+    const data = {
+      amount,
+      operator_id: operatorId,
+      product_id: dataPlanId,
+      device_details: { "beneficiary_msisdn": phone },
+    }
+
+    const useBloc = false;
+    const response = useBloc
+      ? await axios.post(url, data, authorizationHeaders)
+      : { data: { data: { meta_data: await this.getDataPlanMeta(dataPlanId, operatorId) } } };
+
+    return response.data.data;
   }
 
   async getDataPlanMeta(dataPlanId: string, operatorId: string) {
     const products = await this.getProducts(operatorId);
     const targetPlan = products.find((product: { id: string }) => product.id === dataPlanId);
     const { data_value, fee } = targetPlan.meta;
-    const operators = await this.getOperators('telco');
-    const operatorName = operators.find((i: { id: string }) => i.id === operatorId).name;
-    return { data_value, amount: fee * 100, operator_name: operatorName }
+    return { data_value, amount: fee * 100, operator_name: await this.getOperatorNameById(operatorId) }
   }
+
+  async getOperatorNameById(operatorId: string, bill: string = 'telco') {
+    const operators = await this.getOperators(bill);
+    return operators.find((i: { id: string }) => i.id === operatorId).name;
+  }
+
+  async validateCustomerDevice(operatorID: string, bill: string, deviceNumber: string, meterType: string = 'prepaid') {
+    const url = `${this.baseUrl}/customer/validate/${operatorID}?meter_type=${meterType}&bill=${bill}&device_number=${deviceNumber}`;
+    const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
+    try {
+      const response = await axios.get(url, authorizationHeaders);
+      return response.data.data;
+
+    } catch (error: any) {
+      console.error(error);
+      throw new Error('Error fetching customer details');
+    }
+  }
+
+  async buyElectricity(productId: string, amount: number, operatorId: string, meterNumber: string, meterType: string) {
+    console.log('buying electricity', productId, amount, operatorId, meterNumber, meterType)
+    const url = `${this.baseUrl}/payment?bill=electricity`;
+    const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
+
+    const data = {
+      amount,
+      operator_id: operatorId,
+      product_id: productId,
+      device_details: { beneficiary_msisdn: meterNumber, meter_type: meterType },
+    }
+
+    const useBloc = false;
+    let response;
+    if (useBloc) {
+      response = await axios.post(url, data, authorizationHeaders);
+    } else {
+      const units = amount / 7626;
+      response = {
+        data: {
+          data: {
+            meta_data: {
+              token: generateRandomToken(),
+              units: units.toFixed(2),
+              operator_name: await this.getOperatorNameById(operatorId, 'electricity')
+            }
+          }
+        }
+      };
+    }
+
+    return response.data.data;
+  }
+
 }
 
 export const blocApi = new Blochq();

@@ -51,6 +51,14 @@ export const buyData = joi.object().keys({
   dataPlanId: joi.string().required(),
 });
 
+export const buyElectricity = joi.object().keys({
+  amount: joi.number().integer().min(1).required(),
+  productId: joi.string().required(),
+  operatorId: joi.string().required(),
+  meterType: joi.string().required(),
+  meterNumber: joi.string().required(),
+})
+
 export const updateUser = joi.object().keys({
   first: joi.string().max(50),
   last: joi.string().max(50),

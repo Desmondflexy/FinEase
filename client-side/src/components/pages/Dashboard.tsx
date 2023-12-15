@@ -33,7 +33,7 @@ export default function Dashboard() {
       })
   }
 
-  useEffect(getRecentTransactions, []);
+  useEffect(getRecentTransactions, [balance]);
 
   useEffect(() => {
     document.addEventListener('click', closeDropdown);
@@ -59,32 +59,33 @@ export default function Dashboard() {
           </ul>
         </div>
       </div>
-      <div>
-        <h3>Recent Transations</h3>
-      </div>
-      <div className="table">
-        <table>
-          <thead>
-            <tr>
-              <th>SN</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Description</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recent10.map((trx: ITransaction, index: number) => (
-              <tr key={trx._id}>
-                <td>{index + 1}</td>
-                <td>{trx.type}</td>
-                <td>{formatNumber(+trx.amount).slice(3)}</td>
-                <td>{trx.description}</td>
-                <td>{formatDateTime(trx.createdAt)}</td>
+
+      <div className="table-container">
+        <h3>Recent Transactions</h3>
+        <div className="table">
+          <table>
+            <thead>
+              <tr>
+                <th>SN</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Time</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {recent10.map((trx: ITransaction, index: number) => (
+                <tr key={trx._id}>
+                  <td>{index + 1}</td>
+                  <td>{trx.type}</td>
+                  <td>{formatNumber(+trx.amount).slice(3)}</td>
+                  <td>{trx.description}</td>
+                  <td>{formatDateTime(trx.createdAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <FundWalletModal setBalance={setBalance} closeModal={() => setFwOpen(false)} isOpen={fwOpen} email={user.email} />

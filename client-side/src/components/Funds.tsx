@@ -80,6 +80,7 @@ export function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal
         setPassword('');
         setFeedback('');
         setProcessing(false);
+        closeModal();
       })
       .catch(err => {
         toast.error(err.response.data.message);

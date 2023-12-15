@@ -396,11 +396,91 @@ export async function buyData(req: Request, res: Response) {
     });
 
   } catch (error: any) {
+    console.error(error);
     res.status(500);
     res.json({
       success: false,
       message: "Internal Server Error",
       error: error.message
     });
+  }
+}
+
+export async function validateCustomer(req: Request, res: Response) {
+  try {
+    const { operatorID, bill, deviceNumber } = req.query;
+    const customer = await blocApi.validateCustomerDevice(operatorID as string, bill as string, deviceNumber as string);
+
+    return res.json({
+      success: true,
+      message: 'Customer details',
+      customer
+    });
+
+  } catch (error: any) {
+    console.error(error);
+    res.status(500);
+    res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
+  }
+}
+
+export async function buyElectricity(req:Request, res:Response){
+  try {
+    const {error} = validators.buyElectricity.validate(req.body, validators.options);
+    if(error){
+      res.status(400);
+      return res.json({
+        success: false,
+        message: error.message,
+        error: 'Bad request'
+      });
+    }
+
+    const {amount, productId, operatorId, meterType, meterNumber} = req.body;
+    const amountInKobo = amount * 100;
+    const userId = req.user.id;
+    const userBalance = await calcBalance(userId);
+    if (userBalance < amountInKobo) {
+      res.status(402);
+      return res.json({
+        success: false,
+        message: 'You do not have enough funds',
+        error: 'Insufficient funds'
+      });
+    }
+
+    const response = await blocApi.buyElectricity(productId, amountInKobo, operatorId, meterNumber, meterType);
+    const {units, token, operator_name} = response.meta_data;
+
+    await Transaction.create({
+      user: userId,
+      amount: amountInKobo,
+      type: 'debit',
+      service: 'bill payment',
+      description: `Payment of ${amount} electricity bill for ${meterNumber} ${operator_name} | ${token} | ${units} units.`,
+      reference: await generateReference('EPT'),
+      serviceProvider: 'Wallet2Wallet',
+    });
+
+    res.status(201);
+    return res.json({
+      success: true,
+      message: 'Electricity purchased successfully!',
+      meterNumber,
+      token,
+      balance: await calcBalance(userId),
+    });
+
+  } catch (error: any) {
+    res.status(500);
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    })
   }
 }

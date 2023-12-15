@@ -190,10 +190,6 @@ a {
   & a {
     font-size: 0.8em;
   }
-
-  & hr {
-    width: 100px;
-  }
 }
 
 #home-screen {
@@ -322,7 +318,9 @@ a {
   & #main {
     grid-column: 2;
     grid-row: 2/3;
-    padding: 20px;
+    padding: 20px 15%;
+
+
   }
 }
 
@@ -342,7 +340,7 @@ a {
 
 table {
   border-collapse: collapse;
-  width: 100%;
+  /* width: 100%; */
 
   & th,
   td {
@@ -363,6 +361,26 @@ table {
     position: relative;
     margin: 10px 0;
     max-width: 400px;
+  }
+
+  & .table-container{
+    margin-top: 50px;
+
+    .table{
+      width: 400px;
+      height: 300px;
+      border: 5px solid rgb(158, 119, 119);
+      border-radius: 6px;
+      overflow-x: scroll;
+      overflow-y: scroll;
+      box-shadow: 2px 2px 5px inset;
+
+
+      & table{
+        width: 700px;
+      }
+    }
+
   }
 }
 
@@ -575,5 +593,11 @@ button.form-submit {
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 768px) {
+  #main{
+    padding-left: 100px;
   }
 }
