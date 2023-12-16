@@ -3,7 +3,7 @@ import Api from "../../api.config";
 import { useEffect, useState } from "react";
 import { phoneNumberRegex } from "../../utils";
 import { useOutletContext } from "react-router-dom";
-import { OutletContextType } from "../../types";
+import { IDisco, OutletContextType } from "../../types";
 
 const networkLogo: { [key: string]: string } = {
   'mtn': '/src/assets/images/mtn-logo.png',
@@ -221,10 +221,6 @@ export function Data() {
     setPlanId('');
   }
 
-  function handlePlanChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setPlanId(e.target.value);
-  }
-
   return (
     <div>
       <h2>Data</h2>
@@ -238,7 +234,7 @@ export function Data() {
         </div>
         <div>
           <label htmlFor="data-plans">Data Plan</label>
-          <select id="data-plans" required disabled={!operatorId} value={planId} onChange={handlePlanChange} >
+          <select id="data-plans" required disabled={!operatorId} value={planId} onChange={e => setPlanId(e.target.value)} >
             <option value="">-- SELECT DATAPLANS --</option>
             {planOptions}
           </select>
@@ -256,13 +252,190 @@ export function Data() {
 }
 
 export function Electricity() {
+  const [state, setState] = useState<IState>({
+    processing: false,
+    token: '',
+    units: 0,
+    discos: [],
+    formInput: {
+      operatorId: '',
+      meterType: '',
+      meterNumber: '',
+      amount: ''
+    },
+    feedback: {
+      message: '',
+      customer: null,
+    }
+  });
+
+  useEffect(fetchDiscos, []);
+
+  const discoOptions = state.discos.map((disco: IDisco) => {
+    return <option key={disco.id} value={disco.id}>{disco.desc} ({disco.name})</option>
+  });
+
+  function fetchDiscos() {
+    setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Fetching discos...' } }));
+    Api.get('transaction/discos')
+      .then(res => {
+        setState(s => ({ ...s, discos: res.data.discos, feedback: { customer: null, message: '' } }));
+      })
+      .catch(() => {
+        setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Error fetching discos' } }));
+      });
+  }
+
+  function confirmUser() {
+    if (!state.formInput.meterNumber) return;
+    if (state.feedback.customer) return;
+    setState({ ...state, feedback: { ...state.feedback, message: 'Validating customer info...' } });
+    const { meterNumber, operatorId } = state.formInput;
+    Api.get(`transaction/customer-validate?bill=electricity&operatorID=${operatorId}&deviceNumber=${meterNumber}`)
+      .then(res => {
+        const { address, name } = res.data.customer;
+        setState({ ...state, feedback: { message: '', customer: { address, name } } });
+      })
+      .catch((err) => {
+        setState({ ...state, feedback: { message: err.response.data.message, customer: null } });
+      });
+  }
+
+  function buyElectricity() {
+    const { amount, meterNumber, meterType, operatorId } = state.formInput;
+    Api.post('transaction/electricity', { amount, operatorId, meterType, meterNumber })
+      .then(res => {
+        const { message, units, token } = res.data;
+        toast.success(message);
+        setState({
+          ...state,
+          token,
+          units,
+          processing: false,
+          formInput: {
+            ...state.formInput,
+            amount: '',
+            meterNumber: '',
+            meterType: '',
+            operatorId: ''
+          }
+        })
+      })
+      .catch(err => {
+        toast.error(err.response.data.message);
+        setState({ ...state, processing: false });
+      });
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setState({ ...state, processing: true });
+    buyElectricity();
+  }
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'disco':
+        setState({
+          ...state,
+          formInput: { ...state.formInput, operatorId: value, meterType: '', meterNumber: '', amount: '' },
+          token: '',
+          feedback: { ...state.feedback, customer: null }
+        });
+        break;
+      case 'meterType':
+        setState({ ...state, formInput: { ...state.formInput, meterType: value }, token: '' });
+        break;
+      case 'meterNumber':
+        setState({
+          ...state,
+          formInput: { ...state.formInput, meterNumber: value }, token: '',
+          feedback: { ...state.feedback, customer: null }
+        });
+        break;
+      case 'amount':
+        setState({ ...state, formInput: { ...state.formInput, amount: value }, token: '' });
+        break;
+      default:
+        break;
+    }
+  }
+
   return (
-    <h2 style={{ color: "green" }}>Electricity</h2>
-  )
+    <div>
+      <h2 style={{ color: "green" }}>Electricity</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="disco">Disco</label>
+          <select name="disco" id="disco" required value={state.formInput.operatorId} onChange={handleInputChange}>
+            <option value=""> -- SELECT DISCO -- </option>
+            {discoOptions}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="meter-type">Meter Type</label>
+          <select name="meterType" id="meter-type" required value={state.formInput.meterType} onChange={handleInputChange}>
+            <option value=""> -- SELECT METER TYPE -- </option>
+            <option value="prepaid">Prepaid</option>
+            <option value="postpaid">Postpaid</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="meter-number">Meter Number</label>
+          <input type="text" name="meterNumber" id="meter-number" placeholder="Enter customer meter number" required value={state.formInput.meterNumber} onChange={handleInputChange} onBlur={confirmUser} />
+        </div>
+        <div>
+          <label htmlFor="amount">Amount</label>
+          <input type="number" name="amount" id="amount" placeholder="Enter amount in Naira" required value={state.formInput.amount} onChange={handleInputChange} />
+        </div>
+        <button className="form-submit" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>
+      </form>
+
+      <div >
+        <p className="feedback error">{state.feedback.message}</p>
+        {state.feedback.customer && (
+          <div className="feedback success">
+            <p>Name: {state.feedback.customer.name}</p>
+            <p>Address: {state.feedback.customer.address}</p>
+            {state.token && (
+              <>
+                <p>Electricity token: {state.token}</p>
+                <p>Units: {state.units}</p>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  interface IState {
+    processing: boolean;
+    token: string;
+    units: number;
+    discos: IDisco[];
+    formInput: {
+      operatorId: string;
+      meterType: string;
+      meterNumber: string;
+      amount: string;
+    };
+    feedback: {
+      message: string;
+      customer: {
+        address: string;
+        name: string;
+      } | null;
+    };
+  }
 }
 
 export function Tv() {
   return (
-    <h2 style={{ color: "cyan" }}>Tv</h2>
+    <div style={{ color: 'navy' }}>
+      <h2>Television</h2>
+      <p>Coming soon... </p>
+    </div>
   )
 }

@@ -39,7 +39,7 @@ export async function calcBalance(user: string) {
 // 20 digit electricity token for testing, not real
 export function generateRandomToken() {
   const arr = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     const num = Math.floor(Math.random() * 10000);
     const str = num.toString().padStart(4, '0');
     arr.push(str);
@@ -161,7 +161,7 @@ class Blochq {
         device_details: { "beneficiary_msisdn": phone },
       }
 
-      const useBloc = false;
+      const useBloc = true;
       const response = useBloc
         ? await axios.post(url, data, authorizationHeaders)
         : { data: { data: { meta_data: { operator_name: await this.getOperatorNameById(data.operator_id) } } } };
@@ -209,16 +209,21 @@ class Blochq {
     const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
     try {
       const response = await axios.get(url, authorizationHeaders);
-      return response.data.data;
+      const { address } = response.data.data;
+      if (!address)
+        return { result: null, error: { message: 'Unable to validate customer' } };
+
+      return { result: response.data.data, error: null };
 
     } catch (error: any) {
       console.error(error);
-      throw new Error('Error fetching customer details');
+      return { result: null, error: { message: error.response.data.message } };
     }
   }
 
-  async buyElectricity(productId: string, amount: number, operatorId: string, meterNumber: string, meterType: string) {
-    console.log('buying electricity', productId, amount, operatorId, meterNumber, meterType)
+  async buyElectricity(amount: number, operatorId: string, meterNumber: string, meterType: string) {
+    const products = await this.getProducts(operatorId, 'electricity');
+    const productId = products[0].id;
     const url = `${this.baseUrl}/payment?bill=electricity`;
     const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
 
@@ -228,6 +233,11 @@ class Blochq {
       product_id: productId,
       device_details: { beneficiary_msisdn: meterNumber, meter_type: meterType },
     }
+
+    // verify customer meter
+    const { error } = await this.validateCustomerDevice(operatorId, 'electricity', meterNumber, meterType);
+    if (error)
+      throw new Error(error.message);
 
     const useBloc = false;
     let response;
@@ -240,7 +250,7 @@ class Blochq {
           data: {
             meta_data: {
               token: generateRandomToken(),
-              units: units.toFixed(2),
+              units: units.toFixed(1),
               operator_name: await this.getOperatorNameById(operatorId, 'electricity')
             }
           }

@@ -35,8 +35,17 @@ a {
 }
 
 .feedback {
-  color: red;
   font-size: 0.9em;
+  font-style: italic;
+
+  &.error {
+    color: red;
+  }
+
+  &.success {
+    color: darkgreen;
+  }
+
 }
 
 .good.feedback {
@@ -318,8 +327,7 @@ a {
   & #main {
     grid-column: 2;
     grid-row: 2/3;
-    padding: 20px 15%;
-
+    padding: 20px 30px;
 
   }
 }
@@ -340,7 +348,7 @@ a {
 
 table {
   border-collapse: collapse;
-  /* width: 100%; */
+  width: 100%;
 
   & th,
   td {
@@ -593,11 +601,5 @@ button.form-submit {
 
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (min-width: 768px) {
-  #main{
-    padding-left: 100px;
   }
 }

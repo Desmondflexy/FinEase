@@ -14,5 +14,6 @@ router.get('/data-plans', authenticate, transaction.getDataPlans);
 router.post('/buy-data', authenticate, transaction.buyData);
 router.get('/customer-validate', authenticate, transaction.validateCustomer);
 router.post('/electricity', authenticate, transaction.buyElectricity);
+router.get('/discos', authenticate, transaction.getDiscos);
 
 export default router;

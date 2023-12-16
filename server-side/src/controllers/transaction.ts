@@ -409,12 +409,21 @@ export async function buyData(req: Request, res: Response) {
 export async function validateCustomer(req: Request, res: Response) {
   try {
     const { operatorID, bill, deviceNumber } = req.query;
-    const customer = await blocApi.validateCustomerDevice(operatorID as string, bill as string, deviceNumber as string);
+    const { error, result } = await blocApi.validateCustomerDevice(operatorID as string, bill as string, deviceNumber as string);
+
+    if (error) {
+      res.status(404);
+      return res.json({
+        success: false,
+        message: error.message,
+        error: 'Not found'
+      })
+    }
 
     return res.json({
       success: true,
       message: 'Customer details',
-      customer
+      customer: result
     });
 
   } catch (error: any) {
@@ -428,10 +437,10 @@ export async function validateCustomer(req: Request, res: Response) {
   }
 }
 
-export async function buyElectricity(req:Request, res:Response){
+export async function buyElectricity(req: Request, res: Response) {
   try {
-    const {error} = validators.buyElectricity.validate(req.body, validators.options);
-    if(error){
+    const { error } = validators.buyElectricity.validate(req.body, validators.options);
+    if (error) {
       res.status(400);
       return res.json({
         success: false,
@@ -440,9 +449,10 @@ export async function buyElectricity(req:Request, res:Response){
       });
     }
 
-    const {amount, productId, operatorId, meterType, meterNumber} = req.body;
+    const { amount, operatorId, meterType, meterNumber } = req.body;
     const amountInKobo = amount * 100;
     const userId = req.user.id;
+
     const userBalance = await calcBalance(userId);
     if (userBalance < amountInKobo) {
       res.status(402);
@@ -453,17 +463,17 @@ export async function buyElectricity(req:Request, res:Response){
       });
     }
 
-    const response = await blocApi.buyElectricity(productId, amountInKobo, operatorId, meterNumber, meterType);
-    const {units, token, operator_name} = response.meta_data;
+    const response = await blocApi.buyElectricity(amountInKobo, operatorId, meterNumber, meterType);
+    const { units, token, operator_name } = response.meta_data;
 
     await Transaction.create({
       user: userId,
       amount: amountInKobo,
       type: 'debit',
       service: 'bill payment',
-      description: `Payment of ${amount} electricity bill for ${meterNumber} ${operator_name} | ${token} | ${units} units.`,
+      description: `Payment of ${amount} electricity bill | ${meterNumber} ${operator_name} | ${token} | ${units} units.`,
       reference: await generateReference('EPT'),
-      serviceProvider: 'Wallet2Wallet',
+      serviceProvider: operator_name,
     });
 
     res.status(201);
@@ -472,7 +482,27 @@ export async function buyElectricity(req:Request, res:Response){
       message: 'Electricity purchased successfully!',
       meterNumber,
       token,
+      units,
       balance: await calcBalance(userId),
+    });
+
+  } catch (error: any) {
+    res.status(500);
+    return res.json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    })
+  }
+}
+
+export async function getDiscos(req: Request, res: Response) {
+  try {
+    const discos = await blocApi.getOperators('electricity');
+    return res.json({
+      success: true,
+      message: 'Electricity distribution companies',
+      discos
     });
 
   } catch (error: any) {

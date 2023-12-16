@@ -23,3 +23,9 @@ export interface ITransaction {
 
 // shape for [user, setUser] context
 export type OutletContextType = [IUser, React.Dispatch<React.SetStateAction<IUser>>];
+
+export interface IDisco {
+  desc: string;
+  id: string;
+  name: string;
+}

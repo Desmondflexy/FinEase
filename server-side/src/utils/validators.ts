@@ -53,7 +53,6 @@ export const buyData = joi.object().keys({
 
 export const buyElectricity = joi.object().keys({
   amount: joi.number().integer().min(1).required(),
-  productId: joi.string().required(),
   operatorId: joi.string().required(),
   meterType: joi.string().required(),
   meterNumber: joi.string().required(),
