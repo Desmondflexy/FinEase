@@ -13,15 +13,21 @@ const networkLogo: { [key: string]: string } = {
 };
 
 export default function Recharge() {
+  const [state, setState] = useState({
+    service: '',
+  });
+  const { service } = state;
 
-  const [service, setService] = useState('');
+  function handleServiceChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setState(s => ({ ...s, service: e.target.value }));
+  }
 
   return (
     <section id="recharge">
       <h1>Recharge</h1>
       <form>
         <label htmlFor="service">What do you want to do?</label>
-        <select id="service" value={service} onChange={(e) => setService(e.target.value)}>
+        <select id="service" value={service} onChange={handleServiceChange}>
           <option value='' >--select--</option>
           <option value="airtime">Buy Airtime</option>
           <option value="data">Buy Data</option>
@@ -39,68 +45,80 @@ export default function Recharge() {
 }
 
 export function Airtime() {
-  const [network, setNetwork] = useState('');
-  const [networks, setNetworks] = useState([]);
-  const [phone, setPhone] = useState('');
-  const [amount, setAmount] = useState('');
-  const [processing, setProcessing] = useState(false);
-  const [logoUrl, setLogoUrl] = useState('');
-  const [user, setUser] = useOutletContext() as OutletContextType
-
-  const options = networks.map((network: { id: string; name: string }) => {
+  const [state, setState] = useState<IState>({
+    networks: [],
+    processing: false,
+    logoUrl: '',
+    formInput: {
+      operatorId: '',
+      phone: '',
+      amount: ''
+    }
+  });
+  const [user, setUser] = useOutletContext() as OutletContextType;
+  const { operatorId, amount, phone } = state.formInput
+  const options = state.networks.map(network => {
     return <option key={network.id} value={network.id}>{network.name}</option>
   });
+  useEffect(fetchNetworks, []);
 
-  const fetchNetworks = () => {
+  function fetchNetworks() {
     Api.get('transaction/networks')
       .then(res => {
-        const list = res.data.networks.map((network: { id: string; name: string }) => {
-          return { id: network.id, name: network.name };
-        });
-        setNetworks(list);
+        const { networks } = res.data
+        setState(s => ({ ...s, networks }));
       })
       .catch(err => {
         console.log(err.response);
       });
   }
 
-  const buyAirtime = () => {
-    Api.post('transaction/airtime', { operatorId: network, amount, phone })
+  function buyAirtime() {
+    Api.post('transaction/airtime', { operatorId, amount, phone })
       .then(res => {
         toast.success(res.data.message);
-        setProcessing(false);
-        setAmount('');
-        setPhone('');
-        setNetwork('');
-        setUser({
-          ...user,
-          balance: res.data.balance
-        })
+        setState(s => ({ ...s, processing: false, formInput: { operatorId: '', phone: '', amount: '' } }));
+        setUser({ ...user, balance: res.data.balance });
       })
       .catch(err => {
         toast.error(err.response.data.message);
-        setProcessing(false);
+        setState(s => ({ ...s, processing: false }));
       });
   }
 
-  const determineNetwork = () => {
+  function determineNetwork() {
     Api.get(`transaction/phone-network?phone=${phone}`)
       .then(res => {
         const network = res.data.network.toLowerCase() as string;
-        setLogoUrl(networkLogo[network]);
+        setState(s => ({ ...s, logoUrl: networkLogo[network] }));
       })
       .catch(() => {
-        setLogoUrl('');
+        setState(s => ({ ...s, logoUrl: '' }));
       });
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setProcessing(true)
+    setState(s => ({ ...s, processing: true }));
     buyAirtime();
   }
 
-  useEffect(fetchNetworks, []);
+  function handleChange(e: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'network':
+        setState(s => ({ ...s, formInput: { ...s.formInput, operatorId: value } }));
+        break;
+      case 'phone':
+        setState(s => ({ ...s, formInput: { ...s.formInput, phone: value } }));
+        break;
+      case 'amount':
+        setState(s => ({ ...s, formInput: { ...s.formInput, amount: value } }));
+        break;
+      default:
+        break;
+    }
+  }
 
   return (
     <div>
@@ -108,81 +126,101 @@ export function Airtime() {
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="network">Network</label>
-          <select required id="network" value={network} onChange={e => setNetwork(e.target.value)}>
+          <select name="network" required id="network" value={operatorId} onChange={handleChange}>
             <option value="">-- SELECT NETWORK --</option>
             {options}
           </select>
         </div>
         <div>
           <label htmlFor="phone">Phone Number</label>
-          <input maxLength={11} required id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="07022345678" pattern={phoneNumberRegex.source} onBlur={determineNetwork} />
-          {logoUrl && <img className="small-network-logo" src={logoUrl} />}
+          <input name="phone" maxLength={11} required id="phone" value={phone} onChange={handleChange} placeholder="07022345678" pattern={phoneNumberRegex.source} onBlur={determineNetwork} />
+          {state.logoUrl && <img className="small-network-logo" src={state.logoUrl} />}
         </div>
         <div>
           <label htmlFor="amount">Amount</label>
-          <input min={1} required autoComplete="off" type="number" id="amount" value={amount} onChange={e => setAmount(e.target.value)} placeholder="50" />
+          <input name="amount" min={1} required autoComplete="off" type="number" id="amount" value={amount} onChange={handleChange} placeholder="50" />
         </div>
-        <button className="form-submit" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
+        <button className="form-submit" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>
       </form>
     </div>
-
   );
+
+  interface IState {
+    networks: {
+      id: string;
+      name: string;
+    }[];
+    processing: boolean;
+    logoUrl: string;
+    formInput: {
+      operatorId: string;
+      phone: string;
+      amount: string;
+    }
+  }
 }
 
 export function Data() {
-  const [operatorId, setOperatorId] = useState('');
-  const [networks, setNetworks] = useState([]);
-  const [phone, setPhone] = useState('');
-  const [planId, setPlanId] = useState('');
-  const [plans, setPlans] = useState([]);
-  const [processing, setProcessing] = useState(false);
-  const [logoUrl, setLogoUrl] = useState('');
   const [user, setUser] = useOutletContext() as OutletContextType;
 
-  const options = networks.map((network: { id: string; name: string }) => {
+  const [state, setState] = useState<IState>({
+    networks: [],
+    plans: [],
+    processing: false,
+    logoUrl: '',
+    formInput: {
+      operatorId: '',
+      planId: '',
+      phone: ''
+    }
+  });
+
+  const { operatorId, planId, phone } = state.formInput;
+
+  const options = state.networks.map(network => {
     return <option key={network.id} value={network.id}>{network.name}</option>
   });
 
-  const planOptions = plans.map((plan: { id: string; name: string }) => {
+  const planOptions = state.plans.map(plan => {
     return <option key={plan.id} value={plan.id}>{plan.name}</option>
   });
 
-  const fetchNetworks = () => {
+  useEffect(fetchNetworks, []);
+  useEffect(fetchDataPlans, [operatorId]);
+
+  function fetchNetworks() {
     Api.get('transaction/networks')
       .then(res => {
-        const list = res.data.networks.map((network: { id: string; name: string }) => {
-          return { id: network.id, name: network.name };
-        });
-        setNetworks(list);
+        setState(s => ({ ...s, networks: res.data.networks }));
       })
       .catch(err => {
         console.log(err.response);
       });
-  };
+  }
 
-  const fetchDataPlans = () => {
+  function fetchDataPlans() {
     if (operatorId)
       Api.get(`transaction/data-plans?operatorId=${operatorId}`)
         .then(res => {
-          setPlans(res.data.dataPlans);
+          setState(s => ({ ...s, plans: res.data.dataPlans }));
         })
         .catch(err => {
           console.log(err.response);
         })
-  };
+  }
 
-  const determineNetwork = () => {
+  function determineNetwork() {
     Api.get(`transaction/phone-network?phone=${phone}`)
       .then(res => {
         const network = res.data.network.toLowerCase() as string;
-        setLogoUrl(networkLogo[network]);
+        setState(s => ({ ...s, logoUrl: networkLogo[network] }));
       })
       .catch(() => {
-        setLogoUrl('');
+        setState(s => ({ ...s, logoUrl: '' }));
       })
-  };
+  }
 
-  const buyData = () => {
+  function buyData() {
     const data = {
       operatorId,
       dataPlanId: planId,
@@ -191,34 +229,38 @@ export function Data() {
 
     Api.post('transaction/buy-data', data)
       .then(res => {
-        toast.success(res.data.message);
-        setPlanId('');
-        setPhone('');
-        setOperatorId('');
-        setProcessing(false);
-        setUser({
-          ...user,
-          balance: res.data.balance
-        })
+        const { message, balance } = res.data;
+        toast.success(message);
+        setState(s => ({ ...s, processing: false, formInput: { operatorId: '', phone: '', planId: '' } }));
+        setUser({ ...user, balance });
       })
       .catch(err => {
         toast.error(err.response.data.message);
-        setProcessing(false);
+        setState(s => ({ ...s, processing: false }));
       });
   }
 
-  useEffect(fetchNetworks, []);
-  useEffect(fetchDataPlans, [operatorId]);
-
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setProcessing(true);
+    setState(s => ({ ...s, processing: true }));
     buyData();
   }
 
-  function handleNetworkChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setOperatorId(e.target.value);
-    setPlanId('');
+  function handleChange(e: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'network':
+        setState(s => ({ ...s, formInput: { ...s.formInput, operatorId: value } }));
+        break;
+      case 'data-plan':
+        setState(s => ({ ...s, formInput: { ...s.formInput, planId: value } }));
+        break;
+      case 'phone':
+        setState(s => ({ ...s, formInput: { ...s.formInput, phone: value } }));
+        break;
+      default:
+        break;
+    }
   }
 
   return (
@@ -227,28 +269,46 @@ export function Data() {
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="network">Network</label>
-          <select required id="network" value={operatorId} onChange={handleNetworkChange}>
+          <select name="network" required id="network" value={operatorId} onChange={handleChange}>
             <option value="">-- SELECT NETWORK --</option>
             {options}
           </select>
         </div>
         <div>
-          <label htmlFor="data-plans">Data Plan</label>
-          <select id="data-plans" required disabled={!operatorId} value={planId} onChange={e => setPlanId(e.target.value)} >
+          <label htmlFor="data-plan">Data Plan</label>
+          <select name="data-plan" id="data-plan" required disabled={!operatorId} value={planId} onChange={handleChange} >
             <option value="">-- SELECT DATAPLANS --</option>
             {planOptions}
           </select>
         </div>
         <div>
           <label htmlFor="phone">Phone Number</label>
-          <input maxLength={11} required id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="07022345678" pattern={phoneNumberRegex.source} onBlur={determineNetwork} />
-          {logoUrl && <img className="small-network-logo" src={logoUrl} />}
+          <input name="phone" maxLength={11} required id="phone" value={phone} onChange={handleChange} placeholder="07022345678" pattern={phoneNumberRegex.source} onBlur={determineNetwork} />
+          {state.logoUrl && <img className="small-network-logo" src={state.logoUrl} />}
         </div>
-        <button className="form-submit" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
+        <button className="form-submit" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>
       </form>
     </div>
+  );
 
-  )
+  interface IState {
+    networks: {
+      id: string;
+      name: string;
+    }[];
+    plans: {
+      amount: number;
+      id: string;
+      name: string;
+    }[];
+    processing: boolean;
+    logoUrl: string;
+    formInput: {
+      operatorId: string;
+      planId: string;
+      phone: string;
+    }
+  }
 }
 
 export function Electricity() {
@@ -268,6 +328,7 @@ export function Electricity() {
       customer: null,
     }
   });
+  const [user, setUser] = useOutletContext() as OutletContextType;
 
   useEffect(fetchDiscos, []);
 
@@ -294,10 +355,10 @@ export function Electricity() {
     Api.get(`transaction/customer-validate?bill=electricity&operatorID=${operatorId}&deviceNumber=${meterNumber}`)
       .then(res => {
         const { address, name } = res.data.customer;
-        setState({ ...state, feedback: { message: '', customer: { address, name } } });
+        setState(s => ({...s, feedback: { message: '', customer: { address, name } } }));
       })
       .catch((err) => {
-        setState({ ...state, feedback: { message: err.response.data.message, customer: null } });
+        setState(s => ({...s, feedback: { message: err.response.data.message, customer: null } }));
       });
   }
 
@@ -307,29 +368,18 @@ export function Electricity() {
       .then(res => {
         const { message, units, token } = res.data;
         toast.success(message);
-        setState({
-          ...state,
-          token,
-          units,
-          processing: false,
-          formInput: {
-            ...state.formInput,
-            amount: '',
-            meterNumber: '',
-            meterType: '',
-            operatorId: ''
-          }
-        })
+        setState(s => ({ ...s, token, units, processing: false, formInput: { amount: '', meterNumber: '', meterType: '', operatorId: '' } }));
+        setUser({ ...user, balance: res.data.balance })
       })
       .catch(err => {
         toast.error(err.response.data.message);
-        setState({ ...state, processing: false });
+        setState(s => ({ ...s, processing: false }));
       });
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setState({ ...state, processing: true });
+    setState(s => ({ ...s, processing: true }));
     buyElectricity();
   }
 
@@ -337,25 +387,16 @@ export function Electricity() {
     const { name, value } = e.target;
     switch (name) {
       case 'disco':
-        setState({
-          ...state,
-          formInput: { ...state.formInput, operatorId: value, meterType: '', meterNumber: '', amount: '' },
-          token: '',
-          feedback: { ...state.feedback, customer: null }
-        });
+        setState(s => ({ ...s, formInput: { ...s.formInput, operatorId: value, meterType: '', meterNumber: '', amount: '' }, token: '', feedback: { message: '', customer: null } }));
         break;
       case 'meterType':
-        setState({ ...state, formInput: { ...state.formInput, meterType: value }, token: '' });
+        setState(s => ({ ...s, formInput: { ...s.formInput, meterType: value }, token: '' }));
         break;
       case 'meterNumber':
-        setState({
-          ...state,
-          formInput: { ...state.formInput, meterNumber: value }, token: '',
-          feedback: { ...state.feedback, customer: null }
-        });
+        setState(s => ({ ...s, formInput: { ...s.formInput, meterNumber: value }, token: '', feedback: { message: '', customer: null } }));
         break;
       case 'amount':
-        setState({ ...state, formInput: { ...state.formInput, amount: value }, token: '' });
+        setState(s => ({ ...s, formInput: { ...s.formInput, amount: value }, token: '' }));
         break;
       default:
         break;
