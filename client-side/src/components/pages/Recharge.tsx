@@ -355,10 +355,10 @@ export function Electricity() {
     Api.get(`transaction/customer-validate?bill=electricity&operatorID=${operatorId}&deviceNumber=${meterNumber}`)
       .then(res => {
         const { address, name } = res.data.customer;
-        setState(s => ({...s, feedback: { message: '', customer: { address, name } } }));
+        setState(s => ({ ...s, feedback: { message: '', customer: { address, name } } }));
       })
       .catch((err) => {
-        setState(s => ({...s, feedback: { message: err.response.data.message, customer: null } }));
+        setState(s => ({ ...s, feedback: { message: err.response.data.message, customer: null } }));
       });
   }
 
@@ -405,7 +405,7 @@ export function Electricity() {
 
   return (
     <div>
-      <h2 style={{ color: "green" }}>Electricity</h2>
+      <h2>Electricity</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="disco">Disco</label>

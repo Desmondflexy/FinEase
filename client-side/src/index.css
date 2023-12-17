@@ -13,11 +13,16 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   padding: 0;
   margin: 0;
+
+  --color-goldenrod: #e8d21d;
+  --color-magenta: #cf1578;
+  --color-turquoise: #039fbe;
+  --color-brick: #b20238;
 }
 
 a {
   text-decoration: none;
-  color: darkblue;
+  color: var(--color-brick);
   text-decoration: underline;
 
   &:hover {
@@ -25,8 +30,12 @@ a {
   }
 
   &:active {
-    color: darkred;
+    color: var(--color-magenta);
   }
+}
+
+h1, h2, h3{
+  color: var(--color-turquoise);
 }
 
 
@@ -48,17 +57,12 @@ a {
 
 }
 
-.good.feedback {
-  color: green;
-}
-
 /* signup and login forms */
 
 .get-started {
   & * {
     margin: 0;
     padding: 0;
-    /* border: 1px dotted red; */
   }
 
   & .form-container {
@@ -67,34 +71,16 @@ a {
     border-radius: 8px;
     box-shadow: 2px 2px 5px grey;
     overflow: hidden;
-    border-bottom: 8px solid darkred;
-
-    & .google-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      background-color: inherit;
-      cursor: pointer;
-      margin: 0px auto 20px;
-      width: fit-content;
-      padding: 10px;
-      border-radius: 8px;
-
-      &:hover{
-        background-color: lightblue;
-        box-shadow: 2px 2px 5px grey;
-      }
-    }
+    border-bottom: 8px solid var(--color-goldenrod);
   }
 
   & #auth-header {
 
     & h3 {
       text-align: center;
-      border: 5px solid black;
+      border: 5px solid var(--color-turquoise);
       border-radius: 10px;
-      color: black;
+      color: var(--color-turquoise);
       width: fit-content;
       margin: 20px auto;
     }
@@ -110,7 +96,7 @@ a {
   & .form-nav {
     display: flex;
     justify-content: space-around;
-    border-bottom: 1px solid darkred;
+    border-bottom: 1px solid var(--color-goldenrod);
 
     &>div {
       flex: 1;
@@ -126,7 +112,7 @@ a {
     }
 
     & .active {
-      background-color: red;
+      background-color: var(--color-goldenrod);
       color: white;
     }
   }
@@ -242,7 +228,8 @@ a {
     background-color: white;
     height: var(--header-height);
     padding: 10px;
-    border-bottom: 2px solid lightslategrey;
+    border-bottom: 2px solid var(--color-turquoise);
+    color: var(--color-turquoise);
 
 
     & h3 {
@@ -251,7 +238,7 @@ a {
 
       & a {
         text-decoration: none;
-        color: rgb(13, 13, 16);
+        color: var(--color-turquoise);
       }
     }
 
@@ -280,7 +267,7 @@ a {
     flex-direction: column;
     padding: 0;
     margin: 0;
-    border-right: 2px solid lightslategrey;
+    border-right: 2px solid var(--color-turquoise);
     height: calc(100vh - var(--header-height));
     position: sticky;
     top: var(--header-height);
@@ -320,7 +307,7 @@ a {
     }
 
     & .active {
-      background-color: rgb(239, 231, 231);
+      background-color: rgb(241, 241, 214);
     }
   }
 
@@ -349,6 +336,8 @@ a {
 table {
   border-collapse: collapse;
   width: 100%;
+  font-size: 0.9em;
+  color: rgb(39, 39, 66);
 
   & th,
   td {
@@ -356,37 +345,37 @@ table {
     border-bottom: 2px solid grey;
     padding: 8px;
   }
+
+  & .table-desc{
+    width: 30%;
+  }
 }
 
 /* Dashboard */
 
 #dashboard {
   & .card.balance {
-    background-color: red;
+    background-color: var(--color-brick);
     color: white;
     padding: 10px 20px;
     border-radius: 6px;
     position: relative;
     margin: 10px 0;
     max-width: 400px;
+
+    & h2{
+      color: white;
+    }
   }
 
   & .table-container{
     margin-top: 50px;
 
     .table{
-      width: 400px;
       height: 300px;
-      border: 5px solid rgb(158, 119, 119);
+      border: 1px solid rgb(158, 119, 119);
       border-radius: 6px;
-      overflow-x: scroll;
       overflow-y: scroll;
-      box-shadow: 2px 2px 5px inset;
-
-
-      & table{
-        width: 700px;
-      }
     }
 
   }
@@ -476,7 +465,7 @@ table {
       }
 
       &>input:invalid:not(:placeholder-shown) {
-        box-shadow: 0 0 5px 1px red;
+        box-shadow: 0 0 5px 1px var(--color-brick);
       }
 
     }

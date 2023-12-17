@@ -45,7 +45,7 @@ export default function Settings() {
 
   return (
     <section id="settings">
-      <h2>Settings</h2>
+      <h1>Settings</h1>
       <div>
         <h3>Edit User Information</h3>
         <form onSubmit={handleSubmit}>

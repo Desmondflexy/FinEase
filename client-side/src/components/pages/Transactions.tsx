@@ -59,7 +59,7 @@ export default function Transactions() {
               <th>S/N</th>
               <th>Amount</th>
               <th>Type</th>
-              <th>Description</th>
+              <th className="table-desc">Description</th>
               <th>Reference</th>
               <th>Date</th>
             </tr>

@@ -69,7 +69,7 @@ export default function Dashboard() {
                 <th>SN</th>
                 <th>Type</th>
                 <th>Amount</th>
-                <th>Description</th>
+                <th className="table-desc">Description</th>
                 <th>Time</th>
               </tr>
             </thead>

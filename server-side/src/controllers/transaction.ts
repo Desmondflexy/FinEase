@@ -184,7 +184,6 @@ export async function getTransactions(req: Request, res: Response) {
       transactions = await Transaction.find({ user }).sort({ createdAt: -1 }).select(requiredInfo);
     }
 
-    res.status(200);
     return res.json({
       success: true,
       message: `Transaction history for ${req.user.username}`,
@@ -206,7 +205,6 @@ export async function getTransactions(req: Request, res: Response) {
 export async function getNetworks(req: Request, res: Response) {
   try {
     const networks = await blocApi.getOperators('telco');
-    res.status(200);
     return res.json({
       success: true,
       message: 'Telecom operators',
@@ -264,7 +262,6 @@ export async function getDataPlans(req: Request, res: Response) {
       error: error.message
     });
   }
-
 }
 
 export async function buyAirtime(req: Request, res: Response) {
@@ -460,6 +457,17 @@ export async function buyElectricity(req: Request, res: Response) {
         success: false,
         message: 'You do not have enough funds',
         error: 'Insufficient funds'
+      });
+    }
+
+    // validate customer device
+    const validCustomer = await blocApi.validateCustomerDevice(operatorId, 'electricity', meterNumber, meterType);
+    if (validCustomer.error) {
+      res.status(404);
+      return res.json({
+        success: false,
+        message: validCustomer.error.message,
+        error: 'Not found'
       });
     }
 

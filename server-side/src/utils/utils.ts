@@ -161,7 +161,7 @@ class Blochq {
         device_details: { "beneficiary_msisdn": phone },
       }
 
-      const useBloc = true;
+      const useBloc = false;
       const response = useBloc
         ? await axios.post(url, data, authorizationHeaders)
         : { data: { data: { meta_data: { operator_name: await this.getOperatorNameById(data.operator_id) } } } };
@@ -234,11 +234,6 @@ class Blochq {
       device_details: { beneficiary_msisdn: meterNumber, meter_type: meterType },
     }
 
-    // verify customer meter
-    const { error } = await this.validateCustomerDevice(operatorId, 'electricity', meterNumber, meterType);
-    if (error)
-      throw new Error(error.message);
-
     const useBloc = false;
     let response;
     if (useBloc) {
@@ -260,7 +255,6 @@ class Blochq {
 
     return response.data.data;
   }
-
 }
 
 export const blocApi = new Blochq();

@@ -1,6 +1,6 @@
 import Api from "../../api.config";
 import { useState, useEffect } from "react";
-import { FaSort } from "react-icons/fa";
+// import { FaSort } from "react-icons/fa";
 import { IUser } from "../../types";
 import Error from "./Error";
 
@@ -57,7 +57,7 @@ export default function UsersList() {
   if (status === 'success') {
     return (
       <section id="admin">
-        <h2>List of all active users of FinEase</h2>
+        <h1>List of all active users of FinEase</h1>
         <form className="searchbox">
           <input type="search" placeholder="Search for user..." onChange={handleSearch} value={searchTerm} />
         </form>
@@ -66,11 +66,11 @@ export default function UsersList() {
           <thead>
             <tr>
               <th>S/N</th>
-              <th><span>Name</span><button><FaSort /></button></th>
-              <th><span>Username</span><button><FaSort /></button></th>
-              <th><span>Email</span><button><FaSort /></button></th>
-              <th><span>Phone</span><button><FaSort /></button></th>
-              <th><span>Date Registered</span><button><FaSort /></button></th>
+              <th><span>Name</span></th>
+              <th><span>Username</span></th>
+              <th><span>Email</span></th>
+              <th><span>Phone</span></th>
+              <th><span>Date Registered</span></th>
             </tr>
           </thead>
           <tbody>
