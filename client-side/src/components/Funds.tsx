@@ -122,7 +122,7 @@ export function TransferWalletModal({ closeModal, isOpen, setBalance }: ITwModal
         <input disabled={processing} onBlur={confirmUser} placeholder="Recipient username or account number" name="acctNoOrUsername" value={acctNoOrUsername} onChange={handleChange} required />
         <input disabled={processing} placeholder="Transfer amount" type="number" min={1} name="amount" id="amount" value={amount} onChange={handleChange} required />
         <input placeholder="Enter your login password" type="password" name="password" disabled={processing} value={password} onChange={handleChange} required />
-        <p className={`${feedback.includes('Invalid') ? 'bad' : 'good'} feedback`}>{feedback}</p>
+        <p className={`${feedback.includes('Invalid') ? 'error' : 'success'} feedback`}>{feedback}</p>
         <button className="form-submit" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
         <IoMdClose className="close-btn" onClick={handleCloseModal} />
       </form>

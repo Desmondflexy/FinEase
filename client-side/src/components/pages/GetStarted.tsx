@@ -122,31 +122,31 @@ export function Signup({ admin }: { admin: boolean }) {
   return (
     <form className='form' onSubmit={handleSubmit}>
       <div>
-        <input autoComplete="on" type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
+        <input type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
       </div>
       <div>
-        <input autoComplete='on' type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
+        <input type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
       </div>
       <div>
         {emailErrorFeedback && <em className="feedback">{emailErrorFeedback}</em>}
-        <input onBlur={checkEmailAvailability} autoComplete='on' type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
+        <input onBlur={checkEmailAvailability} type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
       </div>
       <div>
-        <input autoComplete='on' type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
+        <input maxLength={11} type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
       </div>
       <div>
         {usernameErrorFeedback && <em className="feedback">{usernameErrorFeedback}</em>}
-        <input onBlur={checkUsernameAvailability} autoComplete='on' type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
+        <input onBlur={checkUsernameAvailability} type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
       </div>
       <div>
-        <input autoComplete='off' type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
+        <input type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
       </div>
       <div>
-        <input autoComplete='off' type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
+        <input type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
       </div>
       {admin &&
         <div>
-          <input autoComplete='off' type='password' id='admin-key' name='adminKey' placeholder='Admin Key' required value={adminKey} onChange={handleChange} />
+          <input type='password' id='admin-key' name='adminKey' placeholder='Admin Key' required value={adminKey} onChange={handleChange} />
         </div>}
       <div>
         <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>

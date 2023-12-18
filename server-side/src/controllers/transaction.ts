@@ -447,6 +447,15 @@ export async function buyElectricity(req: Request, res: Response) {
     }
 
     const { amount, operatorId, meterType, meterNumber } = req.body;
+    if (amount < 500){
+      res.status(400);
+      return res.json({
+        success: false,
+        message: 'Minimum amount is 500',
+        error: 'Bad request'
+      });
+    }
+
     const amountInKobo = amount * 100;
     const userId = req.user.id;
 
