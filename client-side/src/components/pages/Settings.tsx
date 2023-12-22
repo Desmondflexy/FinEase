@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 
 export default function Settings() {
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
   const [user] = useOutletContext() as [IUser];
   const [first, setFirst] = useState(user.fullName.split(' ')[0]);
   const [last, setLast] = useState(user.fullName.split(' ')[1]);
@@ -14,6 +15,7 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [oldPassword, setOldPassword] = useState('');
+
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,15 +33,15 @@ export default function Settings() {
 
   function handlePasswordSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
+    setLoading2(true);
     Api.put('account', { password: newPassword, confirm: confirmPassword, oldPassword })
       .then(res => {
         toast.success(res.data.message);
-        setLoading(false);
+        setLoading2(false);
       })
       .catch(err => {
         toast.error(err.response.data.message);
-        setLoading(false);
+        setLoading2(false);
       });
   }
 
@@ -83,7 +85,7 @@ export default function Settings() {
           <label htmlFor="old">Old Password</label>
           <input id="old" type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
         </div>
-        <button disabled={loading} >{loading ? 'Processing...' : 'Confirm Change Password'}</button>
+        <button disabled={loading2} >{loading2 ? 'Processing...' : 'Confirm Change Password'}</button>
       </form>
     </section>
   )

@@ -4,7 +4,7 @@ import * as validators from "../utils/validators";
 import { calcBalance, verifyTransaction, generateReference, blocApi } from "../utils/utils";
 import User, { IUser } from "../models/users";
 import { phoneNetworks } from "../utils/constants";
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export async function fundWallet(req: Request, res: Response) {
   try {

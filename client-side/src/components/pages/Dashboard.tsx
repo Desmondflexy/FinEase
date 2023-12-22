@@ -43,53 +43,55 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <section id="dashboard">
-      <h1>Dashboard</h1>
-      <div>
-        <p>Email: {user.email}</p>
-      </div>
-      <div className="card balance">
-        <h2>{balance}</h2>
-        <p>Current Wallet Balance</p>
-        <div className="dropdown">
-          <CiSettings className="dropdown-btn rotate" onClick={() => setDropdownOpen(!dropdownOpen)} />
-          <ul className={`dropdown-content ${dropdownOpen ? '' : 'hidden'}`}>
-            <li onClick={() => openModal(setFwOpen)}>Load Wallet</li>
-            <li onClick={() => openModal(setTwOpen)}>Transfer</li>
-          </ul>
+    <>
+      <section id="dashboard">
+        <h1>Dashboard</h1>
+        <div>
+          <p>Email: {user.email}</p>
+          <div className="card balance">
+            <h2>{balance}</h2>
+            <p>Current Wallet Balance</p>
+            <div className="dropdown">
+              <CiSettings className="dropdown-btn rotate" onClick={() => setDropdownOpen(!dropdownOpen)} />
+              <ul className={`dropdown-content ${dropdownOpen ? '' : 'hidden'}`}>
+                <li onClick={() => openModal(setFwOpen)}>Load Wallet</li>
+                <li onClick={() => openModal(setTwOpen)}>Transfer</li>
+              </ul>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="table-container">
-        <h3>Recent Transactions</h3>
-        <div className="table">
-          <table>
-            <thead>
-              <tr>
-                <th>SN</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th className="table-desc">Description</th>
-                <th>Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recent10.map((trx: ITransaction, index: number) => (
-                <tr key={trx._id}>
-                  <td>{index + 1}</td>
-                  <td>{trx.type}</td>
-                  <td>{formatNumber(+trx.amount).slice(3)}</td>
-                  <td>{trx.description}</td>
-                  <td>{formatDateTime(trx.createdAt)}</td>
+        <div className="table-container">
+          <h3>Recent Transactions</h3>
+          <div className="table">
+            <table>
+              <thead>
+                <tr>
+                  <th>SN</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th className="table-desc">Description</th>
+                  <th>Time</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recent10.map((trx: ITransaction, index: number) => (
+                  <tr key={trx._id}>
+                    <td>{index + 1}</td>
+                    <td>{trx.type}</td>
+                    <td>{formatNumber(+trx.amount).slice(3)}</td>
+                    <td>{trx.description}</td>
+                    <td>{formatDateTime(trx.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </section>
 
       <FundWalletModal setBalance={setBalance} closeModal={() => setFwOpen(false)} isOpen={fwOpen} email={user.email} />
       <TransferWalletModal closeModal={() => setTwOpen(false)} isOpen={twOpen} setBalance={setBalance} />
-    </section>
+    </>
   )
 }

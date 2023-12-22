@@ -12,16 +12,16 @@ import transactionRouter from './routes/transaction';
 import indexRouter from './routes/index';
 
 import connectDB from './config/database';
-// import { runCommand } from './utils/utils';
 
 dotenv.config();
 connectDB();
 
 const app = express();
 
+const clientUrl = process.env.NODE_ENV === 'development'? process.env.CLIENT_URL_DEV : process.env.CLIENT_URL;
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: clientUrl,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   }),
@@ -60,5 +60,4 @@ app.use(function (err: HttpError, req: Request, res: Response) {
 
 export default app;
 
-// runCommand().then(() => console.log('Command run')).catch(err => console.log(err));
-console.log(`App is running at http://localhost:${process.env.PORT} in ${app.get('env')} mode`);
+console.log(`App is running on port ${process.env.PORT} in ${process.env.NODE_ENV} mode`);

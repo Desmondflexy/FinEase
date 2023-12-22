@@ -5,6 +5,7 @@ import Loading from "./pages/Loading";
 import { CgProfile } from "react-icons/cg";
 import Error from "./pages/Error";
 import { IUser } from "../types";
+import { IoMenu } from "react-icons/io5";
 
 // routes
 const base = '/account';
@@ -53,10 +54,13 @@ export default function Account() {
     return (
       <div id="app-layout">
         <div id="header">
-          <h3><Link to='/'>FinEase</Link></h3>
+          <div className="flex">
+            <h3><Link to='/'>FinEase</Link></h3>
+            <IoMenu size={25} onClick={() => alert('hello world')} />
+          </div>
           <p><CgProfile />{user.username}</p>
         </div>
-        <ul id="side-menu">
+        <ul id={`side-menu`} className="hidden">
           <li className={location === 'dashboard' ? 'active' : ''}><Link to={routeObj.dashboard}>Dashboard </Link></li>
           <li className={location === 'profile' ? 'active' : ''}><Link to={routeObj.profile}>Profile</Link></li>
           <li className={location === 'transactions' ? 'active' : ''}><Link to={routeObj.transactions}>Transactions</Link></li>

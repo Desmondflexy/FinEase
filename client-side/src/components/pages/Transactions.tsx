@@ -53,32 +53,38 @@ export default function Transactions() {
           <input value={searchTerm} onChange={handleSearch} type="search" placeholder="Search transaction..." />
         </form>
         <hr />
-        <table>
-          <thead>
-            <tr>
-              <th>S/N</th>
-              <th>Amount</th>
-              <th>Type</th>
-              <th className="table-desc">Description</th>
-              <th>Reference</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {searchResults.length
-              ? searchResults.map((trx: ITransaction, index: number) => (
-                <tr key={trx._id}>
-                  <td>{index + 1}</td>
-                  <td>{formatNumber(+trx.amount).slice(3)}</td>
-                  <td>{trx.type}</td>
-                  <td>{trx.description}</td>
-                  <td>{trx.reference}</td>
-                  <td>{formatDateTime(trx.createdAt)}</td>
-                </tr>
-              ))
-              : <tr><td colSpan={6}>No transactions found</td></tr>}
-          </tbody>
-        </table>
+        <div className="table">
+
+        </div>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th className="table-desc">Description</th>
+                <th>Reference</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {searchResults.length
+                ? searchResults.map((trx: ITransaction, index: number) => (
+                  <tr key={trx._id}>
+                    <td>{index + 1}</td>
+                    <td>{formatNumber(+trx.amount).slice(3)}</td>
+                    <td>{trx.type}</td>
+                    <td>{trx.description}</td>
+                    <td>{trx.reference}</td>
+                    <td>{formatDateTime(trx.createdAt)}</td>
+                  </tr>
+                ))
+                : <tr><td colSpan={6}>No transactions found</td></tr>}
+            </tbody>
+          </table>
+        </div>
+
       </section>
     )
   }

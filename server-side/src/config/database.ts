@@ -1,6 +1,6 @@
 import { connect, connection } from "mongoose";
 
-const withoutInternet = false;
+const withoutInternet = true;
 
 export default function connectDB() {
 
@@ -11,7 +11,7 @@ export default function connectDB() {
   function connectWithRetry() {
     connect(databaseUrl)
       .then(() => {
-        console.log(`Database ${withoutInternet ? '(offline)' : "(online)"} is connected`);
+        console.log(`Connected to ${withoutInternet ? 'local' : "remote"} database successfully!`);
       })
       .catch((err) => {
         console.error("Error connecting to Database: ", err.code);

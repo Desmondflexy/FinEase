@@ -62,30 +62,32 @@ export default function UsersList() {
           <input type="search" placeholder="Search for user..." onChange={handleSearch} value={searchTerm} />
         </form>
         <hr />
-        <table>
-          <thead>
-            <tr>
-              <th>S/N</th>
-              <th><span>Name</span></th>
-              <th><span>Username</span></th>
-              <th><span>Email</span></th>
-              <th><span>Phone</span></th>
-              <th><span>Date Registered</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            {searchResults.map((user: IUser, index: number) => (
-              <tr key={user._id}>
-                <td>{index + 1}</td>
-                <td>{user.fullName}</td>
-                <td>{user.username}</td>
-                <td>{user.email}</td>
-                <td>{user.phone}</td>
-                <td>{user.createdAt.split('T')[0]}</td>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th><span>Name</span></th>
+                <th><span>Username</span></th>
+                <th><span>Email</span></th>
+                <th><span>Phone</span></th>
+                <th><span>Date Registered</span></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {searchResults.map((user: IUser, index: number) => (
+                <tr key={user._id}>
+                  <td>{index + 1}</td>
+                  <td>{user.fullName}</td>
+                  <td>{user.username}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phone}</td>
+                  <td>{user.createdAt.split('T')[0]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     )
   }
