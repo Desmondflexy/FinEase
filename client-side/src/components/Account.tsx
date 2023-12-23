@@ -102,7 +102,7 @@ function LogoutButton() {
         navigate('/auth/login');
       })
       .catch(() => {
-        console.log('warning: did not logout successfully');
+        console.warn('warning: did not logout successfully');
         navigate('/auth/login');
       });
   }

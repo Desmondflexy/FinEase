@@ -91,6 +91,10 @@ export default function Dashboard() {
 
       <FundWalletModal setBalance={setBalance} closeModal={() => setFwOpen(false)} isOpen={fwOpen} email={user.email} />
       <TransferWalletModal closeModal={() => setTwOpen(false)} isOpen={twOpen} setBalance={setBalance} />
+
+      <div className="disclaimer">
+        <em>Disclaimer: This app is for demonstration purpose. No real money is funded and no real value is gotten for successful recharges and bills payments.</em>
+      </div>
     </>
   )
 }

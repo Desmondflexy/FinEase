@@ -577,6 +577,16 @@ button.form-submit:disabled {
   border-radius: 5px;
 }
 
+.disclaimer {
+  border: 2px solid;
+  padding: 5px;
+  border-radius: 8px;
+  margin: 20px 0;
+  font-size: 0.8em;
+  color: rgba(0, 100, 0, 0.654);
+  max-width: 500px;
+}
+
 @keyframes rotateAnimation {
   from {
     transform: rotate(0deg);
