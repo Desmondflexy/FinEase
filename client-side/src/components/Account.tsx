@@ -24,6 +24,7 @@ export default function Account() {
   const [error, setError] = useState({ status: 0, statusText: '', goto: '/' });
   const location = useLocation().pathname.split('/')[2];
   const token = localStorage.getItem('token');
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const fetchAcctInfo = () => {
     Api.get('account')
@@ -50,17 +51,22 @@ export default function Account() {
   // only fetch account info if token changes
   useEffect(fetchAcctInfo, [token, location]);
 
+  function handleMenuButton() {
+    // alert('hello world!');
+    setMenuVisible(!menuVisible);
+  }
+
   if (user && status === 'success') {
     return (
       <div id="app-layout">
         <div id="header">
           <div className="flex">
             <h3><Link to='/'>FinEase</Link></h3>
-            <IoMenu size={25} onClick={() => alert('hello world')} />
+            <IoMenu size={25} onClick={handleMenuButton} className='menu-btn' />
           </div>
           <p><CgProfile />{user.username}</p>
         </div>
-        <ul id={`side-menu`} className="hidden">
+        <ul id={`side-menu`} className={menuVisible ? '' : 'hidden'}>
           <li className={location === 'dashboard' ? 'active' : ''}><Link to={routeObj.dashboard}>Dashboard </Link></li>
           <li className={location === 'profile' ? 'active' : ''}><Link to={routeObj.profile}>Profile</Link></li>
           <li className={location === 'transactions' ? 'active' : ''}><Link to={routeObj.transactions}>Transactions</Link></li>

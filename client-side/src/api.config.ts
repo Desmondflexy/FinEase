@@ -1,9 +1,12 @@
 import axios from "axios";
 
+const developmnt = false;
 const dev_url = "http://localhost:8080";
-// const prod_url = "https://finease-api.onrender.com";
+const prod_url = "https://finease-api.onrender.com";
+
+const baseURL = developmnt ? dev_url : prod_url;
 const options = {
-  baseURL: dev_url,
+  baseURL,
   withCredentials: true,
 }
 const Api = axios.create(options);

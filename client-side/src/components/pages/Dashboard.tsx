@@ -23,8 +23,7 @@ export default function Dashboard() {
   }
 
   const getRecentTransactions = () => {
-    const limit = 10;
-    Api.get(`transaction?limit=${limit}`)
+    Api.get(`transaction?limit=${10}`)
       .then(res => {
         setRecent10(res.data.transactions);
       })

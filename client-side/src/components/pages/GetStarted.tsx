@@ -228,9 +228,9 @@ function FormNav() {
   );
 }
 
-function Header() {
+export function Header() {
   return (
-    <header id="auth-header">
+    <header className="header-logo">
       <h3><Link to='/'>FinEase</Link></h3>
     </header>
   )

@@ -6,10 +6,10 @@ import { useOutletContext } from "react-router-dom";
 import { IDisco, OutletContextType } from "../../types";
 
 const networkLogo: { [key: string]: string } = {
-  'mtn': '/src/assets/images/mtn-logo.png',
-  'airtel': '/src/assets/images/airtel-logo.svg',
-  'globacom': '/src/assets/images/glo-logo.png',
-  '9mobile': '/src/assets/images/9mobile-logo.png'
+  'mtn': '/images/mtn-logo.png',
+  'airtel': '/images/airtel-logo.svg',
+  'globacom': '/images/glo-logo.png',
+  '9mobile': '/images/9mobile-logo.png'
 };
 
 export default function Recharge() {
@@ -324,16 +324,18 @@ export function Electricity() {
       amount: ''
     },
     feedback: {
+      // disco_desc: '',
       message: '',
       customer: null,
     }
   });
+  const [discoInfo, setDiscoInfo] = useState('');
   const [user, setUser] = useOutletContext() as OutletContextType;
 
   useEffect(fetchDiscos, []);
 
   const discoOptions = state.discos.map((disco: IDisco) => {
-    return <option key={disco.id} value={disco.id}>{disco.desc} ({disco.name})</option>
+    return <option key={disco.id} value={disco.id}>{disco.name}</option>
   });
 
   function fetchDiscos() {
@@ -386,9 +388,11 @@ export function Electricity() {
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
     switch (name) {
-      case 'disco':
+      case 'disco': {
+        setDiscoInfo(state.discos.find(disco => disco.id === value)?.desc || '');
         setState(s => ({ ...s, formInput: { ...s.formInput, operatorId: value, meterType: '', meterNumber: '', amount: '' }, token: '', feedback: { message: '', customer: null } }));
         break;
+      }
       case 'meterType':
         setState(s => ({ ...s, formInput: { ...s.formInput, meterType: value }, token: '' }));
         break;
@@ -434,6 +438,7 @@ export function Electricity() {
       </form>
 
       <div >
+        <p className="feedback success">{discoInfo}</p>
         <p className="feedback error">{state.feedback.message}</p>
         {state.feedback.customer && (
           <div className="feedback success">
@@ -463,6 +468,7 @@ export function Electricity() {
       amount: string;
     };
     feedback: {
+      // disco_desc: string;
       message: string;
       customer: {
         address: string;
