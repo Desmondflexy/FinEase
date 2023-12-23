@@ -183,6 +183,10 @@ h3 {
   font-size: 0.8em;
 }
 
+#home-screen, .get-started {
+  height: 100vh;
+}
+
 #home-screen {
   padding: 1em;
 }

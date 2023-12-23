@@ -41,7 +41,7 @@ export default function Transactions() {
         trx.description.toLowerCase(),
         trx.reference.toLowerCase(),
       ];
-      return searchPool.some(item => item.toString().includes(text.trim()));
+      return searchPool.some(item => item.toString().includes(text.toLowerCase().trim()));
     }));
   };
 

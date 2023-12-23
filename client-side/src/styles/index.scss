@@ -105,6 +105,7 @@ h3 {
 .get-started {
   padding: 0;
   @extend %header-logo;
+  @extend %background-image;
 
   & .form-container {
     margin: 5px auto;
@@ -211,9 +212,16 @@ h3 {
   }
 }
 
+%background-image{
+  // background-image: url('/images/homepage.jpg');
+  // color: white;
+  height: 100vh;
+}
+
 #home-screen {
   padding: 1em;
   @extend %error-screen;
+  @extend %background-image;
 
   &>h1 {
     border-radius: 20px;

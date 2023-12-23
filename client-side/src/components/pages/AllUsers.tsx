@@ -49,7 +49,7 @@ export default function UsersList() {
         user.phone.toLowerCase(),
         user.acctNo.toLowerCase()
       ];
-      return searchPool.some(item => item.includes(text.trim()));
+      return searchPool.some(item => item.includes(text.toLowerCase().trim()));
     }));
   }
 
