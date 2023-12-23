@@ -133,7 +133,7 @@ export function Airtime() {
         </div>
         <div>
           <label htmlFor="phone">Phone Number</label>
-          <input name="phone" maxLength={11} required id="phone" value={phone} onChange={handleChange} placeholder="07022345678" pattern={phoneNumberRegex.source} onBlur={determineNetwork} />
+          <input name="phone" type="tel" maxLength={11} required id="phone" value={phone} onChange={handleChange} placeholder="07022345678" pattern={phoneNumberRegex.source} onBlur={determineNetwork} />
           {state.logoUrl && <img className="small-network-logo" src={state.logoUrl} />}
         </div>
         <div>
@@ -283,7 +283,7 @@ export function Data() {
         </div>
         <div>
           <label htmlFor="phone">Phone Number</label>
-          <input name="phone" maxLength={11} required id="phone" value={phone} onChange={handleChange} placeholder="07022345678" pattern={phoneNumberRegex.source} onBlur={determineNetwork} />
+          <input name="phone" maxLength={11} type="tel" required id="phone" value={phone} onChange={handleChange} placeholder="07022345678" pattern={phoneNumberRegex.source} onBlur={determineNetwork} />
           {state.logoUrl && <img className="small-network-logo" src={state.logoUrl} />}
         </div>
         <button className="form-submit" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>
