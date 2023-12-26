@@ -10,7 +10,6 @@ import Auth, { Signup, Login } from './components/pages/GetStarted';
 import Transactions from './components/pages/Transactions';
 import Recharge from './components/pages/Recharge';
 import Settings from './components/pages/Settings';
-import DropdownModal from './components/DropdownModal';
 import Account from './components/Account';
 
 export default function App() {
@@ -31,8 +30,6 @@ export default function App() {
           <Route path='recharge' element={<Recharge />} />
           <Route path='settings' element={<Settings />} />
         </Route>
-        <Route path='modal-test' element={<DropdownModal />} />
-
         <Route path='*' element={<Error message={'Page Not Found'} code={404} goto={'/'} />} />
       </Routes>
       <ToastContainer />

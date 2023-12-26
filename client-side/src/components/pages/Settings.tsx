@@ -5,44 +5,95 @@ import Api from "../../api.config";
 import { toast } from "react-toastify";
 
 export default function Settings() {
-  const [loading, setLoading] = useState(false);
-  const [loading2, setLoading2] = useState(false);
+  interface IState {
+    basic: {
+      first: string;
+      last: string;
+      email: string;
+      phone: string;
+      loading: boolean;
+    };
+    security: {
+      oldPassword: string;
+      newPassword: string;
+      confirmPassword: string;
+      loading: boolean;
+    };
+  }
+
   const [user] = useOutletContext() as [IUser];
-  const [first, setFirst] = useState(user.fullName.split(' ')[0]);
-  const [last, setLast] = useState(user.fullName.split(' ')[1]);
-  const [email, setEmail] = useState(user.email);
-  const [phone, setPhone] = useState(user.phone);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [oldPassword, setOldPassword] = useState('');
+  const [state, setState] = useState<IState>({
+    basic: {
+      first: user.fullName.split(' ')[0],
+      last: user.fullName.split(' ')[1],
+      email: user.email,
+      phone: user.phone,
+      loading: false
+    },
+    security: {
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+      loading: false
+    }
+  });
 
+  const { first, last, email, phone } = state.basic;
+  const { newPassword, confirmPassword, oldPassword } = state.security;
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleBasic(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
+    setState(s => ({ ...s, basic: { ...s.basic, loading: true } }));
     Api.put('account', { first, last, email, phone })
       .then(res => {
         toast.success(res.data.message);
-        setLoading(false);
+        setState(s => ({ ...s, basic: { ...s.basic, loading: false } }));
       })
       .catch(err => {
         toast.error(err.response.data.message);
-        setLoading(false);
+        setState(s => ({ ...s, basic: { ...s.basic, loading: false } }));
       });
   }
 
-  function handlePasswordSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSecuritySubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading2(true);
+    setState(s => ({ ...s, security: { ...s.security, loading: true } }));
     Api.put('account', { password: newPassword, confirm: confirmPassword, oldPassword })
       .then(res => {
         toast.success(res.data.message);
-        setLoading2(false);
+        setState(s => ({ ...s, security: { ...s.security, loading: false } }));
       })
       .catch(err => {
         toast.error(err.response.data.message);
-        setLoading2(false);
+        setState(s => ({ ...s, security: { ...s.security, loading: false } }));
       });
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'first':
+        setState(s => ({ ...s, basic: { ...s.basic, first: value } }));
+        break;
+      case 'last':
+        setState(s => ({ ...s, basic: { ...s.basic, last: value } }));
+        break;
+      case 'email':
+        setState(s => ({ ...s, basic: { ...s.basic, email: value } }));
+        break;
+      case 'phone':
+        setState(s => ({ ...s, basic: { ...s.basic, phone: value } }));
+        break;
+      case 'newPassword':
+        setState(s => ({ ...s, security: { ...s.security, newPassword: value } }));
+        break;
+      case 'confirmPassword':
+        setState(s => ({ ...s, security: { ...s.security, confirmPassword: value } }));
+        break;
+      case 'oldPassword':
+        setState(s => ({ ...s, security: { ...s.security, oldPassword: value } }));
+        break;
+    }
   }
 
   return (
@@ -50,42 +101,42 @@ export default function Settings() {
       <h1>Settings</h1>
       <div>
         <h3>Edit User Information</h3>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleBasic}>
           <div>
             <label htmlFor="first" >First name</label>
-            <input id="first" type="text" placeholder="first name" value={first} onChange={(e) => setFirst(e.target.value)} />
+            <input name="first" id="first" type="text" placeholder="first name" value={first} onChange={handleChange} />
           </div>
           <div>
             <label htmlFor="last">Last name</label>
-            <input id="last" type="text" placeholder="last name" value={last} onChange={(e) => setLast(e.target.value)} />
+            <input name="last" id="last" type="text" placeholder="last name" value={last} onChange={handleChange} />
           </div>
           <div>
             <label htmlFor="email">Email</label>
-            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input name="email" id="email" type="email" value={email} onChange={handleChange} />
           </div>
           <div>
             <label htmlFor="phone">Phone number</label>
-            <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <input name="phone" id="phone" type="tel" value={phone} onChange={handleChange} />
           </div>
-          <button disabled={loading} >{loading ? 'Processing...' : 'Confirm'}</button>
+          <button disabled={state.basic.loading} >{state.basic.loading ? 'Processing...' : 'Confirm'}</button>
         </form>
       </div>
 
       <h3>Security</h3>
-      <form onSubmit={handlePasswordSubmit}>
+      <form onSubmit={handleSecuritySubmit}>
         <div>
           <label htmlFor="new-password" >New Password</label>
-          <input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <input name="newPassword" id="new-password" type="password" value={newPassword} onChange={handleChange} />
         </div>
         <div>
           <label htmlFor="confirn-new">Confirm New Password</label>
-          <input id="confirm-new" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          <input name="confirmPassword" id="confirm-new" type="password" value={confirmPassword} onChange={handleChange} />
         </div>
         <div>
           <label htmlFor="old">Old Password</label>
-          <input id="old" type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+          <input name="oldPassword" id="old" type="password" value={oldPassword} onChange={handleChange} />
         </div>
-        <button disabled={loading2} >{loading2 ? 'Processing...' : 'Confirm Change Password'}</button>
+        <button disabled={state.security.loading} >{state.security.loading ? 'Processing...' : 'Confirm Change Password'}</button>
       </form>
     </section>
   )

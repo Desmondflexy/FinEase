@@ -324,7 +324,6 @@ export function Electricity() {
       amount: ''
     },
     feedback: {
-      // disco_desc: '',
       message: '',
       customer: null,
     }
@@ -468,7 +467,6 @@ export function Electricity() {
       amount: string;
     };
     feedback: {
-      // disco_desc: string;
       message: string;
       customer: {
         address: string;

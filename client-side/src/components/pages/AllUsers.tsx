@@ -5,62 +5,81 @@ import { IUser } from "../../types";
 import Error from "./Error";
 
 export default function UsersList() {
-  const [users, setUsers] = useState<IUser[]>([]);
-  const [status, setStatus] = useState('loading');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState(users);
-  const [error, setError] = useState({ status: 0, statusText: '', goto: '/' });
+  interface IState {
+    users: IUser[];
+    apiStatus: 'loading' | 'success' | 'error';
+    searchTerm: string;
+    searchResults: IUser[];
+    error: {
+      status: number;
+      statusText: string;
+      goto: string;
+    }
+  }
 
-  const fetchUsers = () => {
+  const [state, setState] = useState<IState>({
+    users: [],
+    apiStatus: 'loading',
+    searchTerm: '',
+    searchResults: [],
+    error: { status: 0, statusText: '', goto: '/' }
+  });
+
+  const { apiStatus, searchTerm, searchResults, error } = state;
+
+  function fetchUsers() {
     Api.get('/account/all-users')
       .then(res => {
-        setStatus('success');
-        setUsers(res.data.users);
+        setState(s => ({ ...s, apiStatus: 'success', users: res.data.users, searchResults: res.data.users }));
       })
       .catch(err => {
         console.error(err.message);
-        setStatus('error');
+        setState(s => ({ ...s, apiStatus: 'error' }));
         if (err.response) {
           const { status, statusText } = err.response;
-          setError(e => ({
-            ...e,
-            status,
-            statusText,
-            goto: status >= 400 && status <= 499 ? '/auth/login' : e.goto
+          setState(s => ({
+            ...s,
+            error: {
+              ...s.error,
+              status,
+              statusText,
+              goto: status >= 400 && status <= 499 ? '/auth/login' : s.error.goto
+            }
           }));
         } else {
-          setError(e => ({ ...e, status: 500, statusText: err.message }));
+          setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
         }
       });
-  };
+  }
 
   useEffect(fetchUsers, []);
   useEffect(() => {
-    setSearchResults(users);
-  }, [users]);
+    setState(s => ({ ...s, searchResults: s.users }));
+  }, []);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
     const text = e.target.value;
-    setSearchTerm(text);
-    setSearchResults(users.filter(user => {
-      const searchPool = [
-        user.fullName.toLowerCase(),
-        user.email.toLowerCase(),
-        user.phone.toLowerCase(),
-        user.acctNo.toLowerCase()
-      ];
-      return searchPool.some(item => item.includes(text.toLowerCase().trim()));
+    setState(s => ({
+      ...s,
+      searchTerm: text,
+      searchResults: s.users.filter(user => {
+        const { fullName, email, phone, acctNo } = user;
+        const searchPool = [
+          fullName.toLowerCase(),
+          email.toLowerCase(),
+          phone.toLowerCase(),
+          acctNo.toLowerCase()
+        ];
+        return searchPool.some(item => item.includes(text.toLowerCase().trim()));
+      })
     }));
   }
 
-
-  if (status === 'success') {
+  if (apiStatus === 'success') {
     return (
       <section id="admin">
         <h1>List of all active users of FinEase</h1>
-        <form className="searchbox">
-          <input type="search" placeholder="Search for user..." onChange={handleSearch} value={searchTerm} />
-        </form>
+        <input type="search" placeholder="Search for user..." onChange={handleSearch} value={searchTerm} />
         <hr />
         <div className="table-container">
           <table>
@@ -89,13 +108,12 @@ export default function UsersList() {
           </table>
         </div>
       </section>
-    )
+    );
   }
 
-
-  if (status === 'error') {
+  if (apiStatus === 'error') {
     return (
       <Error code={error.status} message={error.statusText} goto={error.goto} />
-    )
+    );
   }
 }

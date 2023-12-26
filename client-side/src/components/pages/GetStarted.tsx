@@ -22,20 +22,40 @@ export default function Auth() {
 }
 
 export function Signup({ admin }: { admin: boolean }) {
-  const [loading, setLoading] = useState(false);
+  interface IState {
+    form:{
+      username: string;
+      first: string;
+      last: string;
+      email: string;
+      phone: string;
+      password: string;
+      confirm: string;
+      adminKey: string;
+    };
+    emailErrorFeedback: string;
+    usernameErrorFeedback: string;
+    loading: boolean;
+  }
 
-  // form inputs
-  const [username, setUsername] = useState('');
-  const [first, setFirst] = useState('');
-  const [last, setLast] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [adminKey, setAdminKey] = useState('');
+  const [state, setState] = useState<IState>({
+    form: {
+      username: '',
+      first: '',
+      last: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirm: '',
+      adminKey: ''
+    },
+    emailErrorFeedback: '',
+    usernameErrorFeedback: '',
+    loading: false
+  });
 
-  const [emailErrorFeedback, setEmailErrorFeedback] = useState('');
-  const [usernameErrorFeedback, setUsernameErrorFeedback] = useState('');
+  const {emailErrorFeedback, usernameErrorFeedback, loading, form} = state;
+  const {username, first, last, email, phone, password, confirm, adminKey} = form;
 
   const navigate = useNavigate();
 
@@ -51,7 +71,7 @@ export function Signup({ admin }: { admin: boolean }) {
         .then(res => {
           toast.success(res.data.message);
           navigate(authRoute.login);
-          setLoading(false);
+          setState(s => ({...s, loading: false}));
         })
         .catch(err => {
           if (err.response) {
@@ -59,11 +79,11 @@ export function Signup({ admin }: { admin: boolean }) {
           } else {
             toast.error(err.message);
           }
-          setLoading(false)
+          setState(s => ({...s, loading: false}));
         });
     };
 
-    setLoading(true);
+    setState(s => ({...s, loading: true}));
     signup();
   }
 
@@ -71,28 +91,28 @@ export function Signup({ admin }: { admin: boolean }) {
     const { name, value } = e.target;
     switch (name) {
       case 'username':
-        setUsername(value);
+        setState(s => ({...s, form: {...s.form, username: value}}));
         break;
       case 'first':
-        setFirst(value);
+        setState(s => ({...s, form: {...s.form, first: value}}));
         break;
       case 'last':
-        setLast(value);
+        setState(s => ({...s, form: {...s.form, last: value}}));
         break;
       case 'email':
-        setEmail(value);
+        setState(s => ({...s, form: {...s.form, email: value}}));
         break;
       case 'phone':
-        setPhone(value);
+        setState(s => ({...s, form: {...s.form, phone: value}}));
         break;
       case 'password':
-        setPassword(value);
+        setState(s => ({...s, form: {...s.form, password: value}}));
         break;
       case 'confirm':
-        setConfirm(value);
+        setState(s => ({...s, form: {...s.form, confirm: value}}));
         break;
       case 'adminKey':
-        setAdminKey(value);
+        setState(s => ({...s, form: {...s.form, adminKey: value}}));
         break;
       default:
         break;
@@ -102,20 +122,20 @@ export function Signup({ admin }: { admin: boolean }) {
   function checkUsernameAvailability() {
     Api.get(`/auth/check/username/${username}`)
       .then(() => {
-        setUsernameErrorFeedback('');
+        setState(s => ({...s, usernameErrorFeedback: ''}));
       })
       .catch(err => {
-        setUsernameErrorFeedback(err.response.data.message);
+        setState(s => ({...s, usernameErrorFeedback: err.response.data.message}));
       });
   }
 
   function checkEmailAvailability() {
     Api.get(`/auth/check/email/${email}`)
       .then(() => {
-        setEmailErrorFeedback('');
+        setState(s => ({...s, emailErrorFeedback: ''}));
       })
       .catch(err => {
-        setEmailErrorFeedback(err.response.data.message);
+        setState(s => ({...s, emailErrorFeedback: err.response.data.message}));
       });
   }
 
@@ -160,11 +180,13 @@ export function Signup({ admin }: { admin: boolean }) {
 }
 
 export function Login() {
+  const [state, setState] = useState({
+    emailOrUsername: '',
+    password: '',
+    loading: false
+  });
 
-  const [emailOrUsername, setEmailOrUsername] = useState('');
-  const [password, setPassword] = useState('');
-
-  const [loading, setLoading] = useState(false);
+  const {emailOrUsername, password, loading} = state;
   const navigate = useNavigate();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -174,7 +196,7 @@ export function Login() {
         .then(res => {
           localStorage.setItem('token', res.data.token);
           navigate('/account/dashboard');
-          setLoading(false);
+          setState(s => ({...s, loading: false}));
         })
         .catch(err => {
           if (err.response) {
@@ -182,21 +204,35 @@ export function Login() {
           } else {
             toast.error(err.message);
           }
-          setLoading(false)
+          setState(s => ({...s, loading: false}));
         });
     }
 
-    setLoading(true);
+    setState(s => ({...s, loading: true}));
     login();
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'username_email':
+        setState(s => ({...s, emailOrUsername: value}));
+        break;
+      case 'password':
+        setState(s => ({...s, password: value}));
+        break;
+      default:
+        break;
+    }
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <input name="username_email" placeholder="Email or Username" value={emailOrUsername} onChange={e => setEmailOrUsername(e.target.value)} required />
+        <input name="username_email" placeholder="Email or Username" value={emailOrUsername} onChange={handleChange} required />
       </div>
       <div>
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+        <input name="password" type="password" placeholder="Password" value={password} onChange={handleChange} required />
       </div>
       <div>
         <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>

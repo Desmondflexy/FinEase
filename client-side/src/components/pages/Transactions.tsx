@@ -6,52 +6,56 @@ import Loading from "./Loading";
 import { ITransaction } from "../../types";
 
 export default function Transactions() {
-  const [transactions, setTransactions] = useState<ITransaction[]>([]);
-  const [error, setError] = useState({ status: 0, statusText: "", goto: "/" });
-  const [status, setStatus] = useState('loading');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState(transactions);
+  const [state, setState] = useState<IStatus>({
+    transactions: [],
+    apiStatus: 'loading',
+    error: { status: 0, statusText: '', goto: '/' },
+    searchTerm: '',
+    searchResults: []
+  });
+
+  const { apiStatus, error, searchTerm, searchResults } = state;
 
   useEffect(getTransactions, []);
 
   function getTransactions() {
     Api.get('/transaction')
       .then(res => {
-        setStatus('success');
-        setTransactions(res.data.transactions);
+        const { transactions } = res.data;
+        setState(s => ({ ...s, apiStatus: 'success', transactions, searchResults: transactions }));
       })
       .catch(err => {
-        setStatus('error');
         const { status, statusText } = err.response;
-        setError(e => ({ ...e, status, statusText, goto: '/' }));
+        setState(s => ({ ...s, status: 'error', error: { ...s.error, status, statusText } }));
       });
   }
 
   useEffect(() => {
-    setSearchResults(transactions);
-  }, [transactions]);
+    setState(s => ({ ...s, searchResults: s.transactions }));
+  }, []);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
     const text = e.target.value;
-    setSearchTerm(text);
-    setSearchResults(transactions.filter(trx => {
-      const searchPool = [
-        trx.amount,
-        trx.type,
-        trx.description.toLowerCase(),
-        trx.reference.toLowerCase(),
-      ];
-      return searchPool.some(item => item.toString().includes(text.toLowerCase().trim()));
+    setState(s => ({
+      ...s,
+      searchTerm: text,
+      searchResults: s.transactions.filter(trx => {
+        const searchPool = [
+          trx.amount,
+          trx.type,
+          trx.description.toLowerCase(),
+          trx.reference.toLowerCase(),
+        ];
+        return searchPool.some(item => item.toString().includes(text.toLowerCase().trim()));
+      })
     }));
-  };
+  }
 
-  if (status === 'success') {
+  if (apiStatus === 'success') {
     return (
       <section id="all-transactions">
         <h1>Transactions</h1>
-        <form className="searchbox">
-          <input value={searchTerm} onChange={handleSearch} type="search" placeholder="Search transaction..." />
-        </form>
+        <input value={searchTerm} onChange={handleSearch} type="search" placeholder="Search transaction..." />
         <hr />
         <div className="table">
 
@@ -84,14 +88,25 @@ export default function Transactions() {
             </tbody>
           </table>
         </div>
-
       </section>
     )
   }
 
-  if (status === 'error') {
+  if (apiStatus === 'error') {
     return <Error code={error.status} message={error.statusText} goto={error.goto} />
   }
 
   return <Loading />
+
+  interface IStatus {
+    transactions: ITransaction[];
+    apiStatus: 'loading' | 'success' | 'error';
+    error: {
+      status: number;
+      statusText: string;
+      goto: string;
+    };
+    searchTerm: string;
+    searchResults: ITransaction[];
+  }
 }

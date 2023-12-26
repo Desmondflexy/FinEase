@@ -19,44 +19,54 @@ const routeObj = {
 }
 
 export default function Account() {
+  interface IState {
+    status: 'loading' | 'error' | 'success';
+    error: {
+      status: number;
+      statusText: string;
+      goto: string;
+    };
+    menuVisible: boolean;
+  }
   const [user, setUser] = useState<IUser | null>(null);
-  const [status, setStatus] = useState('loading'); // loading, error, success
-  const [error, setError] = useState({ status: 0, statusText: '', goto: '/' });
   const location = useLocation().pathname.split('/')[2];
   const token = localStorage.getItem('token');
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [state, setState] = useState<IState>({
+    status: 'loading',
+    error: { status: 0, statusText: '', goto: '/' },
+    menuVisible: false
+  });
 
-  const fetchAcctInfo = () => {
+  const { status, error, menuVisible } = state;
+
+  function fetchAcctInfo() {
     Api.get('account')
       .then(res => {
-        setStatus('success');
         setUser(res.data.user);
+        setState(s => ({ ...s, status: 'success' }));
       })
       .catch(err => {
-        setStatus('error');
+        setState(s => ({ ...s, status: 'error' }));
         if (err.response) {
           const { status, statusText } = err.response;
-          setError(e => ({
-            ...e,
-            status,
-            statusText,
-            goto: status >= 400 && status <= 499 ? '/auth/login' : e.goto
+          setState(s => ({
+            ...s,
+            error: { status, statusText, goto: status >= 400 && status <= 499 ? '/auth/login' : s.error.goto }
           }));
         } else {
-          setError(e => ({ ...e, status: 500, statusText: err.message }));
+          setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
         }
       });
-  };
+  }
 
-  // only fetch account info if token changes
+  // only fetch account info if token or location changes
   useEffect(fetchAcctInfo, [token, location]);
 
   function handleMenuButton() {
-    // alert('hello world!');
-    setMenuVisible(!menuVisible);
+    setState(s => ({ ...s, menuVisible: !s.menuVisible }));
   }
 
-  if (user && status === 'success') {
+  if (status === 'success' && user) {
     return (
       <div id="app-layout">
         <div id="header">

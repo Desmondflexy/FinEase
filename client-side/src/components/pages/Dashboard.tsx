@@ -7,32 +7,26 @@ import { ITransaction, IUser } from "../../types";
 import Api from "../../api.config";
 
 export default function Dashboard() {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [fwOpen, setFwOpen] = useState(false); // fund wallet modal not open
-  const [twOpen, setTwOpen] = useState(false); // transfer wallet modal not open
+  interface IState {
+    dropdownOpen: boolean;
+    fwOpen: boolean;
+    twOpen: boolean;
+    balance: number;
+    recent10: ITransaction[];
+  }
   const [user] = useOutletContext() as [IUser];
-  const [balance, setBalance] = useState(formatNumber(user.balance));
-  const [recent10, setRecent10] = useState<ITransaction[]>([]);
 
-  const openModal = (setModalOpen: (isOpen: boolean) => void) => setModalOpen(true)
-  const closeDropdown = (e: MouseEvent) => {
-    const dropdownBtn = document.querySelector('.dropdown-btn');
-    if (dropdownBtn && !dropdownBtn.contains(e.target as Node)) {
-      setDropdownOpen(false);
-    }
-  }
+  const [state, setState] = useState<IState>({
+    dropdownOpen: false,
+    fwOpen: false,
+    twOpen: false,
+    balance: 0,
+    recent10: []
+  });
 
-  const getRecentTransactions = () => {
-    Api.get(`transaction?limit=${10}`)
-      .then(res => {
-        setRecent10(res.data.transactions);
-      })
-      .catch(err => {
-        console.error(err.response.data);
-      })
-  }
+  const { dropdownOpen, fwOpen, twOpen, balance, recent10 } = state;
 
-  useEffect(getRecentTransactions, [balance]);
+  useEffect(getRecentTransactions, [user]);
 
   useEffect(() => {
     document.addEventListener('click', closeDropdown);
@@ -41,6 +35,50 @@ export default function Dashboard() {
     };
   }, []);
 
+  useEffect(() => {
+    setState(s => ({ ...s, balance: user.balance }));
+  }, [user.balance])
+
+  function openModal(feature: 'fund' | 'transfer') {
+    switch (feature) {
+      case 'fund':
+        console.log('fund wallet open');
+        setState(s => ({ ...s, fwOpen: true }));
+        break;
+      case 'transfer':
+        console.log('transfer wallet open');
+        setState(s => ({ ...s, twOpen: true }));
+        break;
+      default:
+        break;
+    }
+  }
+
+  function closeModal() {
+    setState(s => ({ ...s, fwOpen: false, twOpen: false }));
+  }
+
+  function closeDropdown(e: MouseEvent) {
+    const dropdownBtn = document.querySelector('.dropdown-btn');
+    if (dropdownBtn && !dropdownBtn.contains(e.target as Node)) {
+      setState(s => ({ ...s, dropdownOpen: false }));
+    }
+  }
+
+  function toggleDropdown() {
+    setState(s => ({ ...s, dropdownOpen: !dropdownOpen }));
+  }
+
+  function getRecentTransactions() {
+    Api.get(`transaction?limit=${10}`)
+      .then(res => {
+        setState(s => ({ ...s, recent10: res.data.transactions }));
+      })
+      .catch(err => {
+        console.error(err.response.data);
+      })
+  }
+
   return (
     <>
       <section id="dashboard">
@@ -48,13 +86,13 @@ export default function Dashboard() {
         <div>
           <p>Email: {user.email}</p>
           <div className="card balance">
-            <h2>{balance}</h2>
+            <h2>{formatNumber(balance)}</h2>
             <p>Current Wallet Balance</p>
             <div className="dropdown">
-              <CiSettings className="dropdown-btn rotate" onClick={() => setDropdownOpen(!dropdownOpen)} />
+              <CiSettings className="dropdown-btn rotate" onClick={toggleDropdown} />
               <ul className={`dropdown-content ${dropdownOpen ? '' : 'hidden'}`}>
-                <li onClick={() => openModal(setFwOpen)}>Load Wallet</li>
-                <li onClick={() => openModal(setTwOpen)}>Transfer</li>
+                <li onClick={() => openModal('fund')}>Load Wallet</li>
+                <li onClick={() => openModal('transfer')}>Transfer</li>
               </ul>
             </div>
           </div>
@@ -89,8 +127,8 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <FundWalletModal setBalance={setBalance} closeModal={() => setFwOpen(false)} isOpen={fwOpen} email={user.email} />
-      <TransferWalletModal closeModal={() => setTwOpen(false)} isOpen={twOpen} setBalance={setBalance} />
+      <FundWalletModal closeModal={closeModal} isOpen={fwOpen} />
+      <TransferWalletModal closeModal={closeModal} isOpen={twOpen} />
 
       <div className="disclaimer">
         <em>Disclaimer: This app is for demonstration purpose. No real money is funded and no real value is gotten for successful recharges and bills payments.</em>
