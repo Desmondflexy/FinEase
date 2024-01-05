@@ -1,17 +1,16 @@
 import { connect, connection } from "mongoose";
 
-const withoutInternet = false;
-
 export default function connectDB() {
-
-  const databaseUrl = withoutInternet
-    ? process.env.DATABASE_URL_LOCAL as string
+  const devMode = process.env.NODE_ENV === 'development';
+  
+  const databaseUrl = devMode
+    ? 'mongodb://localhost:27017/finEase'
     : process.env.DATABASE_URL as string;
 
   function connectWithRetry() {
     connect(databaseUrl)
       .then(() => {
-        console.log(`Connected to ${withoutInternet ? 'local' : "remote"} database successfully!`);
+        console.log(`Connected to ${devMode ? 'local' : 'shared'} database successfully!`);
       })
       .catch((err) => {
         console.error("Error connecting to Database: ", err.code);

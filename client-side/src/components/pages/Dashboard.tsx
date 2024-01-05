@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { CiSettings } from "react-icons/ci";
-import { formatDateTime, formatNumber } from "../../utils";
-import { FundWalletModal, TransferWalletModal } from "../Funds";
+import { formatDateTime, formatNumber, greet } from "../../utils";
+// import { FundWalletModal, TransferWalletModal } from "../Funds";
 import { useOutletContext } from "react-router-dom";
 import { ITransaction, IUser } from "../../types";
 import Api from "../../api.config";
+import { IoWalletOutline } from "react-icons/io5";
+import { GiExpense } from "react-icons/gi";
+import { FaMoneyBill } from "react-icons/fa";
+import Modal from "../modals/Dropdown";
+import FormModal from "../modals/FormModal";
+import TransferWallet from "../modals/TransferWallet";
 
 export default function Dashboard() {
   interface IState {
@@ -24,7 +30,8 @@ export default function Dashboard() {
     recent10: []
   });
 
-  const { dropdownOpen, fwOpen, twOpen, balance, recent10 } = state;
+  // const { dropdownOpen, fwOpen, twOpen, balance, recent10 } = state;
+  const { dropdownOpen, balance, recent10 } = state;
 
   useEffect(getRecentTransactions, [user]);
 
@@ -42,11 +49,9 @@ export default function Dashboard() {
   function openModal(feature: 'fund' | 'transfer') {
     switch (feature) {
       case 'fund':
-        console.log('fund wallet open');
         setState(s => ({ ...s, fwOpen: true }));
         break;
       case 'transfer':
-        console.log('transfer wallet open');
         setState(s => ({ ...s, twOpen: true }));
         break;
       default:
@@ -54,9 +59,9 @@ export default function Dashboard() {
     }
   }
 
-  function closeModal() {
-    setState(s => ({ ...s, fwOpen: false, twOpen: false }));
-  }
+  // function closeModal() {
+  //   setState(s => ({ ...s, fwOpen: false, twOpen: false }));
+  // }
 
   function closeDropdown(e: MouseEvent) {
     const dropdownBtn = document.querySelector('.dropdown-btn');
@@ -80,59 +85,84 @@ export default function Dashboard() {
   }
 
   return (
-    <>
-      <section id="dashboard">
-        <h1>Dashboard</h1>
-        <div>
-          <p>Email: {user.email}</p>
-          <div className="card balance">
+    <div id="dashboard">
+      <div className="message">
+        <h2>{greet()} {user.fullName.split(' ')[0]}!</h2>
+      </div>
+      <section>
+        <div className="cards mb-3">
+          <div className="bg-danger text-white">
             <h2>{formatNumber(balance)}</h2>
             <p>Current Wallet Balance</p>
+            <div className="wallet-icon">
+              <IoWalletOutline />
+            </div>
             <div className="dropdown">
-              <CiSettings className="dropdown-btn rotate" onClick={toggleDropdown} />
-              <ul className={`dropdown-content ${dropdownOpen ? '' : 'hidden'}`}>
-                <li onClick={() => openModal('fund')}>Load Wallet</li>
-                <li onClick={() => openModal('transfer')}>Transfer</li>
-              </ul>
+              <button className="icon" onClick={toggleDropdown}><span>{'\u25bc'}</span><CiSettings size={22} /></button >
+              <Modal visible={dropdownOpen}>
+                <ul className={`dropdown-content ${dropdownOpen ? '' : 'hidden'}`}>
+                  <li onClick={() => openModal('fund')}>Load Wallet</li>
+                  {/* <li onClick={() => openModal('transfer')}>Transfer</li> */}
+                  <li data-bs-toggle="modal" data-bs-target="#transferWallet">Transfer</li>
+                </ul>
+              </Modal>
             </div>
           </div>
-        </div>
-
-        <div className="table-container">
-          <h3>Recent Transactions</h3>
-          <div className="table">
-            <table>
-              <thead>
-                <tr>
-                  <th>SN</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th className="table-desc">Description</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recent10.map((trx: ITransaction, index: number) => (
-                  <tr key={trx._id}>
-                    <td>{index + 1}</td>
-                    <td>{trx.type}</td>
-                    <td>{formatNumber(+trx.amount).slice(3)}</td>
-                    <td>{trx.description}</td>
-                    <td>{formatDateTime(trx.createdAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="text-white bg-facebook">
+            <h2>{formatNumber(0)}</h2>
+            <p>Total Monthly Expense</p>
+            <div className="wallet-icon">
+              <GiExpense />
+            </div>
+          </div>
+          <div className="bg-dark text-white">
+            <h2>{formatNumber(0)}</h2>
+            <p>Total Monthly Income</p>
+            <div className="wallet-icon">
+              <FaMoneyBill />
+            </div>
           </div>
         </div>
       </section>
 
-      <FundWalletModal closeModal={closeModal} isOpen={fwOpen} />
-      <TransferWalletModal closeModal={closeModal} isOpen={twOpen} />
+      <section>
+        <div className="header">Recent Transactions</div>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>SN</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th className="table-desc">Description</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recent10.map((trx: ITransaction, index: number) => (
+                <tr key={trx._id}>
+                  <td>{index + 1}</td>
+                  <td>{trx.type}</td>
+                  <td>{formatNumber(+trx.amount).slice(3)}</td>
+                  <td>{trx.description}</td>
+                  <td>{formatDateTime(trx.createdAt)}</td>
+                </tr>
+              ))}
+            </tbody>
 
-      <div className="disclaimer">
+          </table>
+        </div>
+      </section>
+
+      {/* <FundWalletModal closeModal={closeModal} isOpen={fwOpen} /> */}
+      {/* <TransferWalletModal closeModal={closeModal} isOpen={twOpen} /> */}
+      <FormModal id={'transferWallet'} title="Wallet to Wallet Transfer">
+        <TransferWallet/>
+      </FormModal>
+
+      <div className=" disclaimer p-2 bg-primary-subtle text-dark mt-3">
         <em>Disclaimer: This app is for demonstration purpose. No real money is funded and no real value is gotten for successful recharges and bills payments.</em>
       </div>
-    </>
+    </div>
   )
 }

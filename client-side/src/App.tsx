@@ -11,18 +11,20 @@ import Transactions from './components/pages/Transactions';
 import Recharge from './components/pages/Recharge';
 import Settings from './components/pages/Settings';
 import Account from './components/Account';
+import NavExample from './components/BrandExample';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path='/example' element={<NavExample/>} />
         <Route path="/" element={<Home />} />
         <Route path='/auth' element={<Auth />}>
           <Route path='signup' element={<Signup admin={false} />} />
           <Route path='admin-signup' element={<Signup admin={true} />} />
           <Route path='login' element={<Login />} />
         </Route>
-        <Route path='/account' element={<Account/>}>
+        <Route path='/account' element={<Account />}>
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='profile' element={<Profile />} />
           <Route path='all-users' element={<AllUsers />} />

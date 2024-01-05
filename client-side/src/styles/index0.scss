@@ -1,0 +1,692 @@
+// Oh sass (scss) is a beautiful language that compiles to css.
+
+$color-goldenrod: #e8d21d;
+$color-magenta: #cf1578;
+$color-turquoise: #039fbe;
+$color-brick: #b20238;
+$header-height: 50px;
+$width-mobile: 320px; // 320px - 480px
+$width-tablet: 481px; // 481px - 768px
+$width-laptop: 769px; // 769px - 1024px
+$width-desktop: 1025px; // 1025px - higher
+
+%header-logo {
+  header {
+    text-align: center;
+
+    & h3 {
+      display: inline-block;
+      border: 4px solid $color-turquoise;
+      border-radius: 10px;
+      color: $color-turquoise;
+      margin: 5px auto;
+    }
+
+    & a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      padding: 10px;
+    }
+  }
+}
+
+// * {
+//   box-sizing: border-box;
+// }
+
+// html {
+//   font-size: 0.7em;
+//   background-color: rgb(246, 244, 228);
+//   min-width: $width-mobile;
+
+//   @media (min-width: $width-tablet) {
+//     font-size: 0.8em;
+//     background-color: rgb(228, 230, 243);
+//   }
+
+//   @media (min-width: $width-laptop) {
+//     font-size: 1em;
+//     background-color: rgb(245, 229, 237);
+//   }
+
+//   @media (min-width: $width-desktop) {
+//     font-size: 1.2em;
+//     background-color: rgb(230, 244, 230);
+//   }
+// }
+
+// body {
+//   font-family: Arial, Helvetica, sans-serif;
+//   padding: 0;
+//   margin: 0;
+//   width: 100%;
+// }
+
+// a {
+//   text-decoration: none;
+//   color: $color-brick;
+//   text-decoration: underline;
+
+//   &:hover {
+//     text-decoration: none;
+//   }
+
+//   &:active {
+//     color: var(--color-magenta);
+//   }
+// }
+
+h1,
+h2,
+h3 {
+  color: $color-turquoise;
+}
+
+.hidden {
+  display: none;
+}
+
+.feedback {
+  font-size: 0.9em;
+  font-style: italic;
+
+  &.error {
+    color: red;
+  }
+
+  &.success {
+    color: darkgreen;
+  }
+}
+
+// home / landing page
+#homepage{
+  background-color: rgb(229, 242, 245);
+}
+
+/* signup and login forms */
+
+// .get-started {
+//   padding: 0;
+//   @extend %header-logo;
+//   @extend %background-image;
+
+//   & .form-container {
+//     margin: 5px auto;
+//     border-radius: 8px;
+//     box-shadow: 2px 2px 5px grey;
+//     overflow: hidden;
+//     border-bottom: 8px solid $color-goldenrod;
+//     max-width: 300px;
+
+//     @media (min-width: $width-tablet) {
+//       max-width: 460px;
+//     }
+//   }
+
+//   & .form-nav {
+//     display: flex;
+//     justify-content: space-around;
+//     border-bottom: 1px solid $color-goldenrod;
+
+//     &>div {
+//       flex: 1;
+//       text-align: center;
+//     }
+
+//     & a {
+//       display: block;
+//       text-decoration: none;
+//       color: inherit;
+//       font-size: 1.2em;
+//       padding: 10px;
+//     }
+
+//     & .active {
+//       background-color: $color-goldenrod;
+//       color: white;
+//     }
+//   }
+
+//   & form {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
+//     gap: 20px;
+//     max-width: 500px;
+//     padding: 20px;
+
+//     &>div {
+//       width: 100%;
+//       text-align: center;
+//       position: relative;
+
+//       & input {
+//         width: 100%;
+//         border: none;
+//         border-bottom: 2px solid grey;
+//         padding: 10px 5px;
+//         outline: none;
+
+//         &:focus {
+//           border-bottom: 2px solid darkred;
+//         }
+//       }
+
+//       & input:invalid:not(:placeholder-shown) {
+//         box-shadow: 0 0 5px 1px red;
+//       }
+
+//       & .feedback {
+//         position: absolute;
+//         border: 1px solif green;
+//         right: 0;
+//         top: -15px;
+//         text-align: right;
+//         width: 100%;
+//         border-radius: 5px;
+//         padding: 2px;
+//         font-size: 0.8em;
+//       }
+
+//       & button {
+//         padding: 10px;
+//         border-radius: 4px;
+//         min-width: 200px;
+//         margin-top: 20px;
+//       }
+//     }
+//   }
+// }
+
+%error-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 2.5em;
+  padding: 30px;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+
+  & a {
+    font-size: 0.8em;
+  }
+}
+
+%background-image{
+  // background-image: url('/images/homepage.jpg');
+  // color: white;
+  height: 100vh;
+}
+
+// #home-screen {
+//   padding: 1em;
+//   @extend %error-screen;
+//   @extend %background-image;
+
+//   &>h1 {
+//     border-radius: 20px;
+//     border: 10px solid;
+//     padding: .2em;
+//   }
+
+//   &>* {
+//     max-width: 700px;
+//     margin: auto;
+//   }
+// }
+
+#error-screen {
+  @extend %header-logo;
+  @extend %error-screen;
+}
+
+#loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+
+  & img {
+    height: 5em;
+    margin-top: 60px;
+  }
+}
+
+/* Inside app layout */
+#app-layout {
+  display: grid;
+  grid-template-columns: 0fr 1fr;
+
+  @media (min-width: $width-laptop) {
+    grid-template-columns: 200px 1fr;
+  }
+
+  & #header {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    background-color: white;
+    height: $header-height;
+    padding: 10px;
+    border-bottom: 2px solid $color-turquoise;
+    color: $color-turquoise;
+
+    .menu-btn {
+      cursor: pointer;
+    }
+
+    @media (min-width: $width-laptop) {
+      .menu-btn {
+        display: none;
+      }
+    }
+
+    & .flex {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+
+    & h3 {
+      font-size: 1.5em;
+      font-weight: bold;
+
+      & a {
+        text-decoration: none;
+        color: $color-turquoise;
+      }
+    }
+
+    & p {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: ease-in-out 0.2s;
+
+      &:hover {
+        background-color: blue;
+        color: white;
+      }
+    }
+  }
+
+  & #side-menu {
+    grid-column: 1;
+    grid-row: 2/3;
+    list-style: none;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    border-right: 2px solid $color-turquoise;
+    background-color: rgba(255, 255, 255, 0.91);
+    z-index: 1;
+    box-shadow: 0px 0px 5px grey;
+    position: fixed;
+    top: $header-height;
+    overflow-y: scroll;
+    height: calc(100vh - $header-height);
+
+
+    @media (min-width: $width-laptop) {
+      display: block;
+      position: static;
+    }
+
+    &>li {
+      font-weight: bold;
+      border-bottom: 1px solid lightgray;
+
+      &:hover {
+        color: darkred;
+        cursor: pointer;
+      }
+
+      &>* {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        text-align: left;
+        padding: 10px 20px;
+        width: 100%;
+      }
+
+      & button {
+        border: none;
+        background-color: red;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1em;
+
+        &:hover {
+          background-color: darkred;
+        }
+      }
+    }
+
+    & .active {
+      background-color: rgb(241, 241, 214);
+    }
+  }
+
+  & #main {
+    grid-column: 2;
+    grid-row: 2/3;
+    padding: 20px 30px;
+  }
+}
+
+#profile-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 500px;
+
+  &>p {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid grey;
+    padding: 10px;
+  }
+}
+
+.table-container {
+  overflow-x: scroll;
+  box-shadow: 0px 0px 2px grey inset;
+  padding: 5px;
+  width: 260px;
+
+  @media (min-width: $width-tablet) {
+    width: 400px;
+  }
+
+  @media (min-width: $width-laptop) {
+    width: 500px;
+  }
+
+  @media (min-width: $width-desktop) {
+    width: 760px;
+  }
+
+  table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    color: rgb(39, 39, 66);
+
+    .table-desc {
+      min-width: 200px;
+    }
+
+    & th,
+    td {
+      text-align: left;
+      border-bottom: 2px solid grey;
+      padding: 8px;
+    }
+  }
+}
+
+/* Dashboard */
+
+#dashboard {
+  & .card.balance {
+    background-color: $color-brick;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    position: relative;
+    margin: 10px 0;
+    max-width: 260px;
+
+    @media (min-width: $width-tablet) {
+      margin: 20px 0;
+      max-width: 400px;
+    }
+
+    & h2 {
+      color: white;
+    }
+  }
+}
+
+.rotate {
+  animation: rotateAnimation 4s linear infinite;
+}
+
+/* fullscreen overlay for form input */
+.overlay {
+  position: absolute;
+  background-color: rgba(0, 0, 0, .6);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: background-color 1s ease;
+
+  & form {
+    position: relative;
+    background-color: #fff;
+    max-width: 500px;
+    margin: 0 auto;
+    margin-top: 50px;
+    border-radius: 5px;
+    padding: 20px;
+    border-top: 10px solid darkgreen;
+
+    &>input,
+    &>button {
+      width: 100%;
+      margin: 20px 0;
+      padding: 15px;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+
+    & .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 20px;
+      color: darkred;
+      cursor: pointer;
+      border: 1px solid darkred;
+
+      &:active {
+        box-shadow: 0 0 2px 2px darkred;
+        scale: 0.8;
+      }
+    }
+  }
+}
+
+#recharge {
+  &>form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  &>div>form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    max-width: 320px;
+
+    @media (min-width: $width-tablet) {
+      max-width: 500px;
+    }
+
+    @media (min-width: $width-laptop) {
+      max-width: 700px;
+    }
+
+    &>div {
+      display: flex;
+      border: 1px solid darkgrey;
+
+      & label {
+        min-width: 120px;
+        background-color: darkgrey;
+        font-size: .8em;
+        padding: 10px;
+        font-weight: bold;
+      }
+
+      &>input,
+      &>select {
+        flex: 1;
+        padding-left: 5px;
+      }
+
+      &>input:invalid:not(:placeholder-shown) {
+        box-shadow: 0 0 5px 1px $color-brick;
+      }
+    }
+
+    &>button {
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    & .small-network-logo {
+      display: inline-block;
+      width: 36px;
+      height: 36px;
+    }
+  }
+}
+
+button.form-submit {
+  background-color: green;
+  color: white;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darkgreen;
+  }
+
+  &:disabled {
+    background-color: lightgreen;
+    color: grey;
+    cursor: progress;
+  }
+}
+
+.dropdown {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+
+  & .dropdown-btn {
+    float: right;
+    font-weight: 700;
+    font-size: 1.5em;
+    cursor: pointer;
+    border-radius: 50%;
+
+    &:active {
+      box-shadow: 0 0 2px 2px darkred;
+      scale: 0.8;
+    }
+  }
+
+  & .dropdown-content {
+    position: absolute;
+    right: -12px;
+    top: 12px;
+    background-color: #f1f1f1;
+    color: black;
+    box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, .2);
+    z-index: 1;
+    list-style: none;
+    padding: 0;
+    font-size: 0.8em;
+    min-width: 100px;
+    border-radius: 3px;
+
+    & li {
+      padding: 8px;
+      margin: 5px 0;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #ddd;
+        color: darkred;
+        text-shadow: 0 0 1px darkred;
+      }
+    }
+  }
+
+  & .hidden {
+    display: none;
+  }
+}
+
+#settings {
+  & form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    max-width: 500px;
+
+    &>div {
+      display: flex;
+      border: 1px solid darkgrey;
+
+      & label {
+        min-width: 120px;
+        background-color: darkgrey;
+        font-size: .8em;
+        padding: 10px;
+        font-weight: bold;
+      }
+
+      &>input {
+        flex: 1;
+        padding-left: 5px;
+      }
+    }
+
+    &>button {
+      padding: 10px;
+      border-radius: 5px;
+    }
+  }
+}
+
+.disclaimer{
+  border: 2px solid;
+  padding: 5px;
+  border-radius: 8px;
+  margin: 20px 0;
+  font-size: 0.8em;
+  color: rgba(0, 100, 0, 0.654);
+  max-width: 500px;
+}
+
+@keyframes rotateAnimation {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -20,6 +20,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
     next();
 
   } catch (error: any) {
+    console.error(error);
     res.status(401);
     return res.json({
       success: false,

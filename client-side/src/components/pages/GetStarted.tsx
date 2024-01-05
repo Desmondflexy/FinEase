@@ -1,13 +1,24 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import Api from "../../api.config";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+import { useForm } from 'react-hook-form';
 
-const authRoute = {
-  login: '/auth/login',
-  signup: '/auth/signup',
-  adminSignup: '/auth/admin-signup'
-};
+interface SignupInputs {
+  username: string;
+  first: string;
+  last: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirm: string;
+  adminKey?: string;
+}
+
+interface LoginInputs {
+  username_email: string;
+  password: string;
+}
 
 export default function Auth() {
   return (
@@ -18,256 +29,228 @@ export default function Auth() {
         <Outlet />
       </div>
     </div>
-  )
+  );
 }
 
 export function Signup({ admin }: { admin: boolean }) {
   interface IState {
-    form:{
-      username: string;
-      first: string;
-      last: string;
-      email: string;
-      phone: string;
-      password: string;
-      confirm: string;
-      adminKey: string;
-    };
-    emailErrorFeedback: string;
-    usernameErrorFeedback: string;
+    // emailErrorFeedback: string;
+    // usernameErrorFeedback: string;
     loading: boolean;
   }
 
   const [state, setState] = useState<IState>({
-    form: {
-      username: '',
-      first: '',
-      last: '',
-      email: '',
-      phone: '',
-      password: '',
-      confirm: '',
-      adminKey: ''
-    },
-    emailErrorFeedback: '',
-    usernameErrorFeedback: '',
-    loading: false
+    // emailErrorFeedback: "",
+    // usernameErrorFeedback: "",
+    loading: false,
   });
 
-  const {emailErrorFeedback, usernameErrorFeedback, loading, form} = state;
-  const {username, first, last, email, phone, password, confirm, adminKey} = form;
-
+  const { register, handleSubmit } = useForm<SignupInputs>();
+  const { loading } = state;
   const navigate = useNavigate();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  useEffect(() => {
+    document.title = 'FinEase - Signup'
+  });
+
+  function onSubmit(data: SignupInputs) {
+    const { username, first, last, email, phone, password, confirm, adminKey } = data;
     const endpoint = admin
-      ? { url: '/auth/admin-signup', inputs: { username, first, last, email, phone, password, confirm, adminKey } }
-      : { url: '/auth/signup', inputs: { username, first, last, email, phone, password, confirm } };
+      ? { url: "/auth/admin-signup", inputs: { username, first, last, email, phone, password, confirm, adminKey } }
+      : { url: "/auth/signup", inputs: { username, first, last, email, phone, password, confirm } };
+
     const { url, inputs } = endpoint;
 
-    const signup = () => {
+    setState((s) => ({ ...s, loading: true }));
+    signup(url, inputs);
+
+    function signup(url: string, inputs: SignupInputs) {
       Api.post(url, inputs)
-        .then(res => {
+        .then((res) => {
           toast.success(res.data.message);
-          navigate(authRoute.login);
-          setState(s => ({...s, loading: false}));
+          navigate('/auth/login');
+          setState((s) => ({ ...s, loading: false }));
         })
-        .catch(err => {
+        .catch((err) => {
           if (err.response) {
             toast.error(err.response.data.message);
           } else {
             toast.error(err.message);
           }
-          setState(s => ({...s, loading: false}));
+          setState((s) => ({ ...s, loading: false }));
         });
-    };
-
-    setState(s => ({...s, loading: true}));
-    signup();
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    switch (name) {
-      case 'username':
-        setState(s => ({...s, form: {...s.form, username: value}}));
-        break;
-      case 'first':
-        setState(s => ({...s, form: {...s.form, first: value}}));
-        break;
-      case 'last':
-        setState(s => ({...s, form: {...s.form, last: value}}));
-        break;
-      case 'email':
-        setState(s => ({...s, form: {...s.form, email: value}}));
-        break;
-      case 'phone':
-        setState(s => ({...s, form: {...s.form, phone: value}}));
-        break;
-      case 'password':
-        setState(s => ({...s, form: {...s.form, password: value}}));
-        break;
-      case 'confirm':
-        setState(s => ({...s, form: {...s.form, confirm: value}}));
-        break;
-      case 'adminKey':
-        setState(s => ({...s, form: {...s.form, adminKey: value}}));
-        break;
-      default:
-        break;
     }
   }
 
-  function checkUsernameAvailability() {
-    Api.get(`/auth/check/username/${username}`)
-      .then(() => {
-        setState(s => ({...s, usernameErrorFeedback: ''}));
-      })
-      .catch(err => {
-        setState(s => ({...s, usernameErrorFeedback: err.response.data.message}));
-      });
-  }
-
-  function checkEmailAvailability() {
-    Api.get(`/auth/check/email/${email}`)
-      .then(() => {
-        setState(s => ({...s, emailErrorFeedback: ''}));
-      })
-      .catch(err => {
-        setState(s => ({...s, emailErrorFeedback: err.response.data.message}));
-      });
-  }
-
   return (
-    <form className='form' onSubmit={handleSubmit}>
-      <div>
-        <input type="text" id="first" name="first" placeholder="First Name" value={first} onChange={handleChange} required />
-      </div>
-      <div>
-        <input type="text" id="last" name="last" placeholder="Last Name" value={last} onChange={handleChange} required />
-      </div>
-      <div>
-        {emailErrorFeedback && <em className="feedback">{emailErrorFeedback}</em>}
-        <input onBlur={checkEmailAvailability} type="email" id="email" name="email" placeholder="Email" value={email} onChange={handleChange} required />
-      </div>
-      <div>
-        <input maxLength={11} type="tel" id="phone" name="phone" placeholder="Phone Number" value={phone} onChange={handleChange} required />
-      </div>
-      <div>
-        {usernameErrorFeedback && <em className="feedback">{usernameErrorFeedback}</em>}
-        <input onBlur={checkUsernameAvailability} type="text" id="username" name="username" placeholder="Username" value={username} onChange={handleChange} required />
-      </div>
-      <div>
-        <input type="password" id="password" name="password" placeholder="Password" value={password} onChange={handleChange} required />
-      </div>
-      <div>
-        <input type="password" id="confirm" name="confirm" placeholder="Confirm Password" value={confirm} onChange={handleChange} required />
-      </div>
-      {admin &&
-        <div>
-          <input type='password' id='admin-key' name='adminKey' placeholder='Admin Key' required value={adminKey} onChange={handleChange} />
-        </div>}
-      <div>
-        <button type="submit" disabled={loading}>{loading ? 'Please wait...' : 'Signup'}</button>
+    <form className="form" onSubmit={handleSubmit(onSubmit)}>
+      <div className="input-group mb-3">
+        <div className={`form-floating`}>
+          <input {...register('first')} className="form-control" type="text" id="first" placeholder="First Name" required />
+          <label htmlFor="first">First Name</label>
+        </div>
       </div>
 
-      {admin && <p style={{ color: 'darkred' }}>Admin Key is required to create an admin account</p>}
-      <p>Already have an account? <Link to={authRoute.login}>Log In</Link></p>
+      <div className="input-group mb-3">
+        <div className={`form-floating`}>
+          <input {...register('last')} className="form-control" type="text" id="last" placeholder="Last Name" required />
+          <label htmlFor="last">Last Name</label>
+        </div>
+      </div>
 
+      <div className="input-group mb-3">
+        <div className='form-floating'>
+          {/* {emailErrorFeedback && (
+          <em className="feedback">{emailErrorFeedback}</em>
+        )} */}
+          <input {...register('email')} className="form-control" type="email" id="email" placeholder="Email" required />
+          <label htmlFor="email">Email</label>
+        </div>
+        <p className="invalid-feedback">error feedback</p>
+      </div>
+
+      <div className="input-group mb-3">
+        <div className='form-floating'>
+          <input {...register('phone')} className="form-control" minLength={11} maxLength={11} type="tel" id="phone" placeholder="Phone Number" required />
+          <label htmlFor="phone">Phone Number</label>
+        </div>
+      </div>
+
+      <div className="input-group mb-3">
+        <div className='form-floating'>
+          {/* {usernameErrorFeedback && (
+          <em className="feedback">{usernameErrorFeedback}</em>
+        )} */}
+          <input {...register('username')} className="form-control" id="username" placeholder="Username" required />
+          <label htmlFor="username">Username</label>
+        </div>
+        <p className="invalid-feedback">error message</p>
+      </div>
+
+      <div className="input-group mb-3">
+        <div className='form-floating'>
+          <input {...register('password')} className="form-control" type="password" id="password" placeholder="Password" required />
+          <label htmlFor="password">Password</label>
+        </div>
+      </div>
+
+      <div className="input-group mb-3">
+        <div className='form-floating'>
+          <input {...register('confirm')} type="password" id="confirm" placeholder="Confirm Password" className="form-control" required />
+          <label htmlFor="confirm">Confirm Password</label>
+        </div>
+      </div>
+
+      {admin && (
+        <div className="input-group mb-3">
+          <div className='form-floating'>
+            <input {...register('adminKey')} className="form-control" type="password" id="admin-key" placeholder="Admin Key" required />
+            <label htmlFor="admin-key">Admin Key</label>
+          </div>
+        </div>
+      )}
+      <div>
+        <button className="btn btn-primary w-100" type="submit" disabled={loading}>
+          {loading ? "Please wait..." : "Signup"}
+        </button>
+      </div>
+
+      <p className="my-2 text-center">
+        Already have an account? <Link to={'/auth/login'}>Log In</Link>
+      </p>
     </form>
-  )
+  );
 }
 
 export function Login() {
   const [state, setState] = useState({
-    emailOrUsername: '',
-    password: '',
-    loading: false
+    loading: false,
   });
 
-  const {emailOrUsername, password, loading} = state;
+  const { register, handleSubmit } = useForm<LoginInputs>();
+
+  const { loading } = state;
   const navigate = useNavigate();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const login = () => {
-      Api.post('/auth/login', { emailOrUsername, password })
-        .then(res => {
-          localStorage.setItem('token', res.data.token);
-          navigate('/account/dashboard');
-          setState(s => ({...s, loading: false}));
+  useEffect(() => {
+    document.title = 'FinEase - Login';
+  });
+
+  function onSubmit(data: LoginInputs) {
+    const { username_email, password } = data;
+    function login() {
+      Api.post("/auth/login", { emailOrUsername: username_email, password })
+        .then((res) => {
+          localStorage.setItem("token", res.data.token);
+          navigate("/account/dashboard");
+          setState((s) => ({ ...s, loading: false }));
         })
-        .catch(err => {
+        .catch((err) => {
           if (err.response) {
             toast.error(err.response.data.message);
           } else {
             toast.error(err.message);
           }
-          setState(s => ({...s, loading: false}));
+          setState((s) => ({ ...s, loading: false }));
         });
     }
 
-    setState(s => ({...s, loading: true}));
+    setState((s) => ({ ...s, loading: true }));
     login();
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    switch (name) {
-      case 'username_email':
-        setState(s => ({...s, emailOrUsername: value}));
-        break;
-      case 'password':
-        setState(s => ({...s, password: value}));
-        break;
-      default:
-        break;
-    }
-  }
-
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <input name="username_email" placeholder="Email or Username" value={emailOrUsername} onChange={handleChange} required />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="form-floating">
+        <input {...register('username_email')} className="form-control mb-3" id="username_email" placeholder="Email or Username" required />
+        <label htmlFor="username_email">Email or Username</label>
+      </div>
+      <div className="form-floating mb-3">
+        <input {...register('password')} className="form-control" id="password" type="password" placeholder="Password" required />
+        <label htmlFor="password">Password</label>
       </div>
       <div>
-        <input name="password" type="password" placeholder="Password" value={password} onChange={handleChange} required />
-      </div>
-      <div>
-        <button type="submit" disabled={loading} >{loading ? 'Please wait...' : 'Login'}</button>
+        <button className="btn btn-primary w-100" type="submit" disabled={loading}>
+          {loading ? "Please wait..." : "Login"}
+        </button>
       </div>
 
-      <p>Don't have an account? <Link to={authRoute.signup}>Sign Up</Link></p>
-
+      <p>
+        Don't have an account? <Link to='/auth/signup'>Sign Up</Link>
+      </p>
     </form>
-  )
+  );
 }
 
 function FormNav() {
-  const [active, setActive] = useState('');
+  const [active, setActive] = useState("");
   const location = useLocation();
   useEffect(() => {
-    if (location.pathname === authRoute.login) {
-      setActive(authRoute.login);
+    if (location.pathname === '/auth/login') {
+      setActive('/auth/login');
     } else {
-      setActive(authRoute.signup);
+      setActive('/auth/signup');
     }
   }, [location.pathname]);
 
-
   return (
-    <div className="form-nav">
-      <div className={active === authRoute.signup ? 'active' : ''}><Link to={authRoute.signup}>Signup</Link></div>
-      <div className={active === authRoute.login ? 'active' : ''}><Link to={authRoute.login}>Login</Link></div>
-    </div>
+    <ul className="nav nav-tabs">
+      <li className='nav-item'>
+        <Link to='/auth/signup' className={`nav-link ${active === '/auth/signup' ? "active" : ""}`}>Signup</Link>
+      </li>
+      <li className="nav-item">
+        <Link to='/auth/login' className={`nav-link ${active === '/auth/login' ? "active" : ""}`}>Login</Link>
+      </li>
+    </ul>
   );
 }
 
 export function Header() {
   return (
-    <header className="header-logo">
-      <h3><Link to='/'>FinEase</Link></h3>
-    </header>
-  )
+    <nav className="navbar navbar-expand-lg navbar-light bg-light mb-3">
+      <div className="container">
+        <Link to='/' className="navbar-brand" >FinEase</Link>
+      </div>
+    </nav>
+  );
 }

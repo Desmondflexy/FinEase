@@ -1,11 +1,12 @@
 import express from 'express';
-import * as user from '../controllers/users'
+import { userController } from '../controllers/users'
 const router = express.Router();
 
-router.post('/signup', user.signup);
-router.post('/login', user.login);
-router.post('/logout', user.logout);
-router.post('/admin-signup', user.signup);
-router.get('/check/:field/:value', user.isAvailable);
+// /auth
+router.post('/signup', userController.signup);
+router.post('/login', userController.login);
+router.post('/logout', userController.logout);
+router.post('/admin-signup', userController.signup);
+router.get('/check/:field/:value', userController.isAvailable);
 
 export default router;

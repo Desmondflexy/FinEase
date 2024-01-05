@@ -18,7 +18,10 @@ connectDB();
 
 const app = express();
 
-const clientUrl = process.env.NODE_ENV === 'development'? process.env.CLIENT_URL_DEV : process.env.CLIENT_URL;
+const clientUrl = process.env.NODE_ENV === 'development'
+? 'http://localhost:3200'
+: process.env.CLIENT_URL
+
 app.use(
   cors({
     origin: clientUrl,

@@ -42,9 +42,21 @@ export const phoneNumberRegex = /^(070[1234568]|080[2356789]|081[0-8]|090[1-9]|0
 export function formatDateTime(date: string) {
   const dateObj = new Date(date);
   const year = dateObj.getFullYear();
-  const month = dateObj.getMonth().toString().padStart(2, '0');
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
   const day = dateObj.getDate().toString().padStart(2, '0');
   const hour = dateObj.getHours().toString().padStart(2, '0');
   const minutes = dateObj.getMinutes().toString().padStart(2, '0');
   return `${year}/${month}/${day} ${hour}:${minutes}`;
+}
+
+export function greet() {
+  const date = new Date();
+  const hour = date.getHours();
+  if (hour < 12) {
+    return 'Good morning';
+  } else if (hour < 17) {
+    return 'Good afternoon';
+  } else {
+    return 'Good evening';
+  }
 }

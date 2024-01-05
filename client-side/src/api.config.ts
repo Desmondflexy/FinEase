@@ -1,9 +1,8 @@
 import axios from "axios";
 
-const development_mode = false;
-const baseURL = development_mode
+const baseURL = import.meta.env.VITE_NODE_ENV === "development"
   ? "http://localhost:8080"
-  : "https://finease-api.onrender.com";
+  : import.meta.env.VITE_SERVER_URL;
 
 const options = {
   baseURL,

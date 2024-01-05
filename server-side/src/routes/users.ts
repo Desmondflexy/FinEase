@@ -1,13 +1,15 @@
 import express from 'express';
 import { authenticate, adminPass } from '../controllers/middleware/auth';
-import * as user from '../controllers/users'
+import {userController} from '../controllers/users'
 const router = express.Router();
 
-router.get('/', authenticate, user.accountInfo);
-router.get('/me', authenticate, user.me);
-router.get('/all-users', authenticate, adminPass, user.allUsers);
-router.get("/balance", authenticate, user.getBalance);
-router.get('/confirm-user', authenticate, user.getUserFullName);
-router.put('/', authenticate, user.updateUser);
+// /account
+router.use(authenticate)
+router.get('/', userController.accountInfo);
+router.get('/me', userController.me);
+router.get('/all-users', adminPass, userController.allUsers);
+router.get("/balance", userController.getBalance);
+router.get('/confirm-user', userController.getUserFullName);
+router.put('/', userController.updateUser);
 
 export default router;

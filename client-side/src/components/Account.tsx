@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Api from "../api.config";
 import Loading from "./pages/Loading";
@@ -6,116 +6,97 @@ import { CgProfile } from "react-icons/cg";
 import Error from "./pages/Error";
 import { IUser } from "../types";
 import { IoMenu } from "react-icons/io5";
+import SideBar from "./SideBar";
+// import SideBar from "./modals/SideBar";
 
-// routes
-const base = '/account';
-const routeObj = {
-  dashboard: `${base}/dashboard`,
-  profile: `${base}/profile`,
-  allUsers: `${base}/all-users`,
-  transactions: `${base}/transactions`,
-  recharge: `${base}/recharge`,
-  settings: `${base}/settings`
+interface IState {
+  status: 'loading' | 'error' | 'success';
+  error: {
+    status: number;
+    statusText: string;
+    goto: string;
+  };
+  isVisible: {
+    sideBar: boolean;
+  }
 }
 
 export default function Account() {
-  interface IState {
-    status: 'loading' | 'error' | 'success';
-    error: {
-      status: number;
-      statusText: string;
-      goto: string;
-    };
-    menuVisible: boolean;
-  }
   const [user, setUser] = useState<IUser | null>(null);
   const location = useLocation().pathname.split('/')[2];
   const token = localStorage.getItem('token');
   const [state, setState] = useState<IState>({
     status: 'loading',
     error: { status: 0, statusText: '', goto: '/' },
-    menuVisible: false
+    isVisible: { sideBar: false },
   });
 
-  const { status, error, menuVisible } = state;
+  const { status, error } = state;
 
-  function fetchAcctInfo() {
-    Api.get('account')
-      .then(res => {
-        setUser(res.data.user);
-        setState(s => ({ ...s, status: 'success' }));
-      })
-      .catch(err => {
-        setState(s => ({ ...s, status: 'error' }));
-        if (err.response) {
-          const { status, statusText } = err.response;
-          setState(s => ({
-            ...s,
-            error: { status, statusText, goto: status >= 400 && status <= 499 ? '/auth/login' : s.error.goto }
-          }));
-        } else {
-          setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
-        }
-      });
-  }
+  useEffect(() => {
+    document.title = 'FinEase | Account';
+  })
 
-  // only fetch account info if token or location changes
-  useEffect(fetchAcctInfo, [token, location]);
+  useEffect(() => {
+    fetchAcctInfo();
 
-  function handleMenuButton() {
-    setState(s => ({ ...s, menuVisible: !s.menuVisible }));
+    function fetchAcctInfo() {
+      Api.get('account')
+        .then(res => {
+          setUser(res.data.user);
+          setState(s => ({ ...s, status: 'success' }));
+        })
+        .catch(err => {
+          setState(s => ({ ...s, status: 'error' }));
+          if (err.response) {
+            const { status, statusText } = err.response;
+            setState(s => ({
+              ...s,
+              error: { status, statusText, goto: status >= 400 && status <= 499 ? '/auth/login' : s.error.goto }
+            }));
+          } else {
+            setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
+          }
+        });
+    }
+
+  }, [token, location]);
+
+
+  if (status === 'loading') {
+    return <Loading />
   }
 
   if (status === 'success' && user) {
     return (
       <div id="app-layout">
-        <div id="header">
-          <div className="flex">
-            <h3><Link to='/'>FinEase</Link></h3>
-            <IoMenu size={25} onClick={handleMenuButton} className='menu-btn' />
-          </div>
-          <p><CgProfile />{user.username}</p>
+
+        <div className="app-header">
+          <ul>
+            <li><IoMenu size={25} data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"/></li>
+            <li><Link to='/'>FinEase</Link></li>
+            <li><span><CgProfile /></span><span>{user.username}</span></li>
+          </ul>
         </div>
-        <ul id={`side-menu`} className={menuVisible ? '' : 'hidden'}>
-          <li className={location === 'dashboard' ? 'active' : ''}><Link to={routeObj.dashboard}>Dashboard </Link></li>
-          <li className={location === 'profile' ? 'active' : ''}><Link to={routeObj.profile}>Profile</Link></li>
-          <li className={location === 'transactions' ? 'active' : ''}><Link to={routeObj.transactions}>Transactions</Link></li>
-          <li className={location === 'recharge' ? 'active' : ''}><Link to={routeObj.recharge}>Recharge</Link></li>
-          <li className={location === 'settings' ? 'active' : ''}><Link to={routeObj.settings}>Settings</Link></li>
-          {user.isAdmin &&
-            <li className={location === 'all-users' ? 'active' : ''}><Link to={routeObj.allUsers}>Admin Area</Link></li>}
-          <li><LogoutButton /></li>
-        </ul>
-        <div id="main">
-          <Outlet context={[user, setUser]} />
+
+        <div className="app-body">
+          {/* <SideBar user={user} /> */}
+          <SideBar user={user}/>
+
+          <main className="main p-3">
+            <Outlet context={[user, setUser]} />
+          </main>
+          <footer className="app-footer p-3">
+            <p>© 2024 FinEase. All Rights Reserved.</p>
+          </footer>
         </div>
       </div>
-    )
+    );
   }
 
   if (status === 'error') {
     return (
       <Error code={error.status} message={error.statusText} goto={error.goto} />
-    )
+    );
   }
-
-  return <Loading />
-}
-
-function LogoutButton() {
-  const navigate = useNavigate();
-
-  function handleLogout() {
-    Api.post('/auth/logout')
-      .then(() => {
-        localStorage.removeItem('token');
-        navigate('/auth/login');
-      })
-      .catch(() => {
-        console.warn('warning: did not logout successfully');
-        navigate('/auth/login');
-      });
-  }
-
-  return <button onClick={handleLogout}>Logout</button>
 }
