@@ -34,27 +34,6 @@ button.icon {
   }
 }
 
-.dropdown {
-  ul {
-    position: absolute;
-    background-color: #f1f1f1;
-    color: black;
-    box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, .2);
-    z-index: 1;
-    list-style: none;
-    padding: 4px 0;
-    border-radius: 4px;
-
-    li {
-      padding: 8px;
-
-      &:hover {
-        background-color: #ddd;
-      }
-    }
-  }
-}
-
 #homepage {
   background-image: linear-gradient(#f3eadb, #c18054);
 
@@ -188,34 +167,40 @@ button.icon {
           }
         }
 
-        .dropdown {
-          position: absolute;
-          top: 0;
-          right: 0;
-          padding: 8px;
+        // .dropdown {
+        //   position: absolute;
+        //   top: 0;
+        //   right: 0;
+        //   padding: 8px;
 
-          .dropdown-content {
-            top: 30px;
-            right: 6px;
-            width: 100px;
+        //   .dropdown-content {
+        //     top: 30px;
+        //     right: 6px;
+        //     width: 100px;
 
-            li:hover {
-              color: red;
-              font-weight: bold;
-            }
-          }
+        //     li:hover {
+        //       color: red;
+        //       font-weight: bold;
+        //     }
+        //   }
 
-          button {
-            span {
-              font-size: 10px;
-            }
-          }
-        }
+        //   button {
+        //     span {
+        //       font-size: 10px;
+        //     }
+        //   }
+        // }
       }
 
       .disclaimer {
         border-radius: 8px;
       }
     }
+  }
+}
+
+#recharge{
+  form{
+    max-width: 500px;
   }
 }

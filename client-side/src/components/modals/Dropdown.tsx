@@ -1,12 +1,13 @@
 interface Props {
-  visible: boolean;
   children: React.ReactNode;
 }
 
-export default function Modal({visible, children}:Props){
+export default function Dropdown({ children }: Props) {
   return (
-    <>
-      {visible && children}
-    </>
+    <div className="dropdown">
+      <ul className="dropdown-menu">
+        {children}
+      </ul>
+    </div>
   )
 }

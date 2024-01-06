@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { payWithPaystack } from "../utils";
+import { payWithPaystack } from "../utils/utils";
 import Api from "../api.config";
 import { toast } from "react-toastify";
 import { IoMdClose } from "react-icons/io";

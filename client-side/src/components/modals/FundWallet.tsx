@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { payWithPaystack } from "../../utils";
+import { payWithPaystack } from "../../utils/utils";
 import Api from "../../api.config";
 import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
@@ -45,10 +45,11 @@ export function FundWalletModal() {
   }
 
   return (
-    <form className="fund-wallet" onSubmit={handleSubmit}>
-      <h2>Load Wallet</h2>
-      <input disabled={processing} placeholder="amount" autoComplete="off" type="number" min={100} name="amount" id="amount" value={fundAmount} onChange={handleChange} required />
-      <button className="form-submit" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
+    <form className="mx-3" onSubmit={handleSubmit}>
+      <div className="mb-3">
+        <input className="form-control" disabled={processing} placeholder="amount" autoComplete="off" type="number" min={100} name="amount" id="amount" value={fundAmount} onChange={handleChange} required />
+      </div>
+      <button className="btn btn-primary w-100" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
     </form>
   )
 }

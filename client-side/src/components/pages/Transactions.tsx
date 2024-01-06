@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Api from "../../api.config";
 import Error from "./Error";
-import { formatDateTime, formatNumber } from "../../utils";
+import { formatDateTime, formatNumber } from "../../utils/utils";
 import Loading from "./Loading";
 import { ITransaction } from "../../types";
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { CiSettings } from "react-icons/ci";
-import { formatDateTime, formatNumber, greet } from "../../utils";
+// import { CiSettings } from "react-icons/ci";
+import { formatDateTime, formatNumber, greet } from "../../utils/utils";
 // import { FundWalletModal, TransferWalletModal } from "../Funds";
 import { useOutletContext } from "react-router-dom";
 import { ITransaction, IUser } from "../../types";
@@ -8,9 +8,10 @@ import Api from "../../api.config";
 import { IoWalletOutline } from "react-icons/io5";
 import { GiExpense } from "react-icons/gi";
 import { FaMoneyBill } from "react-icons/fa";
-import Modal from "../modals/Dropdown";
+// import Modal from "../modals/Dropdown";
 import FormModal from "../modals/FormModal";
 import TransferWallet from "../modals/TransferWallet";
+import { FundWalletModal } from "../modals/FundWallet";
 
 export default function Dashboard() {
   interface IState {
@@ -31,7 +32,7 @@ export default function Dashboard() {
   });
 
   // const { dropdownOpen, fwOpen, twOpen, balance, recent10 } = state;
-  const { dropdownOpen, balance, recent10 } = state;
+  const { balance, recent10 } = state;
 
   useEffect(getRecentTransactions, [user]);
 
@@ -46,18 +47,18 @@ export default function Dashboard() {
     setState(s => ({ ...s, balance: user.balance }));
   }, [user.balance])
 
-  function openModal(feature: 'fund' | 'transfer') {
-    switch (feature) {
-      case 'fund':
-        setState(s => ({ ...s, fwOpen: true }));
-        break;
-      case 'transfer':
-        setState(s => ({ ...s, twOpen: true }));
-        break;
-      default:
-        break;
-    }
-  }
+  // function openModal(feature: 'fund' | 'transfer') {
+  //   switch (feature) {
+  //     case 'fund':
+  //       setState(s => ({ ...s, fwOpen: true }));
+  //       break;
+  //     case 'transfer':
+  //       setState(s => ({ ...s, twOpen: true }));
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
   // function closeModal() {
   //   setState(s => ({ ...s, fwOpen: false, twOpen: false }));
@@ -70,9 +71,9 @@ export default function Dashboard() {
     }
   }
 
-  function toggleDropdown() {
-    setState(s => ({ ...s, dropdownOpen: !dropdownOpen }));
-  }
+  // function toggleDropdown() {
+  //   setState(s => ({ ...s, dropdownOpen: !dropdownOpen }));
+  // }
 
   function getRecentTransactions() {
     Api.get(`transaction?limit=${10}`)
@@ -97,16 +98,6 @@ export default function Dashboard() {
             <div className="wallet-icon">
               <IoWalletOutline />
             </div>
-            <div className="dropdown">
-              <button className="icon" onClick={toggleDropdown}><span>{'\u25bc'}</span><CiSettings size={22} /></button >
-              <Modal visible={dropdownOpen}>
-                <ul className={`dropdown-content ${dropdownOpen ? '' : 'hidden'}`}>
-                  <li onClick={() => openModal('fund')}>Load Wallet</li>
-                  {/* <li onClick={() => openModal('transfer')}>Transfer</li> */}
-                  <li data-bs-toggle="modal" data-bs-target="#transferWallet">Transfer</li>
-                </ul>
-              </Modal>
-            </div>
           </div>
           <div className="text-white bg-facebook">
             <h2>{formatNumber(0)}</h2>
@@ -122,6 +113,11 @@ export default function Dashboard() {
               <FaMoneyBill />
             </div>
           </div>
+        </div>
+
+        <div className="d-flex mb-3 gap-3">
+          <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#fundWallet">Load Wallet</button>
+          <button className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#transferWallet">Transfer Funds</button>
         </div>
       </section>
 
@@ -154,10 +150,11 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* <FundWalletModal closeModal={closeModal} isOpen={fwOpen} /> */}
-      {/* <TransferWalletModal closeModal={closeModal} isOpen={twOpen} /> */}
       <FormModal id={'transferWallet'} title="Wallet to Wallet Transfer">
-        <TransferWallet/>
+        <TransferWallet />
+      </FormModal>
+      <FormModal id={'fundWallet'} title="Fund Wallet">
+        <FundWalletModal />
       </FormModal>
 
       <div className=" disclaimer p-2 bg-primary-subtle text-dark mt-3">

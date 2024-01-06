@@ -5,7 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
 
 
-function TransferWallet() {
+function TransferWalletModal() {
   const [state, setState] = useState<IState>({
     form: {
       acctNoOrUsername: '',
@@ -74,18 +74,18 @@ function TransferWallet() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-3 mx-3">
+    <form className="mx-3" onSubmit={handleSubmit}>
+      <div className="mb-3">
         <input id="username" type="text" className="form-control" disabled={processing} onBlur={confirmUser} placeholder="Recipient username or account number" name="acctNoOrUsername" value={acctNoOrUsername} onChange={handleChange} required  />
+      <p className={`text-${feedback.includes('Invalid') ? 'danger' : 'success'} feedback form-text`}>{feedback}</p>
       </div>
-      <div className="mb-3 mx-3">
-        <input type="number" className="form-control" disabled={processing} placeholder="Transfer amount" min={1} name="amount" id="amount" value={amount} onChange={handleChange} required />
+      <div className="mb-3">
+        <input type="number" className="form-control" disabled={processing} placeholder="Transfer amount" min={1} name="amount" value={amount} onChange={handleChange} required />
       </div>
-      <div className="mb-3 mx-3">
+      <div className="mb-3">
         <input type="password" className="form-control" disabled={processing} placeholder="Enter your login password" name="password" value={password} onChange={handleChange} required />
       </div>
-      <p className={`mx-3 ${feedback.includes('Invalid') ? 'error' : 'success'} feedback`}>{feedback}</p>
-      <button className="btn btn-primary w-auto mx-3" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
+      <button className="btn btn-primary w-100" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
     </form>
   );
 
@@ -100,4 +100,4 @@ function TransferWallet() {
   }
 }
 
-export default TransferWallet;
+export default TransferWalletModal;
