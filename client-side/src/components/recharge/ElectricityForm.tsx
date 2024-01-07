@@ -124,15 +124,15 @@ function ElectricityForm() {
         </div>
         <div className="input-group mb-3">
           <div className="form-floating">
-          <input className="form-control" type="text" name="meterNumber" id="meter-number" placeholder="Enter customer meter number" required value={state.formInput.meterNumber} onChange={handleInputChange} onBlur={confirmUser} />
-          <label htmlFor="meter-number">Meter Number</label>
+            <input className="form-control" type="text" name="meterNumber" id="meter-number" placeholder="Enter customer meter number" required value={state.formInput.meterNumber} onChange={handleInputChange} onBlur={confirmUser} />
+            <label htmlFor="meter-number">Meter Number</label>
           </div>
         </div>
 
         <div className="input-group mb-3">
           <div className="form-floating">
-          <input className="form-control" type="number" name="amount" id="amount" placeholder="Enter amount in Naira" required value={state.formInput.amount} onChange={handleInputChange} />
-          <label htmlFor="amount">Amount</label>
+            <input className="form-control" type="number" name="amount" id="amount" placeholder="Enter amount in Naira" required value={state.formInput.amount} onChange={handleInputChange} />
+            <label htmlFor="amount">Amount</label>
           </div>
         </div>
         <button className="btn btn-danger w-100" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>

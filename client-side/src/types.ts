@@ -15,7 +15,7 @@ export interface IUser {
 export interface ITransaction {
   _id: string;
   amount: number;
-  type: string;
+  type: 'debit' | 'credit';
   description: string;
   reference: string;
   createdAt: string;

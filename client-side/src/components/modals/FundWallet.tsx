@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
 
-export function FundWalletModal() {
+export function FundWalletModal({ closeModal }: { closeModal: (id: string) => void }) {
   interface IState {
     fundAmount: string;
     processing: boolean;
@@ -16,7 +16,7 @@ export function FundWalletModal() {
     processing: false,
   });
 
-  const { fundAmount, processing } = state;
+  const { processing, fundAmount } = state;
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,7 +26,6 @@ export function FundWalletModal() {
     } catch {
       toast.error('Paystack could not initiate')
     }
-    setState(s => ({ ...s, processing: false }));
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -37,10 +36,13 @@ export function FundWalletModal() {
     Api.post('/transaction/fund-wallet', { reference: response.reference })
       .then(res => {
         setUser(u => ({ ...u, balance: res.data.balance }));
+        closeModal('fundWallet');
         toast.success('Wallet funded successfully!');
+        setState(s => ({ ...s, processing: false, fundAmount: '' }));
       })
       .catch(err => {
         console.error(err.response.data);
+        setState(s => ({ ...s, processing: false }));
       });
   }
 

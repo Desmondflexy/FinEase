@@ -7,7 +7,6 @@ import Error from "./pages/Error";
 import { IUser } from "../types";
 import { IoMenu } from "react-icons/io5";
 import SideBar from "./SideBar";
-// import SideBar from "./modals/SideBar";
 
 interface IState {
   status: 'loading' | 'error' | 'success';
@@ -71,16 +70,15 @@ export default function Account() {
     return (
       <div id="app-layout">
 
-        <div className="app-header">
+        <div className="app-header text-secondary bg-white">
           <ul>
             <li><IoMenu size={25} data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"/></li>
-            <li><Link to='/'>FinEase</Link></li>
+            <li><Link className="navbar-brand" to='/'>FinEase</Link></li>
             <li><span><CgProfile /></span><span>{user.username}</span></li>
           </ul>
         </div>
 
         <div className="app-body">
-          {/* <SideBar user={user} /> */}
           <SideBar user={user}/>
 
           <main className="main p-3">

@@ -1,3 +1,6 @@
+import Api from "../api.config";
+import { ITransaction } from "../types";
+
 // PaystackPop is a global object from paystack.js
 declare const PaystackPop: {
   setup: (options: {
@@ -57,4 +60,18 @@ export function greet() {
   } else {
     return 'Good evening';
   }
+}
+
+// get total expense or income for the current month depending on type
+export async function getTotalMonthly(type: 'debit' | 'credit'){
+  const date = new Date();
+  const month = date.getMonth();
+  const { data: { transactions } } = await Api.get('/transaction');
+  const totalExpense = transactions
+    .filter((trx:ITransaction) => {
+      const trxDate = new Date(trx.createdAt);
+      return trx.type === type && trxDate.getMonth() === month;
+    })
+    .reduce((acc:number, curr:ITransaction) => acc + curr.amount, 0);
+  return totalExpense;
 }

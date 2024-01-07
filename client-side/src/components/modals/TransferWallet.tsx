@@ -5,7 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
 
 
-function TransferWalletModal() {
+function TransferWalletModal({ closeModal }: { closeModal: (id: string) => void }) {
   const [state, setState] = useState<IState>({
     form: {
       acctNoOrUsername: '',
@@ -39,6 +39,7 @@ function TransferWalletModal() {
           processing: false,
           feedback: '',
         }));
+        closeModal('transferWallet');
       })
       .catch(err => {
         toast.error(err.response.data.message);
@@ -76,8 +77,8 @@ function TransferWalletModal() {
   return (
     <form className="mx-3" onSubmit={handleSubmit}>
       <div className="mb-3">
-        <input id="username" type="text" className="form-control" disabled={processing} onBlur={confirmUser} placeholder="Recipient username or account number" name="acctNoOrUsername" value={acctNoOrUsername} onChange={handleChange} required  />
-      <p className={`text-${feedback.includes('Invalid') ? 'danger' : 'success'} feedback form-text`}>{feedback}</p>
+        <input id="username" type="text" className="form-control" disabled={processing} onBlur={confirmUser} placeholder="Recipient username or account number" name="acctNoOrUsername" value={acctNoOrUsername} onChange={handleChange} required />
+        <p className={`text-${feedback.includes('Invalid') ? 'danger' : 'success'} feedback form-text`}>{feedback}</p>
       </div>
       <div className="mb-3">
         <input type="number" className="form-control" disabled={processing} placeholder="Transfer amount" min={1} name="amount" value={amount} onChange={handleChange} required />

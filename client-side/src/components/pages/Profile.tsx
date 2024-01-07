@@ -5,8 +5,9 @@ export default function Profile() {
   const [user] = useOutletContext() as [IUser];
 
   return (
-    <section id="profile-screen">
+    <section id="user-profile">
       <h1>Account Info</h1>
+      <hr />
       <p><b>Name: </b><i>{user.fullName} <b style={{ color: 'darkblue' }}>{user.isAdmin && '(Admin)'}</b></i></p>
       <p><b>Email: </b><i>{user.email}</i></p>
       <p><b>Phone: </b><i>{user.phone}</i></p>

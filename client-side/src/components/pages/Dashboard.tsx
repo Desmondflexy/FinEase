@@ -1,79 +1,66 @@
 import { useEffect, useState } from "react";
-// import { CiSettings } from "react-icons/ci";
-import { formatDateTime, formatNumber, greet } from "../../utils/utils";
-// import { FundWalletModal, TransferWalletModal } from "../Funds";
+import { formatDateTime, formatNumber, getTotalMonthly, greet } from "../../utils/utils";
 import { useOutletContext } from "react-router-dom";
 import { ITransaction, IUser } from "../../types";
 import Api from "../../api.config";
 import { IoWalletOutline } from "react-icons/io5";
 import { GiExpense } from "react-icons/gi";
 import { FaMoneyBill } from "react-icons/fa";
-// import Modal from "../modals/Dropdown";
 import FormModal from "../modals/FormModal";
 import TransferWallet from "../modals/TransferWallet";
 import { FundWalletModal } from "../modals/FundWallet";
 
 export default function Dashboard() {
   interface IState {
-    dropdownOpen: boolean;
-    fwOpen: boolean;
-    twOpen: boolean;
     balance: number;
     recent10: ITransaction[];
+    modal: {
+      fundWallet: boolean;
+      transferWallet: boolean;
+    },
+    totalIncome: number;
+    totalExpense: number;
   }
   const [user] = useOutletContext() as [IUser];
 
   const [state, setState] = useState<IState>({
-    dropdownOpen: false,
-    fwOpen: false,
-    twOpen: false,
     balance: 0,
-    recent10: []
+    recent10: [],
+    modal: {
+      fundWallet: false,
+      transferWallet: false,
+    },
+    totalIncome: 0,
+    totalExpense: 0,
   });
 
-  // const { dropdownOpen, fwOpen, twOpen, balance, recent10 } = state;
-  const { balance, recent10 } = state;
+  const { balance, recent10, totalIncome, totalExpense } = state;
 
   useEffect(getRecentTransactions, [user]);
 
   useEffect(() => {
-    document.addEventListener('click', closeDropdown);
-    return () => {
-      document.removeEventListener('click', closeDropdown);
-    };
-  }, []);
+    setState(s => ({ ...s, balance: user.balance }));
+  }, [user.balance]);
 
   useEffect(() => {
-    setState(s => ({ ...s, balance: user.balance }));
-  }, [user.balance])
+    getTotalMonthly('debit')
+      .then(res => {
+        setState(s => ({ ...s, totalExpense: res }));
+      })
+      .catch(err => {
+        console.error(err.response.data);
+      })
+  }, [balance]);
 
-  // function openModal(feature: 'fund' | 'transfer') {
-  //   switch (feature) {
-  //     case 'fund':
-  //       setState(s => ({ ...s, fwOpen: true }));
-  //       break;
-  //     case 'transfer':
-  //       setState(s => ({ ...s, twOpen: true }));
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
-
-  // function closeModal() {
-  //   setState(s => ({ ...s, fwOpen: false, twOpen: false }));
-  // }
-
-  function closeDropdown(e: MouseEvent) {
-    const dropdownBtn = document.querySelector('.dropdown-btn');
-    if (dropdownBtn && !dropdownBtn.contains(e.target as Node)) {
-      setState(s => ({ ...s, dropdownOpen: false }));
-    }
-  }
-
-  // function toggleDropdown() {
-  //   setState(s => ({ ...s, dropdownOpen: !dropdownOpen }));
-  // }
+  useEffect(() => {
+    getTotalMonthly('credit')
+      .then(res => {
+        setState(s => ({ ...s, totalIncome: res }));
+      })
+      .catch(err => {
+        console.error(err.response.data);
+      })
+  }, [balance])
 
   function getRecentTransactions() {
     Api.get(`transaction?limit=${10}`)
@@ -84,6 +71,12 @@ export default function Dashboard() {
         console.error(err.response.data);
       })
   }
+
+  function toggleModal(modal: 'fundWallet' | 'transferWallet') {
+    setState(s => ({ ...s, modal: { ...s.modal, [modal]: !state.modal[modal] } }));
+  }
+
+  console.log(state);
 
   return (
     <div id="dashboard">
@@ -100,14 +93,14 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="text-white bg-facebook">
-            <h2>{formatNumber(0)}</h2>
+            <h2>{formatNumber(totalExpense)}</h2>
             <p>Total Monthly Expense</p>
             <div className="wallet-icon">
               <GiExpense />
             </div>
           </div>
           <div className="bg-dark text-white">
-            <h2>{formatNumber(0)}</h2>
+            <h2>{formatNumber(totalIncome)}</h2>
             <p>Total Monthly Income</p>
             <div className="wallet-icon">
               <FaMoneyBill />
@@ -116,8 +109,8 @@ export default function Dashboard() {
         </div>
 
         <div className="d-flex mb-3 gap-3">
-          <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#fundWallet">Load Wallet</button>
-          <button className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#transferWallet">Transfer Funds</button>
+          <button onClick={() => toggleModal('fundWallet')} className="btn btn-success" data-bs-toggle="modal" data-bs-target="#fundWallet">Load Wallet</button>
+          <button onClick={() => toggleModal('transferWallet')} className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#transferWallet">Transfer Funds</button>
         </div>
       </section>
 
@@ -150,11 +143,11 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <FormModal id={'transferWallet'} title="Wallet to Wallet Transfer">
-        <TransferWallet />
+      <FormModal closeModal={() => toggleModal('fundWallet')} id='transferWallet' title="Wallet to Wallet Transfer">
+        <TransferWallet closeModal={() => toggleModal('transferWallet')} />
       </FormModal>
-      <FormModal id={'fundWallet'} title="Fund Wallet">
-        <FundWalletModal />
+      <FormModal closeModal={() => toggleModal('fundWallet')} id='fundWallet' title="Fund Wallet">
+        <FundWalletModal closeModal={() => toggleModal('fundWallet')} />
       </FormModal>
 
       <div className=" disclaimer p-2 bg-primary-subtle text-dark mt-3">
