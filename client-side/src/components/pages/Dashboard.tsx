@@ -76,8 +76,6 @@ export default function Dashboard() {
     setState(s => ({ ...s, modal: { ...s.modal, [modal]: !state.modal[modal] } }));
   }
 
-  console.log(state);
-
   return (
     <div id="dashboard">
       <div className="message">
