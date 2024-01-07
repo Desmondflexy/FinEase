@@ -46,7 +46,7 @@ function ElectricityForm() {
     if (state.feedback.customer) return;
     setState({ ...state, feedback: { ...state.feedback, message: 'Validating customer info...' } });
     const { meterNumber, operatorId } = state.formInput;
-    Api.get(`transaction/customer-validate/${operatorId}?bill=electricity&deviceNumber=${meterNumber}`)
+    Api.get(`transaction/customer-validate?operatorID=${operatorId}&bill=electricity&deviceNumber=${meterNumber}`)
       .then(res => {
         const { address, name } = res.data.customer;
         setState(s => ({ ...s, feedback: { message: '', customer: { address, name } } }));
