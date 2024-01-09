@@ -5,7 +5,6 @@ import { ITransaction, IUser } from "../../types";
 import Api from "../../api.config";
 import { IoWalletOutline } from "react-icons/io5";
 import { GiExpense } from "react-icons/gi";
-import { FaMoneyBill } from "react-icons/fa";
 import FormModal from "../modals/FormModal";
 import TransferWallet from "../modals/TransferWallet";
 import { FundWalletModal } from "../modals/FundWallet";
@@ -34,9 +33,9 @@ export default function Dashboard() {
     totalExpense: 0,
   });
 
-  const { balance, recent10, totalIncome, totalExpense } = state;
+  const { balance, recent10, totalExpense } = state;
 
-  useEffect(getRecentTransactions, [user]);
+  useEffect(getRecentTransactions, []);
 
   useEffect(() => {
     setState(s => ({ ...s, balance: user.balance }));
@@ -51,16 +50,6 @@ export default function Dashboard() {
         console.error(err.response.data);
       })
   }, [balance]);
-
-  useEffect(() => {
-    getTotalMonthly('credit')
-      .then(res => {
-        setState(s => ({ ...s, totalIncome: res }));
-      })
-      .catch(err => {
-        console.error(err.response.data);
-      })
-  }, [balance])
 
   function getRecentTransactions() {
     Api.get(`transaction?limit=${10}`)
@@ -95,13 +84,6 @@ export default function Dashboard() {
             <p>Total Monthly Expense</p>
             <div className="wallet-icon">
               <GiExpense />
-            </div>
-          </div>
-          <div className="bg-dark text-white">
-            <h2>{formatNumber(totalIncome)}</h2>
-            <p>Total Monthly Income</p>
-            <div className="wallet-icon">
-              <FaMoneyBill />
             </div>
           </div>
         </div>
@@ -141,11 +123,11 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <FormModal closeModal={() => toggleModal('fundWallet')} id='transferWallet' title="Wallet to Wallet Transfer">
-        <TransferWallet closeModal={() => toggleModal('transferWallet')} />
+      <FormModal closeModal={() => toggleModal('transferWallet')} id='transferWallet' title="Wallet to Wallet Transfer">
+        <TransferWallet onSuccess={getRecentTransactions} closeModal={() => toggleModal('transferWallet')} />
       </FormModal>
       <FormModal closeModal={() => toggleModal('fundWallet')} id='fundWallet' title="Fund Wallet">
-        <FundWalletModal closeModal={() => toggleModal('fundWallet')} />
+        <FundWalletModal onSuccess={getRecentTransactions} closeModal={() => toggleModal('fundWallet')} />
       </FormModal>
 
       <div className=" disclaimer p-2 bg-primary-subtle text-dark mt-3">

@@ -1,8 +1,8 @@
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Api from "../../api.config";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import Api from "../../../api.config";
 import { toast } from "react-toastify";
-import { useForm } from 'react-hook-form';
 
 interface SignupInputs {
   username: string;
@@ -15,24 +15,7 @@ interface SignupInputs {
   adminKey?: string;
 }
 
-interface LoginInputs {
-  username_email: string;
-  password: string;
-}
-
-export default function Auth() {
-  return (
-    <div className="get-started">
-      <Header />
-      <div className="form-container">
-        <FormNav />
-        <Outlet />
-      </div>
-    </div>
-  );
-}
-
-export function Signup({ admin }: { admin: boolean }) {
+export default function Signup({ admin }: { admin: boolean }) {
   interface IState {
     // emailErrorFeedback: string;
     // usernameErrorFeedback: string;
@@ -45,7 +28,7 @@ export function Signup({ admin }: { admin: boolean }) {
     loading: false,
   });
 
-  const { register, handleSubmit } = useForm<SignupInputs>();
+  const { register, handleSubmit, setValue } = useForm<SignupInputs>();
   const { loading } = state;
   const navigate = useNavigate();
 
@@ -82,18 +65,28 @@ export function Signup({ admin }: { admin: boolean }) {
     }
   }
 
+    /**Prevent user from entering a space on the target input element.
+   * Should be used on the onKeyUp event
+  */
+    function preventSpace(e: React.KeyboardEvent<HTMLInputElement>) {
+      const { value, name } = e.currentTarget;
+      if (value.split(' ').length > 1) {
+        setValue(name as 'first' | 'last' | 'username', value.split(' ').join(''));
+      }
+    }
+
   return (
     <form className="form" onSubmit={handleSubmit(onSubmit)}>
       <div className="input-group mb-3">
         <div className={`form-floating`}>
-          <input {...register('first')} className="form-control" type="text" id="first" placeholder="First Name" required />
+          <input onKeyUp={preventSpace} {...register('first')} className="form-control" type="text" id="first" placeholder="First Name" required />
           <label htmlFor="first">First Name</label>
         </div>
       </div>
 
       <div className="input-group mb-3">
         <div className={`form-floating`}>
-          <input {...register('last')} className="form-control" type="text" id="last" placeholder="Last Name" required />
+          <input onKeyUp={preventSpace} {...register('last')} className="form-control" type="text" id="last" placeholder="Last Name" required />
           <label htmlFor="last">Last Name</label>
         </div>
       </div>
@@ -121,7 +114,7 @@ export function Signup({ admin }: { admin: boolean }) {
           {/* {usernameErrorFeedback && (
           <em className="feedback">{usernameErrorFeedback}</em>
         )} */}
-          <input {...register('username')} className="form-control" id="username" placeholder="Username" required />
+          <input onKeyDown={preventSpace} {...register('username')} className="form-control" id="username" placeholder="Username" required />
           <label htmlFor="username">Username</label>
         </div>
         <p className="invalid-feedback">error message</p>
@@ -150,8 +143,11 @@ export function Signup({ admin }: { admin: boolean }) {
         </div>
       )}
       <div>
-        <button className="btn btn-primary w-100" type="submit" disabled={loading}>
-          {loading ? "Please wait..." : "Signup"}
+      <button className="btn btn-primary w-100" type="submit" disabled={loading}>
+          {loading ? <>
+            <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            <span role="status">Preparing your account... Please wait</span>
+          </> : "Login"}
         </button>
       </div>
 
@@ -159,98 +155,5 @@ export function Signup({ admin }: { admin: boolean }) {
         Already have an account? <Link to={'/auth/login'}>Log In</Link>
       </p>
     </form>
-  );
-}
-
-export function Login() {
-  const [state, setState] = useState({
-    loading: false,
-  });
-
-  const { register, handleSubmit } = useForm<LoginInputs>();
-
-  const { loading } = state;
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    document.title = 'FinEase - Login';
-  });
-
-  function onSubmit(data: LoginInputs) {
-    const { username_email, password } = data;
-    function login() {
-      Api.post("/auth/login", { emailOrUsername: username_email, password })
-        .then((res) => {
-          localStorage.setItem("token", res.data.token);
-          navigate("/account/dashboard");
-          setState((s) => ({ ...s, loading: false }));
-        })
-        .catch((err) => {
-          if (err.response) {
-            toast.error(err.response.data.message);
-          } else {
-            toast.error(err.message);
-          }
-          setState((s) => ({ ...s, loading: false }));
-        });
-    }
-
-    setState((s) => ({ ...s, loading: true }));
-    login();
-  }
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="form-floating">
-        <input {...register('username_email')} className="form-control mb-3" id="username_email" placeholder="Email or Username" required />
-        <label htmlFor="username_email">Email or Username</label>
-      </div>
-      <div className="form-floating mb-3">
-        <input {...register('password')} className="form-control" id="password" type="password" placeholder="Password" required />
-        <label htmlFor="password">Password</label>
-      </div>
-      <div>
-        <button className="btn btn-primary w-100" type="submit" disabled={loading}>
-          {loading ? "Please wait..." : "Login"}
-        </button>
-      </div>
-
-      <p>
-        Don't have an account? <Link to='/auth/signup'>Sign Up</Link>
-      </p>
-    </form>
-  );
-}
-
-function FormNav() {
-  const [active, setActive] = useState("");
-  const location = useLocation();
-  useEffect(() => {
-    if (location.pathname === '/auth/login') {
-      setActive('/auth/login');
-    } else {
-      setActive('/auth/signup');
-    }
-  }, [location.pathname]);
-
-  return (
-    <ul className="nav nav-tabs">
-      <li className='nav-item'>
-        <Link to='/auth/signup' className={`nav-link ${active === '/auth/signup' ? "active" : ""}`}>Signup</Link>
-      </li>
-      <li className="nav-item">
-        <Link to='/auth/login' className={`nav-link ${active === '/auth/login' ? "active" : ""}`}>Login</Link>
-      </li>
-    </ul>
-  );
-}
-
-export function Header() {
-  return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light mb-3">
-      <div className="container">
-        <Link to='/' className="navbar-brand" >FinEase</Link>
-      </div>
-    </nav>
   );
 }

@@ -17,6 +17,7 @@ button.icon {
 
   table {
     min-width: 700px;
+    font-size: .8rem;
 
     thead {
       background-color: #ddd;
@@ -88,6 +89,7 @@ button.icon {
     position: sticky;
     top: 0;
     z-index: 1;
+
     ul {
       display: flex;
       justify-content: space-between;
@@ -99,10 +101,12 @@ button.icon {
         &:first-child {
           flex: 1;
         }
+
         &:nth-child(2) {
           flex: 2;
           text-align: center;
         }
+
         &:nth-child(3) {
           flex: 1;
           text-align: right;
@@ -146,30 +150,6 @@ button.icon {
             font-size: 30px;
           }
         }
-
-        // .dropdown {
-        //   position: absolute;
-        //   top: 0;
-        //   right: 0;
-        //   padding: 8px;
-
-        //   .dropdown-content {
-        //     top: 30px;
-        //     right: 6px;
-        //     width: 100px;
-
-        //     li:hover {
-        //       color: red;
-        //       font-weight: bold;
-        //     }
-        //   }
-
-        //   button {
-        //     span {
-        //       font-size: 10px;
-        //     }
-        //   }
-        // }
       }
 
       .disclaimer {
@@ -179,9 +159,35 @@ button.icon {
   }
 }
 
-#recharge, #settings {
-  form {
+#recharge,
+#settings {
+  div {
     max-width: 500px;
+  }
+
+  .details {
+    >div {
+      padding: 10px;
+      border-radius: 6px;
+      border-left: 8px solid #198754;
+    }
+
+    p {
+      margin: 0;
+      color: #198754;
+      border-bottom: 1px solid #198754;
+    }
+  }
+}
+
+#user-profile>div{
+  padding: 5px;
+  border-radius: 4px;
+  border-left: 8px solid #198754;
+
+  p {
+    color: #198754;
+    border-bottom: 3px dotted;
   }
 }
 
@@ -203,17 +209,17 @@ button.icon {
 }
 
 #error-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    font-size: 2.5em;
-    padding: 30px;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 2.5em;
+  padding: 30px;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
 
-    & a {
-      font-size: 0.8em;
-    }
+  & a {
+    font-size: 0.8em;
+  }
 }

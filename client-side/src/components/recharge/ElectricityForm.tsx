@@ -3,67 +3,97 @@ import { useOutletContext } from "react-router-dom";
 import { IDisco, OutletContextType } from "../../types";
 import Api from "../../api.config";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+
+interface DataInputs {
+  operatorId: string;
+  meterType: string;
+  meterNumber: string;
+  amount: string;
+}
+
+interface State {
+  processing: boolean;
+  token: string;
+  units: number;
+  discos: IDisco[];
+  feedback: {
+    message: string;
+    customer: {
+      address: string;
+      name: string;
+    } | null;
+    error: boolean;
+    loading: boolean;
+  };
+}
 
 function ElectricityForm() {
-  const [state, setState] = useState<IState>({
+  const [state, setState] = useState<State>({
     processing: false,
     token: '',
     units: 0,
     discos: [],
-    formInput: {
-      operatorId: '',
-      meterType: '',
-      meterNumber: '',
-      amount: ''
-    },
     feedback: {
       message: '',
       customer: null,
+      error: false,
+      loading: false,
     }
   });
-  const [discoInfo, setDiscoInfo] = useState('');
+  const { processing, token, units, discos, feedback: { error, message, customer, loading } } = state;
   const [user, setUser] = useOutletContext() as OutletContextType;
-
-  useEffect(fetchDiscos, []);
-
-  const discoOptions = state.discos.map((disco: IDisco) => {
+  const { register, handleSubmit, watch, reset, setValue } = useForm<DataInputs>();
+  const operatorId = watch('operatorId');
+  const meterNumber = watch('meterNumber');
+  const discoInfo = state.discos.find(disco => disco.id === operatorId)?.desc || '';
+  const discoOptions = discos.map((disco: IDisco) => {
     return <option key={disco.id} value={disco.id}>{disco.name}</option>
   });
 
+  useEffect(fetchDiscos, []);
+
+  useEffect(() => {
+    setValue('meterType', '');
+    setValue('meterNumber', '');
+    setState(s => ({ ...s, feedback: { ...s.feedback, customer: null } }));
+  }, [operatorId, setValue]);
+
   function fetchDiscos() {
-    setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Fetching discos...' } }));
+    setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Fetching discos...', loading: true } }));
     Api.get('transaction/discos')
       .then(res => {
-        setState(s => ({ ...s, discos: res.data.discos, feedback: { customer: null, message: '' } }));
+        setState(s => ({ ...s, discos: res.data.discos, feedback: { ...s.feedback, customer: null, message: '', loading:false } }));
       })
       .catch(() => {
-        setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Error fetching discos' } }));
+        setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Error fetching discos', error: true, loading:false } }));
       });
   }
 
   function confirmUser() {
-    if (!state.formInput.meterNumber) return;
-    if (state.feedback.customer) return;
-    setState({ ...state, feedback: { ...state.feedback, message: 'Validating customer info...' } });
-    const { meterNumber, operatorId } = state.formInput;
-    Api.get(`transaction/customer-validate?operatorID=${operatorId}&bill=electricity&deviceNumber=${meterNumber}`)
+    if (!meterNumber) {
+      setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Meter number is required!', error: true } }));
+      return;
+    }
+    setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Validating customer info. Please wait...', error: false, loading:true } }));
+    Api.get(`transaction/customer-validate/${operatorId}?bill=electricity&deviceNumber=${meterNumber}`)
       .then(res => {
         const { address, name } = res.data.customer;
-        setState(s => ({ ...s, feedback: { message: '', customer: { address, name } } }));
+        setState(s => ({ ...s, feedback: { ...s.feedback, message: '', customer: { address, name }, loading: false } }));
       })
       .catch((err) => {
-        setState(s => ({ ...s, feedback: { message: err.response.data.message, customer: null } }));
+        setState(s => ({ ...s, feedback: { ...s.feedback, message: err.response.data.message, error: true, loading: false } }));
       });
   }
 
-  function buyElectricity() {
-    const { amount, meterNumber, meterType, operatorId } = state.formInput;
+  function buyElectricity(amount: string, operatorId: string, meterType: string, meterNumber: string) {
     Api.post('transaction/electricity', { amount, operatorId, meterType, meterNumber })
-      .then(res => {
+      .then((res) => {
         const { message, units, token } = res.data;
         toast.success(message);
-        setState(s => ({ ...s, token, units, processing: false, formInput: { amount: '', meterNumber: '', meterType: '', operatorId: '' } }));
-        setUser({ ...user, balance: res.data.balance })
+        setState(s => ({ ...s, token, units, processing: false }));
+        setUser({ ...user, balance: res.data.balance });
+        reset();
       })
       .catch(err => {
         toast.error(err.response.data.message);
@@ -71,41 +101,23 @@ function ElectricityForm() {
       });
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function onSubmit(data: DataInputs) {
+    const { amount, meterNumber, meterType, operatorId } = data;
     setState(s => ({ ...s, processing: true }));
-    buyElectricity();
-  }
-
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-    const { name, value } = e.target;
-    switch (name) {
-      case 'disco': {
-        setDiscoInfo(state.discos.find(disco => disco.id === value)?.desc || '');
-        setState(s => ({ ...s, formInput: { ...s.formInput, operatorId: value, meterType: '', meterNumber: '', amount: '' }, token: '', feedback: { message: '', customer: null } }));
-        break;
-      }
-      case 'meterType':
-        setState(s => ({ ...s, formInput: { ...s.formInput, meterType: value }, token: '' }));
-        break;
-      case 'meterNumber':
-        setState(s => ({ ...s, formInput: { ...s.formInput, meterNumber: value }, token: '', feedback: { message: '', customer: null } }));
-        break;
-      case 'amount':
-        setState(s => ({ ...s, formInput: { ...s.formInput, amount: value }, token: '' }));
-        break;
-      default:
-        break;
-    }
+    buyElectricity(amount, operatorId, meterType, meterNumber);
   }
 
   return (
-    <div>
+    <div id="electricity-recharge">
       <h2>Electricity</h2>
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={handleSubmit(onSubmit)}>
+        <div className={`${token ? '' : 'hidden'} alert alert-success alert-dismissible fade show`} role="alert">
+          <strong>Transaction successful.</strong> Electricity token: {token}. Units: {units}.
+          <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <div className="input-group mb-3">
           <div className="form-floating">
-            <select className="form-control" name="disco" id="disco" required value={state.formInput.operatorId} onChange={handleInputChange}>
+            <select {...register('operatorId')} className="form-control" id="disco" required>
               <option value=""> -- SELECT DISCO -- </option>
               {discoOptions}
             </select>
@@ -114,7 +126,7 @@ function ElectricityForm() {
         </div>
         <div className="input-group mb-3">
           <div className="form-floating">
-            <select className="form-control" name="meterType" id="meter-type" required value={state.formInput.meterType} onChange={handleInputChange}>
+            <select {...register('meterType')} className="form-control" id="meter-type" required>
               <option value=""> -- SELECT METER TYPE -- </option>
               <option value="prepaid">Prepaid</option>
               <option value="postpaid">Postpaid</option>
@@ -124,58 +136,34 @@ function ElectricityForm() {
         </div>
         <div className="input-group mb-3">
           <div className="form-floating">
-            <input className="form-control" type="text" name="meterNumber" id="meter-number" placeholder="Enter customer meter number" required value={state.formInput.meterNumber} onChange={handleInputChange} onBlur={confirmUser} />
+            <input {...register('meterNumber')} disabled={!operatorId} className="form-control" type="number" id="meter-number" placeholder="Enter customer meter number" required onBlur={confirmUser} />
             <label htmlFor="meter-number">Meter Number</label>
           </div>
         </div>
 
         <div className="input-group mb-3">
           <div className="form-floating">
-            <input className="form-control" type="number" name="amount" id="amount" placeholder="Enter amount in Naira" required value={state.formInput.amount} onChange={handleInputChange} />
+            <input {...register('amount')} className="form-control" type="number" id="amount" placeholder="Enter amount in Naira" required />
             <label htmlFor="amount">Amount</label>
           </div>
         </div>
-        <button className="btn btn-danger w-100" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>
+        <button className="btn btn-danger w-100" disabled={processing || loading}>{processing ? 'Processing...' : 'Proceed'}</button>
       </form>
 
-      <div >
-        <p className="feedback success">{discoInfo}</p>
-        <p className="feedback error">{state.feedback.message}</p>
-        {state.feedback.customer && (
-          <div className="feedback success">
-            <p>Name: {state.feedback.customer.name}</p>
-            <p>Address: {state.feedback.customer.address}</p>
-            {state.token && (
-              <>
-                <p>Electricity token: {state.token}</p>
-                <p>Units: {state.units}</p>
-              </>
-            )}
-          </div>
-        )}
-      </div>
+      {discoInfo && <div className="details">
+        <div className="my-4 bg-info-subtle">
+          <p>{discoInfo}</p>
+          {message && <i className={`text-${error ? 'danger' : 'primary'}`}>{message}</i>}
+          {(customer && !message) && (
+            <div>
+              <p>Name: {customer.name}</p>
+              <p>Address: {customer.address}</p>
+            </div>
+          )}
+        </div>
+      </div>}
     </div>
   );
-
-  interface IState {
-    processing: boolean;
-    token: string;
-    units: number;
-    discos: IDisco[];
-    formInput: {
-      operatorId: string;
-      meterType: string;
-      meterNumber: string;
-      amount: string;
-    };
-    feedback: {
-      message: string;
-      customer: {
-        address: string;
-        name: string;
-      } | null;
-    };
-  }
 }
 
 export default ElectricityForm;

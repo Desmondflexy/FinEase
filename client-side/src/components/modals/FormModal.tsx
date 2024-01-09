@@ -1,3 +1,4 @@
+
 interface Props {
   children: React.ReactNode;
   id: string;
@@ -5,10 +6,9 @@ interface Props {
   closeModal: (id: string) => void;
 }
 
-function FormModal({ id, children, closeModal, title }: Props) {
-
+export default function FormModal({ id, children, closeModal, title }: Props) {
   return (
-    <div className={`modal fade hidden`} id={id} data-bs-backdrop='static' data-bs-keyboard="false" tabIndex={-1}
+    <div className={`modal fade`} id={id} data-bs-backdrop={'static'} data-bs-keyboard={"false"} tabIndex={-1}
       aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div className="modal-dialog">
         <div className="modal-content">
@@ -23,5 +23,3 @@ function FormModal({ id, children, closeModal, title }: Props) {
     </div>
   )
 }
-
-export default FormModal;

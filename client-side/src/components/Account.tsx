@@ -70,20 +70,24 @@ export default function Account() {
     return (
       <div id="app-layout">
 
+        {/* header */}
         <div className="app-header text-secondary bg-white">
           <ul>
-            <li><IoMenu size={25} data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"/></li>
+            <li><IoMenu size={30} data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions" /></li>
             <li><Link className="navbar-brand" to='/'>FinEase</Link></li>
             <li><span><CgProfile /></span><span>{user.username}</span></li>
           </ul>
         </div>
 
+        {/* main */}
         <div className="app-body">
-          <SideBar user={user}/>
+          <SideBar user={user} />
 
           <main className="main p-3">
             <Outlet context={[user, setUser]} />
           </main>
+
+          {/* footer */}
           <footer className="app-footer p-3">
             <p>© 2024 FinEase. All Rights Reserved.</p>
           </footer>

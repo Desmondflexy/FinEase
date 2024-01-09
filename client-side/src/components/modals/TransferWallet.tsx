@@ -4,8 +4,12 @@ import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
 
+interface Prop {
+  closeModal: (id: string) => void;
+  onSuccess: () => void;
+}
 
-function TransferWalletModal({ closeModal }: { closeModal: (id: string) => void }) {
+function TransferWalletModal({ closeModal, onSuccess }: Prop) {
   const [state, setState] = useState<IState>({
     form: {
       acctNoOrUsername: '',
@@ -40,6 +44,7 @@ function TransferWalletModal({ closeModal }: { closeModal: (id: string) => void 
           feedback: '',
         }));
         closeModal('transferWallet');
+        onSuccess();
       })
       .catch(err => {
         toast.error(err.response.data.message);

@@ -6,11 +6,13 @@ import Profile from './components/pages/Profile'
 import Dashboard from './components/pages/Dashboard';
 import Error from './components/pages/Error';
 import AllUsers from './components/pages/AllUsers';
-import Auth, { Signup, Login } from './components/pages/GetStarted';
+import Auth from './components/pages/onboarding/GetStarted';
+import Signup from './components/pages/onboarding/Signup';
 import Transactions from './components/pages/Transactions';
 import Recharge from './components/pages/Recharge';
 import Settings from './components/pages/Settings';
 import Account from './components/Account';
+import { Login } from './components/pages/onboarding/Login';
 
 export default function App() {
   return (

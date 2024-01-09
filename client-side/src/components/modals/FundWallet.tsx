@@ -5,7 +5,12 @@ import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
 
-export function FundWalletModal({ closeModal }: { closeModal: (id: string) => void }) {
+interface Props {
+  closeModal: (id: string) => void;
+  onSuccess: () => void;
+}
+
+export function FundWalletModal({ closeModal, onSuccess }: Props) {
   interface IState {
     fundAmount: string;
     processing: boolean;
@@ -39,6 +44,7 @@ export function FundWalletModal({ closeModal }: { closeModal: (id: string) => vo
         closeModal('fundWallet');
         toast.success('Wallet funded successfully!');
         setState(s => ({ ...s, processing: false, fundAmount: '' }));
+        onSuccess();
       })
       .catch(err => {
         console.error(err.response.data);

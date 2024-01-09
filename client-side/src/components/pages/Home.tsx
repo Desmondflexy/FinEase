@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function HomePage() {
@@ -8,26 +8,16 @@ export default function HomePage() {
 
   const copyrightDate = new Date();
 
-  const [state, setState] = useState({
-    menuVisible: false,
-  });
-
-  const { menuVisible } = state;
-
-  function toggleMenu() {
-    setState(s => ({ ...s, menuVisible: !s.menuVisible }));
-  }
-
   return (
     <div id="homepage">
       {/* Navigation Bar */}
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div className="container">
+      <nav className="navbar navbar-expand-lg bg-body-tertiary">
+        <div className="container-fluid">
           <Link to='/' className="navbar-brand" >FinEase</Link>
-          <button onClick={toggleMenu} className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
-          <div className={`${menuVisible ? '' : 'collapse'} navbar-collapse`} id="navbarNav">
+          <div className={`${'collapse'} navbar-collapse`} id="navbarNav">
             <ul className="navbar-nav">
               <li className="nav-item"><a className="nav-link" href="#features">Features</a></li>
               <li className="nav-item"><a className="nav-link" href="#contact">Contact</a></li>
