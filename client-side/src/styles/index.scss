@@ -90,14 +90,15 @@ button.icon {
     top: 0;
     z-index: 1;
 
-    ul {
+    >ul {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       list-style-type: none;
       padding: 10px;
       border-bottom: 1px solid #ccc;
 
-      li {
+      >li {
         &:first-child {
           flex: 1;
         }

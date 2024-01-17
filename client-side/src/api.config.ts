@@ -4,11 +4,11 @@ const baseURL = import.meta.env.VITE_NODE_ENV === "development"
   ? "http://localhost:8080"
   : import.meta.env.VITE_SERVER_URL;
 
-const options = {
+const Api = axios.create({
   baseURL,
   withCredentials: true,
-}
-const Api = axios.create(options);
+  timeout: 60000
+});
 
 Api.interceptors.request.use(config => {
   const token = localStorage.getItem("token");

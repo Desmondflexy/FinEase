@@ -80,7 +80,7 @@ function TransferWalletModal({ closeModal, onSuccess }: Prop) {
   }
 
   return (
-    <form className="mx-3" onSubmit={handleSubmit}>
+    <form className="m-3" onSubmit={handleSubmit}>
       <div className="mb-3">
         <input id="username" type="text" className="form-control" disabled={processing} onBlur={confirmUser} placeholder="Recipient username or account number" name="acctNoOrUsername" value={acctNoOrUsername} onChange={handleChange} required />
         <p className={`text-${feedback.includes('Invalid') ? 'danger' : 'success'} feedback form-text`}>{feedback}</p>

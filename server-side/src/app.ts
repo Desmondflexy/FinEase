@@ -18,22 +18,15 @@ connectDB();
 
 const app = express();
 
-const clientUrl = process.env.NODE_ENV === 'development'
-? 'http://localhost:3200'
-: process.env.CLIENT_URL
-
-app.use(
-  cors({
-    origin: clientUrl,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  }),
-);
-
 // view engine setup
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
+const corsOptions = {
+  origin: true,
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

@@ -13,6 +13,7 @@ import Recharge from './components/pages/Recharge';
 import Settings from './components/pages/Settings';
 import Account from './components/Account';
 import { Login } from './components/pages/onboarding/Login';
+import { Logout } from './components/Logout';
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           <Route path='signup' element={<Signup admin={false} />} />
           <Route path='admin-signup' element={<Signup admin={true} />} />
           <Route path='login' element={<Login />} />
+          <Route path='logout' element={<Logout />} />
         </Route>
         <Route path='/account' element={<Account />}>
           <Route path='dashboard' element={<Dashboard />} />

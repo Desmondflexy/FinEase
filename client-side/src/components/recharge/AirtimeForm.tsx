@@ -17,6 +17,7 @@ function AirtimeForm() {
     networks: [],
     processing: false,
     logoUrl: '',
+    errorFeedback: 'Fetching networks...',
   });
   const [user, setUser] = useOutletContext() as OutletContextType;
   const { register, reset, watch, handleSubmit } = useForm<DataInputs>();
@@ -30,10 +31,10 @@ function AirtimeForm() {
     Api.get('transaction/networks')
       .then(res => {
         const { networks } = res.data
-        setState(s => ({ ...s, networks }));
+        setState(s => ({ ...s, networks, errorFeedback: '' }));
       })
-      .catch(err => {
-        console.error(err.response.data.error);
+      .catch(() => {
+        setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
       });
   }
 
@@ -98,12 +99,13 @@ function AirtimeForm() {
 
         <div className="input-group mb-3">
           <div className="form-floating">
-            <input {...register('amount')} className="form-control" min={1} required autoComplete="off" type="number" id="amount"  placeholder="50" />
+            <input {...register('amount')} className="form-control" min={1} required autoComplete="off" type="number" id="amount" placeholder="50" />
             <label htmlFor="amount">Amount</label>
           </div>
         </div>
         <button className="w-100 btn btn-success" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>
       </form>
+      {state.errorFeedback && <i className="text-danger">{state.errorFeedback}</i>}
     </div>
   );
 
@@ -114,6 +116,7 @@ function AirtimeForm() {
     }[];
     processing: boolean;
     logoUrl: string;
+    errorFeedback: string;
   }
 }
 

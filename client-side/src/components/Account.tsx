@@ -75,7 +75,17 @@ export default function Account() {
           <ul>
             <li><IoMenu size={30} data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions" /></li>
             <li><Link className="navbar-brand" to='/'>FinEase</Link></li>
-            <li><span><CgProfile /></span><span>{user.username}</span></li>
+            <li>
+              <div className="dropdown">
+                <button className="btn dropdown-toggle d-flex gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style={{alignItems:'center'}}>
+                  <CgProfile /><span>{user.username}</span>
+                </button>
+                <ul className="dropdown-menu" style={{fontSize: '12px'}}>
+                  <li><Link className="dropdown-item" to="/account/profile">Profile</Link></li>
+                  <li><Link className="dropdown-item" to="/auth/logout">Logout</Link></li>
+                </ul>
+              </div>
+            </li>
           </ul>
         </div>
 

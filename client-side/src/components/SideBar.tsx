@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
 import { IUser } from "../types";
-import { LogoutButton } from "./LogoutButton";
 
 function SideBar({ user }: { user: IUser }) {
   const location = useLocation().pathname.split('/')[2];
@@ -19,7 +18,7 @@ function SideBar({ user }: { user: IUser }) {
           <Link to='/account/profile' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'profile' ? 'active' : ''}`}>Profile</Link>
           <Link to='/account/settings' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'settings' ? 'active' : ''}`} >Settings</Link>
           {user.isAdmin && <Link to='/account/all-users' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'all-users' ? 'active' : ''}`}>Admin Area</Link>}
-          <LogoutButton/>
+          <Link to="/auth/logout" className="btn btn-danger mt-2">Logout</Link>
         </ul>
       </div>
     </div>

@@ -26,6 +26,7 @@ interface State {
     error: boolean;
     loading: boolean;
   };
+  fetchingMessage: string;
 }
 
 function ElectricityForm() {
@@ -39,7 +40,8 @@ function ElectricityForm() {
       customer: null,
       error: false,
       loading: false,
-    }
+    },
+    fetchingMessage: 'Fetching discos...'
   });
   const { processing, token, units, discos, feedback: { error, message, customer, loading } } = state;
   const [user, setUser] = useOutletContext() as OutletContextType;
@@ -63,10 +65,10 @@ function ElectricityForm() {
     setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Fetching discos...', loading: true } }));
     Api.get('transaction/discos')
       .then(res => {
-        setState(s => ({ ...s, discos: res.data.discos, feedback: { ...s.feedback, customer: null, message: '', loading:false } }));
+        setState(s => ({ ...s, fetchingMessage: '', discos: res.data.discos, feedback: { ...s.feedback, customer: null, message: '', loading:false } }));
       })
       .catch(() => {
-        setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Error fetching discos', error: true, loading:false } }));
+        setState(s => ({ ...s, fetchingMessage: 'Service unavailable. Please try again later.', feedback: { ...s.feedback, message: 'Error fetching discos', error: true, loading:false } }));
       });
   }
 
@@ -149,6 +151,7 @@ function ElectricityForm() {
         </div>
         <button className="btn btn-danger w-100" disabled={processing || loading}>{processing ? 'Processing...' : 'Proceed'}</button>
       </form>
+      {state.fetchingMessage && <i className="text-danger">{state.fetchingMessage}</i>}
 
       {discoInfo && <div className="details">
         <div className="my-4 bg-info-subtle">

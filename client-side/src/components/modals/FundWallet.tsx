@@ -53,7 +53,7 @@ export function FundWalletModal({ closeModal, onSuccess }: Props) {
   }
 
   return (
-    <form className="mx-3" onSubmit={handleSubmit}>
+    <form className="m-3" onSubmit={handleSubmit}>
       <div className="mb-3">
         <input className="form-control" disabled={processing} placeholder="amount" autoComplete="off" type="number" min={100} name="amount" id="amount" value={fundAmount} onChange={handleChange} required />
       </div>

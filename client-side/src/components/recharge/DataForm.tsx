@@ -19,9 +19,10 @@ export default function DataForm() {
     plans: [],
     processing: false,
     logoUrl: '',
+    errorFeedback: 'Fetching networks...',
   });
 
-  const {register, handleSubmit, watch, reset} = useForm<DataInputs>();
+  const { register, handleSubmit, watch, reset } = useForm<DataInputs>();
   const phone = watch('phone');
   const operatorId = watch('operatorId');
 
@@ -39,10 +40,10 @@ export default function DataForm() {
   function fetchNetworks() {
     Api.get('transaction/networks')
       .then(res => {
-        setState(s => ({ ...s, networks: res.data.networks }));
+        setState(s => ({ ...s, networks: res.data.networks, errorFeedback: '' }));
       })
-      .catch(err => {
-        console.error(err.response.data.error);
+      .catch(() => {
+        setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
       });
   }
 
@@ -60,7 +61,7 @@ export default function DataForm() {
   // console.log(state);
 
   function determineNetwork() {
-    if (!phoneNumberRegex.test(phone)){
+    if (!phoneNumberRegex.test(phone)) {
       setState(s => ({ ...s, logoUrl: '' }));
       return;
     }
@@ -75,7 +76,7 @@ export default function DataForm() {
   }
 
   function buyData(operatorId: string, dataPlanId: string, phone: string) {
-    Api.post('transaction/buy-data', {operatorId, dataPlanId, phone})
+    Api.post('transaction/buy-data', { operatorId, dataPlanId, phone })
       .then(res => {
         const { message, balance } = res.data;
         toast.success(message);
@@ -110,11 +111,11 @@ export default function DataForm() {
         </div>
         <div className="input-group mb-3">
           <div className="form-floating">
-          <select {...register('dataPlanId')} className="form-control" id="data-plan" required disabled={!operatorId} >
-            <option value="">-- SELECT DATAPLANS --</option>
-            {planOptions}
-          </select>
-          <label htmlFor="data-plan">Data Plan</label>
+            <select {...register('dataPlanId')} className="form-control" id="data-plan" required disabled={!operatorId} >
+              <option value="">-- SELECT DATAPLANS --</option>
+              {planOptions}
+            </select>
+            <label htmlFor="data-plan">Data Plan</label>
           </div>
 
         </div>
@@ -127,6 +128,7 @@ export default function DataForm() {
         </div>
         <button className="w-100 btn btn-primary" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>
       </form>
+      {state.errorFeedback && <i className="text-danger">{state.errorFeedback}</i>}
     </div>
   );
 
@@ -142,6 +144,7 @@ export default function DataForm() {
     }[];
     processing: boolean;
     logoUrl: string;
+    errorFeedback: string;
   }
 }
 

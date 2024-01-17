@@ -1,21 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import Api from "../api.config";
+import { useEffect } from "react";
 
-export function LogoutButton() {
+export function Logout() {
   const navigate = useNavigate();
 
-  function handleLogout() {
+  useEffect(() => {
     localStorage.removeItem('token');
-
     Api.post('/auth/logout')
       .then(() => {
-        navigate('/auth/login');
+        console.info('info: logged out successfully');
       })
       .catch(() => {
         console.warn('warning: did not logout successfully');
-        navigate('/auth/login');
-      });
-  }
+      })
+      .finally(() => navigate('/auth/login'));
+  })
 
-  return <button className="btn btn-danger mt-2" onClick={handleLogout}>Logout</button>
+  return null;
 }

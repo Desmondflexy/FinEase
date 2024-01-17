@@ -17,7 +17,6 @@ export default function Dashboard() {
       fundWallet: boolean;
       transferWallet: boolean;
     },
-    totalIncome: number;
     totalExpense: number;
   }
   const [user] = useOutletContext() as [IUser];
@@ -29,7 +28,6 @@ export default function Dashboard() {
       fundWallet: false,
       transferWallet: false,
     },
-    totalIncome: 0,
     totalExpense: 0,
   });
 
@@ -104,7 +102,7 @@ export default function Dashboard() {
                 <th>Type</th>
                 <th>Amount</th>
                 <th className="table-desc">Description</th>
-                <th>Time</th>
+                <th style={{width: '130px'}}>Time</th>
               </tr>
             </thead>
             <tbody>

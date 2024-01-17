@@ -69,7 +69,7 @@ export default function Transactions() {
                 <th>Type</th>
                 <th className="table-desc">Description</th>
                 <th>Reference</th>
-                <th>Date</th>
+                <th style={{width: '130px'}}>Date</th>
               </tr>
             </thead>
             <tbody>
