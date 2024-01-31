@@ -149,7 +149,7 @@ function ElectricityForm() {
             <label htmlFor="amount">Amount</label>
           </div>
         </div>
-        <button className="btn btn-danger w-100" disabled={processing || loading}>{processing ? 'Processing...' : 'Proceed'}</button>
+        <button className="btn btn-danger w-100" disabled={processing || loading}>{processing ? 'Transaction processing! Please wait...' : 'Proceed'}</button>
       </form>
       {state.fetchingMessage && <i className="text-danger">{state.fetchingMessage}</i>}
 

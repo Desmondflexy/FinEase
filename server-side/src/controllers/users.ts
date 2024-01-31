@@ -5,6 +5,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { generateAcctNo, isFieldAvailable } from "../utils/utils";
 import { calcBalance } from "../utils/utils";
+import sendMail from "../config/nodemailer";
+import { baseUrl } from "../utils/constants";
+import Token from "../models/token";
 
 class UserController {
   async allUsers(req: Request, res: Response) {
@@ -87,15 +90,32 @@ class UserController {
       }
 
       // create user
-      await User.create({
+      user = await User.create({
         username,
         email,
         password: await bcrypt.hash(password, 10),
         fullName: `${first} ${last}`,
         phone,
         acctNo: await generateAcctNo(),
-        isAdmin
-      })
+        isAdmin,
+      });
+
+      // send verification email
+      const emailVerificationToken = Math.random().toString(36).substring(2);
+      await Token.create({
+        user: user._id,
+        type: 'email',
+        otp: emailVerificationToken
+      });
+      const buttonMessage = `
+        <button style="background-color: #4CAF50; border-radius: 4px; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block;">Verify Email</button>
+      `;
+      const message = `
+        Click the button to verify your email address\n\n
+        <a href="${baseUrl}/auth/${user._id}/email-verify/${emailVerificationToken}">${buttonMessage}</a>
+        `;
+
+      sendMail(email, 'FinEase: Email Verification', message)
 
       res.status(201);
       res.json({
@@ -111,6 +131,36 @@ class UserController {
         success: false,
         message: "Internal Server Error",
         error: error.message
+      })
+    }
+  }
+
+  async verifyEmail(req: Request, res: Response) {
+    try {
+      const { userId, token } = req.params;
+      if (!token) return res.status(400).send('Bad request');
+
+      const user = await User.findById(userId)
+      if (!user) return res.status(404).send('user not found');
+      if (user.emailVerified) return res.status(400).send('Email already verified');
+
+      const otp = await Token.findOne({user: userId, type: 'email', otp: token});
+      if (!otp) return res.status(400).send('Link is invalid');
+
+      user.emailVerified = true;
+      user.emailVerificationToken = '';
+      await user.save();
+
+      const htmlMessage = `<h1>Hi ${user.fullName}, welcome to FinEase!</h1>`;
+      sendMail(user.email, 'Welcome to FinEase', htmlMessage);
+      otp.deleteOne();
+      return res.send('Email verified successfully. Proceed to login')
+
+    } catch (err: any) {
+      console.error(err);
+      res.status(500).json({
+        message: 'Internal server error',
+        error: err.message
       })
     }
   }
@@ -334,6 +384,71 @@ class UserController {
       res.status(500);
       return res.json({
         success: false,
+        message: "Internal Server Error",
+        error: error.message
+      })
+    }
+  }
+
+  async sendPasswordResetOtp(req: Request, res: Response) {
+    try {
+      const { error } = validators.forgotPassword.validate(req.body, validators.options);
+      if (error) return res.status(400).json({ message: error.message });
+
+      const { email } = req.body;
+      const user = await User.findOne({ email });
+
+      if (!user) return res.status(404).json({ message: 'User with given email does not exist' });
+
+      let token = await Token.findOne({ user: user._id, type: 'password' });
+      if (token) await token.deleteOne();
+
+      token = new Token({
+        user: user._id,
+        type: 'password',
+        otp: Math.random().toString().substring(2, 7)
+      });
+      await token.save();
+
+      sendMail(email, 'FinEase: Password Reset', `Password reset token: <strong>${token.otp}<strong/>`)
+      return res.json({
+        message: 'Check your email for password reset token'
+      });
+
+    } catch (error: any) {
+      console.error(error);
+      res.status(500);
+      return res.json({
+        message: "Internal Server Error",
+        error: error.message
+      })
+    }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const { error } = validators.resetPassword.validate(req.body, validators.options);
+      if (error) return res.status(400).json({ message: error.message });
+
+      const { password, otp, email } = req.body;
+      const user = await User.findOne({ email });
+      if (!user) return res.status(404).json({ message: 'User not found' });
+
+      const token = await Token.findOne({ otp, type: 'password', user: user._id });
+      if (!token) return res.status(404).json({ message: 'Invalid or expired token' });
+
+      user.password = await bcrypt.hash(password, 10);
+      await user.save();
+      await token.deleteOne();
+
+      return res.json({
+        message: 'Password reset successful'
+      });
+
+    } catch (error: any) {
+      console.error(error);
+      res.status(500);
+      return res.json({
         message: "Internal Server Error",
         error: error.message
       })

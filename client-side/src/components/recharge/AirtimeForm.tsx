@@ -103,7 +103,7 @@ function AirtimeForm() {
             <label htmlFor="amount">Amount</label>
           </div>
         </div>
-        <button className="w-100 btn btn-success" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>
+        <button className="w-100 btn btn-success" disabled={state.processing}>{state.processing ? 'Transaction processing! Please wait...' : 'Proceed'}</button>
       </form>
       {state.errorFeedback && <i className="text-danger">{state.errorFeedback}</i>}
     </div>

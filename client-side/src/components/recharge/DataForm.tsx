@@ -126,7 +126,7 @@ export default function DataForm() {
           </div>
           {state.logoUrl && <img className="small-network-logo" src={state.logoUrl} style={{ width: '40px' }} />}
         </div>
-        <button className="w-100 btn btn-primary" disabled={state.processing}>{state.processing ? 'Processing...' : 'Proceed'}</button>
+        <button className="w-100 btn btn-primary" disabled={state.processing}>{state.processing ? 'Transaction processing! Please wait...' : 'Proceed'}</button>
       </form>
       {state.errorFeedback && <i className="text-danger">{state.errorFeedback}</i>}
     </div>

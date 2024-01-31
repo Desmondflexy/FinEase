@@ -1,4 +1,8 @@
-export const phoneNetworks: {[key: string]: string} = {
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+export const phoneNetworks: { [key: string]: string } = {
   "0701": "Airtel",
   "0702": "MTN",
   "0703": "MTN",
@@ -43,3 +47,7 @@ export const phoneNetworks: {[key: string]: string} = {
 }
 
 export const phoneNumberRegex = /^(070[1234568]|080[2356789]|081[0-8]|090[1-9]|091[12356])\d{7}$/;
+
+export const baseUrl = process.env.NODE_ENV === 'development'
+  ? 'http://localhost:' + process.env.PORT
+  : process.env.SERVER_URL;

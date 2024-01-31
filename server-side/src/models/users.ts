@@ -8,6 +8,8 @@ export interface IUser extends mongoose.Document {
   acctNo: string;
   isAdmin: boolean;
   username: string;
+  emailVerified: boolean;
+  emailVerificationToken: string;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -44,6 +46,13 @@ const userSchema = new mongoose.Schema<IUser>({
     unique: true,
     trim: true,
     lowercase: true
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerificationToken: {
+    type: String,
   }
 }, {
   timestamps: true
