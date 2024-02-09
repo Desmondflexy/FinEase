@@ -41,6 +41,16 @@ button.icon {
   img {
     border-radius: 8px;
   }
+
+  a.contactmail {
+    color: inherit;
+    &:hover {
+      text-decoration: none;
+    }
+    &:active {
+      color: red
+    }
+  }
 }
 
 .get-started {

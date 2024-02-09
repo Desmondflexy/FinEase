@@ -77,7 +77,7 @@ export default function HomePage() {
         <div className="container">
           <h2>Contact Us</h2>
           <p>Have questions or feedback? Reach out to us!</p>
-          <p>ikilodesmond@gmail.com</p>
+          <p><a className="contactmail" href="mailto:ikilodesmond@gmail.com">ikilodesmond@gmail.com</a></p>
         </div>
       </section>
 

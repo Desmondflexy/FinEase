@@ -6,10 +6,9 @@ import { OutletContextType } from "../../types";
 
 interface Prop {
   closeModal: (id: string) => void;
-  onSuccess: () => void;
 }
 
-function TransferWalletModal({ closeModal, onSuccess }: Prop) {
+function TransferWalletModal({ closeModal }: Prop) {
   const [state, setState] = useState<IState>({
     form: {
       acctNoOrUsername: '',
@@ -44,7 +43,9 @@ function TransferWalletModal({ closeModal, onSuccess }: Prop) {
           feedback: '',
         }));
         closeModal('transferWallet');
-        onSuccess();
+        setTimeout(()=>{
+          window.location.reload();
+        }, 3000);
       })
       .catch(err => {
         toast.error(err.response.data.message);

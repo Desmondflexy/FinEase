@@ -7,10 +7,9 @@ import { OutletContextType } from "../../types";
 
 interface Props {
   closeModal: (id: string) => void;
-  onSuccess: () => void;
 }
 
-export function FundWalletModal({ closeModal, onSuccess }: Props) {
+export function FundWalletModal({ closeModal }: Props) {
   interface IState {
     fundAmount: string;
     processing: boolean;
@@ -44,7 +43,9 @@ export function FundWalletModal({ closeModal, onSuccess }: Props) {
         closeModal('fundWallet');
         toast.success('Wallet funded successfully!');
         setState(s => ({ ...s, processing: false, fundAmount: '' }));
-        onSuccess();
+        setTimeout(()=>{
+          window.location.reload();
+        }, 3000);
       })
       .catch(err => {
         console.error(err.response.data);

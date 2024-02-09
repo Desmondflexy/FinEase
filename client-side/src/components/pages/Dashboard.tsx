@@ -122,10 +122,10 @@ export default function Dashboard() {
       </section>
 
       <FormModal closeModal={() => toggleModal('transferWallet')} id='transferWallet' title="Wallet to Wallet Transfer">
-        <TransferWallet onSuccess={getRecentTransactions} closeModal={() => toggleModal('transferWallet')} />
+        <TransferWallet closeModal={() => toggleModal('transferWallet')} />
       </FormModal>
       <FormModal closeModal={() => toggleModal('fundWallet')} id='fundWallet' title="Fund Wallet">
-        <FundWalletModal onSuccess={getRecentTransactions} closeModal={() => toggleModal('fundWallet')} />
+        <FundWalletModal closeModal={() => toggleModal('fundWallet')} />
       </FormModal>
 
       <div className=" disclaimer p-2 bg-primary-subtle text-dark mt-3">
