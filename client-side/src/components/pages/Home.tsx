@@ -1,3 +1,4 @@
+import './Home.css';
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -45,17 +46,17 @@ export default function HomePage() {
           <h2>Key Features</h2>
           <div className="row">
             <div className="col-md-4">
-              <img src="https://www.firstbit.com.ng/imgs/Fisrtsbit-01.png" alt="Airtime" className="img-fluid" />
+              <img src="images/airtime-image.jpg" alt="Airtime" className="img-fluid" />
               <h3>Buy Airtime</h3>
               <p>Top up your mobile phone with ease using FinEase.</p>
             </div>
             <div className="col-md-4">
-              <img src="https://ebills.ng/wp-content/uploads/2021/10/Data.jpg" alt="Data" className="img-fluid" />
+              <img src="images/internet-data.png" alt="Data" className="img-fluid" />
               <h3>Buy Data</h3>
               <p>Stay connected by purchasing data plans at your convenience.</p>
             </div>
             <div className="col-md-4">
-              <img src="https://prestmit.com/blog/wp-content/uploads/2023/04/IMG-20230425-WA0000.jpg" alt="Bills" className="img-fluid" />
+              <img src="images/electricity.jpg" alt="Bills" className="img-fluid" />
               <h3>Pay Bills</h3>
               <p>Effortlessly pay your bills and manage your finances.</p>
             </div>

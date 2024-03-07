@@ -1,13 +1,8 @@
 import axios from "axios";
 
-const baseURL = import.meta.env.VITE_NODE_ENV === "development"
-  ? "http://localhost:8080"
-  : import.meta.env.VITE_SERVER_URL;
-
 const Api = axios.create({
-  baseURL,
+  baseURL: import.meta.env.VITE_SERVER_URL,
   withCredentials: true,
-  timeout: 60000
 });
 
 Api.interceptors.request.use(config => {

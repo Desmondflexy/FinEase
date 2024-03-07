@@ -1,0 +1,10 @@
+#features .col-md-4 img {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  #features .col-md-4 img {
+      height: 80%;
+      width: 100%;
+  }
+}
