@@ -1,4 +1,4 @@
-import { Outlet, useLocation, Link } from "react-router-dom";
+import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Api from "../api.config";
 import Loading from "./pages/Loading";
@@ -34,31 +34,37 @@ export default function Account() {
 
   useEffect(() => {
     document.title = 'FinEase | Account';
-  })
+  });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchAcctInfo();
-
-    function fetchAcctInfo() {
-      Api.get('account')
-        .then(res => {
-          setUser(res.data.user);
-          setState(s => ({ ...s, status: 'success' }));
-        })
-        .catch(err => {
-          setState(s => ({ ...s, status: 'error' }));
-          if (err.response) {
-            const { status, statusText } = err.response;
-            setState(s => ({
-              ...s,
-              error: { status, statusText, goto: status >= 400 && status <= 499 ? '/auth/login' : s.error.goto }
-            }));
-          } else {
-            setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
-          }
-        });
+    if (!token) {
+      console.log('i got here!')
+      navigate("/auth/login");
     }
+  });
 
+
+
+  useEffect(() => {
+    Api.get('account')
+      .then(res => {
+        setUser(res.data.user);
+        setState(s => ({ ...s, status: 'success' }));
+      })
+      .catch(err => {
+        setState(s => ({ ...s, status: 'error' }));
+        if (err.response) {
+          const { status, statusText } = err.response;
+          setState(s => ({
+            ...s,
+            error: { status, statusText, goto: status >= 400 && status <= 499 ? '/auth/login' : s.error.goto }
+          }));
+        } else {
+          setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
+        }
+      });
   }, [token, location]);
 
 
@@ -77,10 +83,10 @@ export default function Account() {
             <li><Link className="navbar-brand" to='/'>FinEase</Link></li>
             <li>
               <div className="dropdown">
-                <button className="btn dropdown-toggle d-flex gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style={{alignItems:'center'}}>
+                <button className="btn dropdown-toggle d-flex gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ alignItems: 'center' }}>
                   <CgProfile /><span>{user.username}</span>
                 </button>
-                <ul className="dropdown-menu" style={{fontSize: '12px'}}>
+                <ul className="dropdown-menu" style={{ fontSize: '12px' }}>
                   <li><Link className="dropdown-item" to="/account/profile">Profile</Link></li>
                   <li><Link className="dropdown-item" to="/auth/logout">Logout</Link></li>
                 </ul>

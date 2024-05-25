@@ -7,6 +7,7 @@ export default function Error({ code, message, goto }: IError) {
 
   useEffect(() => {
     if (code === 401) {
+      localStorage.removeItem('token');
       navigate('/auth/login');
     }
   })

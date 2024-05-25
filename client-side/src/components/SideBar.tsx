@@ -12,12 +12,18 @@ function SideBar({ user }: { user: IUser }) {
       </div>
       <div className="offcanvas-body">
         <ul className="list-group list-group-flush m-0">
-          <a href='/account/dashboard' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'dashboard' ? 'active' : ''}`} >Dashboard</a>
+          {/* <a href='/account/dashboard' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'dashboard' ? 'active' : ''}`} >Dashboard</a>
           <a href='/account/recharge' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'recharge' ? 'active' : ''}`} >Recharge</a>
           <a href='/account/transactions' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'transactions' ? 'active' : ''}`}>Transactions</a>
           <a href='/account/profile' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'profile' ? 'active' : ''}`}>Profile</a>
           <a href='/account/settings' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'settings' ? 'active' : ''}`} >Settings</a>
-          {user.isAdmin && <a href='/account/all-users' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'all-users' ? 'active' : ''}`}>Admin Area</a>}
+          {user.isAdmin && <a href='/account/all-users' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'all-users' ? 'active' : ''}`}>Admin Area</a>} */}
+          <Link to='/account/dashboard' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'dashboard' ? 'active' : ''}`} >Dashboard</Link>
+          <Link to='/account/recharge' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'recharge' ? 'active' : ''}`} >Recharge</Link>
+          <Link to='/account/transactions' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'transactions' ? 'active' : ''}`}>Transactions</Link>
+          <Link to='/account/profile' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'profile' ? 'active' : ''}`}>Profile</Link>
+          <Link to='/account/settings' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'settings' ? 'active' : ''}`} >Settings</Link>
+          {user.isAdmin && <Link to='/account/all-users' className={`list-group-item list-group-item-action list-group-item-dark ${location === 'all-users' ? 'active' : ''}`}>Admin Area</Link>}
           <Link to="/auth/logout" className="btn btn-danger mt-2">Logout</Link>
         </ul>
       </div>
