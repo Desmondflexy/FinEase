@@ -1,12 +1,5 @@
 import mongoose from "mongoose";
 
-interface IToken extends mongoose.Document {
-    user: mongoose.Types.ObjectId;
-    otp: string;
-    type: string;
-    expires: Date;
-}
-
 const tokenSchema = new mongoose.Schema<IToken>(
     {
         user: {

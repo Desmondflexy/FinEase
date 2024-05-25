@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate, adminPass } from '../controllers/middleware/auth';
-import {userController} from '../controllers/users'
+import { userController } from '../controllers/users'
 const router = express.Router();
 
 // /account

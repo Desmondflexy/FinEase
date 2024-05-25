@@ -1,13 +1,10 @@
 import express, { Request, Response } from 'express';
 
 const router = express.Router();
-router.get('/', index);
+router.get('/', async function (req: Request, res: Response) {
+    return res.render('index', {
+        title: 'FinEase API'
+    });
+});
 
 export default router;
-
-
-async function index(req: Request, res: Response) {
-  return res.render('index', {
-    title: 'FinEase API'
-  });
-}
