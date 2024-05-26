@@ -1,24 +1,26 @@
 import { Request, Response } from "express";
-import Transaction from "../models/transaction";
+import database from "../models";
 import * as validators from "../utils/validators";
 import { calcBalance, verifyTransaction, generateReference, errorHandler } from "../utils/utils";
 import { blocApi } from "../utils/blochq-api";
-import User from "../models/users";
 import { phoneNetworks } from "../utils/constants";
 import bcrypt from 'bcryptjs';
+
+const { Transaction, User } = database;
 
 class TransactionController {
     async getTransactions(req: Request, res: Response) {
         try {
             const user = req.user.id;
             const requiredInfo = 'amount type reference createdAt description';
-            let transactions;
-            if (req.query.limit) {
-                const { limit } = req.query as { limit: string };
-                transactions = await Transaction.find({ user }).sort({ createdAt: -1 }).limit(+limit).select(requiredInfo);
-            } else {
-                transactions = await Transaction.find({ user }).sort({ createdAt: -1 }).select(requiredInfo);
-            }
+            const limit = req.query.limit || 10;
+            const page = req.query.page || 1;
+            const transactions = await Transaction
+                .find({ user })
+                .sort({ createdAt: -1 })
+                .limit(Number(limit))
+                .skip((Number(page) - 1) * Number(limit))
+                .select(requiredInfo);
 
             return res.json({
                 success: true,
@@ -473,7 +475,4 @@ class TransactionController {
     }
 }
 
-export default TransactionController;
-
-// const transactionController = new TransactionController();
-// export default transactionController;
+export default new TransactionController();

@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import User from "../models/users";
 import * as validators from "../utils/validators";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -7,17 +6,25 @@ import { errorHandler, generateAcctNo, isFieldAvailable } from "../utils/utils";
 import { calcBalance } from "../utils/utils";
 import sendMail from "../services/email";
 import { baseUrl } from "../utils/constants";
-import Token from "../models/token";
+import database from "../models";
+
+const { User, Token } = database;
 
 class UserController {
     async allUsers(req: Request, res: Response) {
         try {
             const requiredInfo = '_id username fullName email phone acctNo createdAt';
-            const users = await User.find().select(requiredInfo);
-            res.status(200);
+            const limit = req.query.limit || 10;
+            const page = req.query.page || 1;
+            const users = await User
+                .find()
+                .select(requiredInfo)
+                .limit(Number(limit))
+                .skip(Number(limit) * (Number(page) - 1));
+
             return res.json({
                 success: true,
-                message: "All registered users",
+                message: "All registered users" + (req.query.limit ? ` (page ${req.query.page})` : ''),
                 users
             })
 
@@ -296,7 +303,7 @@ class UserController {
 
         } catch (error) {
             errorHandler(error, res);
-         }
+        }
     }
 
     async updateUser(req: Request, res: Response) {

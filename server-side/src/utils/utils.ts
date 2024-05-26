@@ -1,31 +1,30 @@
 import { Response } from "express";
-import Transaction from "../models/transaction";
-import User from "../models/users";
+import db from "../models";
 import axios from "axios";
 
 export async function generateAcctNo() {
     let acctNo = Math.floor(Math.random() * 10000000000);
-    let user = await User.findOne({ acctNo });
+    let user = await db.User.findOne({ acctNo });
     while (user) {
         acctNo = Math.floor(Math.random() * 10000000000);
-        user = await User.findOne({ acctNo });
+        user = await db.User.findOne({ acctNo });
     }
     return String(acctNo);
 }
 
 export async function generateReference(prefix: string) {
     let ref = Math.floor(Math.random() * 10000000000);
-    let trx = await Transaction.findOne({ reference: prefix + ref });
+    let trx = await db.Transaction.findOne({ reference: prefix + ref });
     while (trx) {
         ref = Math.floor(Math.random() * 10000000000);
-        trx = await Transaction.findOne({ reference: prefix + ref });
+        trx = await db.Transaction.findOne({ reference: prefix + ref });
     }
     return prefix + ref;
 }
 
 export async function calcBalance(user: string) {
     try {
-        const transactions = await Transaction.find({ user });
+        const transactions = await db.Transaction.find({ user });
         const balance = transactions.reduce((acc, curr) => {
             if (curr.type === 'credit') return acc + curr.amount;
             return acc - curr.amount;
@@ -62,7 +61,7 @@ export async function verifyTransaction(ref: string) {
 
 /**Used during user registration to check if the value of a given field has not been taken. */
 export async function isFieldAvailable(field: string, value: string) {
-    const found = Boolean(await User.findOne({ [field]: value }));
+    const found = Boolean(await db.User.findOne({ [field]: value }));
     return !found;
 }
 

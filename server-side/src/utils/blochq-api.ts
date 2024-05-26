@@ -4,10 +4,10 @@ import { generateRandomToken } from './utils';
 
 /**The Blochq Api class */
 class Blochq {
-    dataCategoryId: string;
-    airtimeCategoryId: string;
-    billsUrl: string;
-    fakeResponse: boolean;
+    private dataCategoryId: string;
+    private airtimeCategoryId: string;
+    private billsUrl: string;
+    private fakeResponse: boolean;
     private reqHeadersConfig: IReqHeadersConfig;
 
     constructor() {
