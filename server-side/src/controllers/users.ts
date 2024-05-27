@@ -14,17 +14,21 @@ class UserController {
     async allUsers(req: Request, res: Response) {
         try {
             const requiredInfo = '_id username fullName email phone acctNo createdAt';
-            const limit = req.query.limit || 10;
-            const page = req.query.page || 1;
+            const limit = Number(req.query.limit) || 10;
+            const page = Number(req.query.page) || 1;
             const users = await User
                 .find()
                 .select(requiredInfo)
-                .limit(Number(limit))
-                .skip(Number(limit) * (Number(page) - 1));
+                .limit(limit)
+                .skip(limit * (page - 1));
+
+            const totalUsers = await User.countDocuments();
 
             return res.json({
                 success: true,
                 message: "All registered users" + (req.query.limit ? ` (page ${req.query.page})` : ''),
+                totalUsers,
+                totalPages: Math.ceil(totalUsers / limit),
                 users
             })
 

@@ -63,11 +63,12 @@ export default function Transactions() {
                             : <tr><td colSpan={6}>No transactions found</td></tr>}
                     </tbody>
                 </table>
-                <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center' }}>
-                    <button disabled={page === 1} onClick={handlePrevious}>Prev Page</button>
-                    <span>{state.fetchingTransactions ? 'fetching data...' : `PAGE ${page}`}</span>
-                    <button disabled={page === state.totalPages} onClick={handleNext}>Next Page</button>
-                </div>
+                {page === state.totalPages && page === 1 ? null :
+                    <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
+                        <button disabled={page === 1} onClick={handlePrevious}>Prev Page</button>
+                        <span>{state.fetchingTransactions ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
+                        <button disabled={page === state.totalPages} onClick={handleNext}>Next Page</button>
+                    </div>}
             </div>
         </section>
     }
