@@ -13,19 +13,23 @@ class TransactionController {
         try {
             const user = req.user.id;
             const requiredInfo = 'amount type reference createdAt description';
-            const limit = req.query.limit || 10;
-            const page = req.query.page || 1;
+            const limit = Number(req.query.limit) || 10;
+            const page = Number(req.query.page) || 1;
             const transactions = await Transaction
                 .find({ user })
                 .sort({ createdAt: -1 })
-                .limit(Number(limit))
-                .skip((Number(page) - 1) * Number(limit))
+                .limit(limit)
+                .skip((page - 1) * limit)
                 .select(requiredInfo);
+
+            const totalTransactions = await Transaction.countDocuments({ user })
 
             return res.json({
                 success: true,
                 message: `Transaction history for ${req.user.username}`,
-                'transaction count': transactions.length,
+                transactionCount: transactions.length,
+                totalTransactions,
+                totalPages: Math.ceil(totalTransactions / limit),
                 transactions
             });
 

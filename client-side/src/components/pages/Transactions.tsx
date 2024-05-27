@@ -17,80 +17,59 @@ export default function Transactions() {
         error: { status: 0, statusText: '', goto: '/' },
         searchTerm: '',
         searchResults: [],
-        page: Number(searchParams.get('page')) || 1,
-        nextButtonDisabled: false,
-        prevButtonDisabled: true
+        totalPages: 1,
+        fetchingTransactions: false,
     });
+    const page = Number(searchParams.get('page')) || 1;
     const navigate = useNavigate();
     const { apiStatus, error, searchTerm, searchResults } = state;
 
     useEffect(function () {
-        Api.get(`/transaction?page=${state.page}`)
-            .then(res => {
-                const { transactions } = res.data;
-                setState(s => ({ ...s, apiStatus: 'success', transactions, searchResults: transactions }));
-                if(!transactions.length) {
-                    setState(s => ({ ...s, nextButtonDisabled: true }));
-                } else {
-                    setState(s => ({ ...s, nextButtonDisabled: false }));
-                }
-                if(state.page === 1) {
-                    setState(s => ({ ...s, prevButtonDisabled: true }));
-                } else {
-                    setState(s => ({ ...s, prevButtonDisabled: false }));
-                }
-            })
-            .catch(err => {
-                const { status, statusText } = err.response;
-                setState(s => ({ ...s, status: 'error', error: { ...s.error, status, statusText } }));
-            });
-        setState(s => ({ ...s, searchResults: s.transactions }));
-    }, [state.page]);
+        fetchTransactions(page);
+    }, [page]);
 
     if (apiStatus === 'success') {
-        return (
-            <section id="all-transactions">
-                <h1>Transactions</h1>
-                <input value={searchTerm} onChange={handleSearch} type="search" placeholder="Search transaction..." />
-                <hr />
-                <div className="table">
+        return <section id="all-transactions">
+            <h1>Transactions</h1>
+            <input value={searchTerm} onChange={handleSearch} type="search" placeholder="Search transaction..." />
+            <hr />
+            <div className="table">
 
+            </div>
+            <div className="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th className="table-desc">Description</th>
+                            <th>Reference</th>
+                            <th style={{ width: '130px' }}>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {searchResults.length
+                            ? searchResults.map((trx: ITransaction, index: number) => (
+                                <tr key={trx._id}>
+                                    <td>{index + 1}</td>
+                                    <td>{formatNumber(+trx.amount).slice(3)}</td>
+                                    <td>{trx.type}</td>
+                                    <td>{trx.description}</td>
+                                    <td>{trx.reference}</td>
+                                    <td>{formatDateTime(trx.createdAt)}</td>
+                                </tr>
+                            ))
+                            : <tr><td colSpan={6}>No transactions found</td></tr>}
+                    </tbody>
+                </table>
+                <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center' }}>
+                    <button disabled={page === 1} onClick={handlePrevious}>Prev Page</button>
+                    <span>{state.fetchingTransactions ? 'fetching data...' : `PAGE ${page}`}</span>
+                    <button disabled={page === state.totalPages} onClick={handleNext}>Next Page</button>
                 </div>
-                <div className="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>S/N</th>
-                                <th>Amount</th>
-                                <th>Type</th>
-                                <th className="table-desc">Description</th>
-                                <th>Reference</th>
-                                <th style={{ width: '130px' }}>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {searchResults.length
-                                ? searchResults.map((trx: ITransaction, index: number) => (
-                                    <tr key={trx._id}>
-                                        <td>{index + 1}</td>
-                                        <td>{formatNumber(+trx.amount).slice(3)}</td>
-                                        <td>{trx.type}</td>
-                                        <td>{trx.description}</td>
-                                        <td>{trx.reference}</td>
-                                        <td>{formatDateTime(trx.createdAt)}</td>
-                                    </tr>
-                                ))
-                                : <tr><td colSpan={6}>No transactions found</td></tr>}
-                        </tbody>
-                    </table>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center' }}>
-                        <button disabled={state.prevButtonDisabled} onClick={gotoPrevPage}>Prev Page</button>
-                        <span>PAGE {state.page}</span>
-                        <button disabled={state.nextButtonDisabled} onClick={gotoNextPage}>Next Page</button>
-                    </div>
-                </div>
-            </section>
-        )
+            </div>
+        </section>
     }
 
     if (apiStatus === 'error') {
@@ -116,16 +95,27 @@ export default function Transactions() {
         }));
     }
 
-    function gotoNextPage() {
-        const page = Number(searchParams.get('page'));
+    function handleNext() {
+        setState(s => ({ ...s, fetchingTransactions: true }));
         navigate(`/account/transactions?page=${page + 1}`);
-        setState(s => ({ ...s, page: s.page + 1 }));
     }
 
-    function gotoPrevPage() {
-        const page = Number(searchParams.get('page'));
+    function handlePrevious() {
+        setState(s => ({ ...s, fetchingTransactions: true }));
         navigate(`/account/transactions?page=${page - 1}`);
-        setState(s => ({ ...s, page: s.page - 1 }));
+    }
+
+    function fetchTransactions(page: number) {
+        Api.get(`/transaction?page=${page}`)
+            .then(res => {
+                const { transactions, totalPages } = res.data;
+                setState(s => ({ ...s, apiStatus: 'success', transactions, searchResults: transactions, totalPages, fetchingTransactions: false }));
+            })
+            .catch(err => {
+                const { status, statusText } = err.response;
+                setState(s => ({ ...s, status: 'error', error: { ...s.error, status, statusText } }));
+            });
+        setState(s => ({ ...s, searchResults: s.transactions }));
     }
 
     interface IStatus {
@@ -138,8 +128,7 @@ export default function Transactions() {
         };
         searchTerm: string;
         searchResults: ITransaction[];
-        page: number;
-        nextButtonDisabled: boolean;
-        prevButtonDisabled: boolean;
+        totalPages: number;
+        fetchingTransactions: boolean;
     }
 }
