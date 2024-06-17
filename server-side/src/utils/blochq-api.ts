@@ -11,10 +11,10 @@ class Blochq {
     private reqHeadersConfig: IReqHeadersConfig;
 
     constructor() {
-        this.dataCategoryId = 'pctg_ftZLPijqrVsTan5Ag7khQx';
-        this.airtimeCategoryId = 'pctg_xkf8nz3rFLjbooWzppWBG6';
-        this.billsUrl = 'https://api.blochq.io/v1/bills';
-        this.fakeResponse = true;
+        this.dataCategoryId = process.env.BLOC_DATA_CATEGORY_ID as string;
+        this.airtimeCategoryId = process.env.BLOC_AIRTIME_CATEGORY_ID as string;
+        this.billsUrl = process.env.BLOC_BILLS_URL as string;
+        this.fakeResponse = Boolean(process.env.FAKE_API);
         this.reqHeadersConfig = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
     }
 

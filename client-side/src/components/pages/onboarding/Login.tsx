@@ -40,6 +40,7 @@ export function Login() {
           }
           setState((s) => ({ ...s, loading: false }));
         });
+        document.querySelector('button')?.focus();
     }
 
     setState((s) => ({ ...s, loading: true }));

@@ -29,7 +29,7 @@ export default function UsersList() {
 
     if (apiStatus === 'success') {
         return <section id="admin">
-            <h1>List of all active users of FinEase</h1>
+            <h1>Active Users</h1>
             <input type="search" placeholder="Search for user..." onChange={handleSearch} value={searchTerm} />
             <hr />
             <div className="table-container">
@@ -57,13 +57,13 @@ export default function UsersList() {
                         ))}
                     </tbody>
                 </table>
-                {page === state.totalPages && page === 1 ? null :
-                    <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
-                        <button disabled={page === 1} onClick={handlePrevious}>Prev Page</button>
-                        <span>{state.fetchingTransactions ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
-                        <button disabled={page === state.totalPages} onClick={handleNext}>Next Page</button>
-                    </div>}
             </div>
+            {page === state.totalPages && page === 1 ? null :
+                <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
+                    <button disabled={page === 1} onClick={handlePrevious}>Prev Page</button>
+                    <span>{state.fetchingTransactions ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
+                    <button disabled={page === state.totalPages} onClick={handleNext}>Next Page</button>
+                </div>}
         </section>;
     }
 

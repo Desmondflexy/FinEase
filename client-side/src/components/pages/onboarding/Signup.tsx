@@ -46,6 +46,7 @@ export default function Signup({ admin }: { admin: boolean }) {
 
     setState((s) => ({ ...s, loading: true }));
     signup(url, inputs);
+    document.querySelector('button')?.focus();
 
     function signup(url: string, inputs: SignupInputs) {
       Api.post(url, inputs)
