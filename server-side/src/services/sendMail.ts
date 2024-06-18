@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer';
 
-
-function sendMail(to: string, subject: string, text: string) {
+export default function(to: string, subject: string, text: string) {
     const user = process.env.GMAIL;
     const pass = process.env.GMAIL_PASSWORD;
     const host = process.env.GMAIL_HOST;
@@ -22,5 +21,3 @@ function sendMail(to: string, subject: string, text: string) {
 
     return result;
 }
-
-export default sendMail;

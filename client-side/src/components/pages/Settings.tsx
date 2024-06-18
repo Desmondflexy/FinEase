@@ -144,13 +144,13 @@ function PasswordEditForm() {
                 </div>
                 <div className="input-group mb-3">
                     <div className="form-floating">
-                        <input {...register('newPassword')} placeholder="Confirm New Password" className="form-control" name="confirmPassword" id="confirm-new" type="password" />
+                        <input {...register('confirmPassword')} placeholder="Confirm New Password" className="form-control" name="confirmPassword" id="confirm-new" type="password" />
                         <label htmlFor="confirn-new">Confirm New Password</label>
                     </div>
                 </div>
                 <div className="input-group mb-3">
                     <div className="form-floating">
-                        <input {...register('newPassword')} placeholder="Old Password" className="form-control" name="oldPassword" id="old" type="password" />
+                        <input {...register('oldPassword')} placeholder="Old Password" className="form-control" name="oldPassword" id="old" type="password" />
                         <label htmlFor="old">Old Password</label>
                     </div>
                 </div>

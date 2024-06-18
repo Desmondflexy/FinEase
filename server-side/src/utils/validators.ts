@@ -76,5 +76,4 @@ export const resetPassword = joi.object().keys({
     password: joi.string().min(6).required(),
     confirm: joi.string().valid(joi.ref('password')).required().messages({ 'any.only': 'Passwords do not match' }),
     otp: joi.string().required().trim(),
-    email: joi.string().email().required().trim(),
 });

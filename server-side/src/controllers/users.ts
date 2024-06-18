@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { errorHandler, generateAcctNo, isFieldAvailable } from "../utils/utils";
 import { calcBalance } from "../utils/utils";
-import sendMail from "../services/email";
+import sendMail from "../services/sendMail";
 import { baseUrl } from "../utils/constants";
 import database from "../models";
 
@@ -113,12 +113,12 @@ class UserController {
                 otp: emailVerificationToken
             });
             const buttonMessage = `
-        <button style="background-color: #4CAF50; border-radius: 4px; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block;">Verify Email</button>
-      `;
+                <button style="background-color: #4CAF50; border-radius: 4px; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block;">Verify Email</button>
+                `;
             const message = `
-        Click the button to verify your email address\n\n
-        <a href="${baseUrl}/auth/${user._id}/email-verify/${emailVerificationToken}">${buttonMessage}</a>
-        `;
+                Click the button to verify your email address\n\n
+                <a href="${baseUrl}/auth/${user._id}/email-verify/${emailVerificationToken}">${buttonMessage}</a>
+                `;
 
             sendMail(email, 'FinEase: Email Verification', message)
 
@@ -395,7 +395,8 @@ class UserController {
             const { error } = validators.resetPassword.validate(req.body, validators.options);
             if (error) return res.status(400).json({ message: error.message });
 
-            const { password, otp, email } = req.body;
+            const { password, otp } = req.body;
+            const { email } = req.query;
             const user = await User.findOne({ email });
             if (!user) return res.status(404).json({ message: 'User not found' });
 
