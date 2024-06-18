@@ -38,9 +38,6 @@ const userSchema = new mongoose.Schema<IUser>({
     emailVerified: {
         type: Boolean,
         default: false
-    },
-    emailVerificationToken: {
-        type: String,
     }
 }, {
     timestamps: true

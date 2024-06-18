@@ -4,8 +4,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { errorHandler, generateAcctNo, isFieldAvailable } from "../utils/utils";
 import { calcBalance } from "../utils/utils";
-import sendMail from "../services/sendMail";
-import { baseUrl } from "../utils/constants";
+import sendMail, { getPasswordResetHTML } from "../services/sendMail";
+import { baseUrl, clientUrl } from "../utils/constants";
 import database from "../models";
 
 const { User, Token } = database;
@@ -106,21 +106,16 @@ class UserController {
             });
 
             // send verification email
-            const emailVerificationToken = Math.random().toString(36).substring(2);
-            await Token.create({
-                user: user._id,
-                type: 'email',
-                otp: emailVerificationToken
-            });
+            const token = await Token.create({ email, type: 'email' });
             const buttonMessage = `
                 <button style="background-color: #4CAF50; border-radius: 4px; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block;">Verify Email</button>
                 `;
             const message = `
                 Click the button to verify your email address\n\n
-                <a href="${baseUrl}/auth/${user._id}/email-verify/${emailVerificationToken}">${buttonMessage}</a>
+                <a href="${baseUrl}/auth/email-verify/${token.id}">${buttonMessage}</a>
                 `;
 
-            sendMail(email, 'FinEase: Email Verification', message)
+            sendMail(email, 'FinEase: Email Verification', message);
 
             res.status(201);
             res.json({
@@ -137,24 +132,20 @@ class UserController {
 
     async verifyEmail(req: Request, res: Response) {
         try {
-            const { userId, token } = req.params;
-            if (!token) return res.status(400).send('Bad request');
-
-            const user = await User.findById(userId)
+            const { tokenId } = req.params;
+            const token = await Token.findById(tokenId);
+            if (!token) return res.status(404).send('Link is invalid');
+            const user = await User.findOne({ email: token.email });
             if (!user) return res.status(404).send('user not found');
             if (user.emailVerified) return res.status(400).send('Email already verified');
 
-            const otp = await Token.findOne({ user: userId, type: 'email', otp: token });
-            if (!otp) return res.status(400).send('Link is invalid');
-
             user.emailVerified = true;
-            user.emailVerificationToken = '';
             await user.save();
 
             const htmlMessage = `<h1>Hi ${user.fullName}, welcome to FinEase!</h1>`;
             sendMail(user.email, 'Welcome to FinEase', htmlMessage);
-            otp.deleteOne();
-            return res.send('Email verified successfully. Proceed to login')
+            token.deleteOne();
+            return res.send('Email verified successfully. Proceed to login');
 
         } catch (err) {
             errorHandler(err, res);
@@ -370,19 +361,16 @@ class UserController {
 
             if (!user) return res.status(404).json({ message: 'User with given email does not exist' });
 
-            let token = await Token.findOne({ user: user._id, type: 'password' });
+            let token = await Token.findOne({ email, type: 'password' });
             if (token) await token.deleteOne();
 
-            token = new Token({
-                user: user._id,
-                type: 'password',
-                otp: Math.random().toString().substring(2, 7)
-            });
+            token = new Token({ email, type: 'password' });
             await token.save();
 
-            sendMail(email, 'FinEase: Password Reset', `Password reset token: <strong>${token.otp}<strong/>`)
+            const resetLink = `${clientUrl}/auth/reset-password/${token.id}`;
+            sendMail(email, 'Finease: Password', getPasswordResetHTML(user.fullName, resetLink));
             return res.json({
-                message: 'Check your email for password reset token'
+                message: 'Check your email for password reset link'
             });
 
         } catch (error) {
@@ -395,13 +383,14 @@ class UserController {
             const { error } = validators.resetPassword.validate(req.body, validators.options);
             if (error) return res.status(400).json({ message: error.message });
 
-            const { password, otp } = req.body;
-            const { email } = req.query;
-            const user = await User.findOne({ email });
-            if (!user) return res.status(404).json({ message: 'User not found' });
+            const { password } = req.body;
+            const { resetId } = req.params;
 
-            const token = await Token.findOne({ otp, type: 'password', user: user._id });
+            const token = await Token.findOne({ _id: resetId, type: 'password', expires: { $gt: new Date() } });
             if (!token) return res.status(404).json({ message: 'Invalid or expired token' });
+
+            const user = await User.findOne({ email: token.email });
+            if (!user) return res.status(404).json({ message: 'User not found' });
 
             user.password = await bcrypt.hash(password, 10);
             await user.save();

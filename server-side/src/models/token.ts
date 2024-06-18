@@ -2,12 +2,7 @@ import mongoose from "mongoose";
 
 const tokenSchema = new mongoose.Schema<IToken>(
     {
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
-        otp: {
+        email: {
             type: String,
             required: true,
         },
@@ -19,11 +14,8 @@ const tokenSchema = new mongoose.Schema<IToken>(
         expires: {
             type: Date,
             required: true,
-            default: Date.now() + 2 * 60 * 1000, // 2mins
+            default: Date.now() + 10 * 60 * 1000, // 10mins for password reset
         },
-    },
-    {
-        timestamps: true,
     }
 );
 

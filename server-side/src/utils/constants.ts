@@ -51,3 +51,7 @@ export const phoneNumberRegex = /^(070[1234568]|080[2356789]|081[0-8]|090[1-9]|0
 export const baseUrl = process.env.NODE_ENV === 'development'
     ? 'http://localhost:' + process.env.PORT
     : process.env.SERVER_URL;
+
+export const clientUrl = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3200'
+    : process.env.CLIENT_URL;

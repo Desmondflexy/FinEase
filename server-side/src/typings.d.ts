@@ -11,8 +11,8 @@ interface IPayload {
 }
 
 interface IToken extends mongoose.Document {
-    user: mongoose.Types.ObjectId;
-    otp: string;
+    email: string;
+    // otp: string;
     type: string;
     expires: Date;
 }
@@ -39,7 +39,7 @@ interface IUser extends mongoose.Document {
     isAdmin: boolean;
     username: string;
     emailVerified: boolean;
-    emailVerificationToken: string;
+    // emailVerificationToken: string;
     _id: string;
 }
 

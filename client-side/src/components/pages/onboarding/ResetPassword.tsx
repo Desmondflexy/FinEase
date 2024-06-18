@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Api from "../../../api.config";
 import { toast } from "react-toastify";
 
 interface DataType {
     password: string;
     confirm: string;
-    otp: string;
 }
 
 export function ResetPassword() {
@@ -24,14 +23,14 @@ export function ResetPassword() {
         document.title = 'FinEase - Reset Password';
     });
 
-    const [searchParams] = useSearchParams();
+    const { resetId } = useParams();
 
     function onSubmit(data: DataType) {
-        const email = searchParams.get('email');
-        const { password, confirm, otp } = data;
+        const { password, confirm } = data;
         function reset() {
-            Api.post(`/auth/reset-password?email=${email}`, { password, confirm, otp })
-                .then(() => {
+            Api.post(`/auth/reset-password/${resetId}`, { password, confirm })
+                .then((res) => {
+                    console.log(res.data);
                     navigate("/auth/login");
                     toast.success("Password reset successful");
                     setState((s) => ({ ...s, loading: false }));
@@ -52,10 +51,6 @@ export function ResetPassword() {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-floating mb-3">
-                <input {...register('otp')} className="form-control" id="otp" placeholder="OTP" required />
-                <label htmlFor="otp">OTP</label>
-            </div>
             <div className="form-floating mb-3">
                 <input {...register('password')} className="form-control" id="password" type="password" placeholder="New Password" required />
                 <label htmlFor="password">New Password</label>

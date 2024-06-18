@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import Api from "../../../api.config";
 import { toast } from "react-toastify";
 
@@ -12,7 +11,6 @@ export default function ForgotPassword() {
     const { register, handleSubmit } = useForm<{ email: string }>();
 
     const { loading } = state;
-    const navigate = useNavigate();
 
     useEffect(() => {
         document.title = 'FinEase - Reset Password';
@@ -23,8 +21,7 @@ export default function ForgotPassword() {
         function sendOtp() {
             Api.post("/auth/forgot-password", { email })
                 .then(() => {
-                    navigate(`/auth/reset-password?email=${email}`);
-                    toast.info("Check your email for the reset OTP", { autoClose: false });
+                    toast.info("Check your email for the reset link", { autoClose: false });
                     setState((s) => ({ ...s, loading: false }));
                 })
                 .catch((err) => {
@@ -52,7 +49,7 @@ export default function ForgotPassword() {
                     {loading ? <>
                         <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
                         <span role="status">Sending... Please wait</span>
-                    </> : "Send Reset OTP to Email"}
+                    </> : "Send Reset Link to Email"}
                 </button>
             </div>
 
