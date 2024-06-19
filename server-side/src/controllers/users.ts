@@ -4,9 +4,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { errorHandler, generateAcctNo, isFieldAvailable } from "../utils/utils";
 import { calcBalance } from "../utils/utils";
-import sendMail, { getPasswordResetHTML } from "../services/sendMail";
-import { baseUrl, clientUrl } from "../utils/constants";
+import sendMail, { getEmailVerifyHTML, getPasswordResetHTML } from "../services/sendMail";
+import { clientUrl } from "../utils/constants";
 import database from "../models";
+import mongoose from "mongoose";
 
 const { User, Token } = database;
 
@@ -107,13 +108,7 @@ class UserController {
 
             // send verification email
             const token = await Token.create({ email, type: 'email' });
-            const buttonMessage = `
-                <button style="background-color: #4CAF50; border-radius: 4px; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block;">Verify Email</button>
-                `;
-            const message = `
-                Click the button to verify your email address\n\n
-                <a href="${baseUrl}/auth/email-verify/${token.id}">${buttonMessage}</a>
-                `;
+            const message = getEmailVerifyHTML(user.fullName, `${clientUrl}/auth/verify-email/${token.id}`);
 
             sendMail(email, 'FinEase: Email Verification', message);
 
@@ -132,9 +127,13 @@ class UserController {
 
     async verifyEmail(req: Request, res: Response) {
         try {
-            const { tokenId } = req.params;
-            const token = await Token.findById(tokenId);
-            if (!token) return res.status(404).send('Link is invalid');
+            const { verifyId } = req.params;
+            // check if the verification link is valid
+            if (!mongoose.Types.ObjectId.isValid(verifyId)) {
+                return res.status(400).send('The verification link is invalid');
+            }
+            const token = await Token.findById(verifyId);
+            if (!token) return res.status(400).send('The verification link is invalid');
             const user = await User.findOne({ email: token.email });
             if (!user) return res.status(404).send('user not found');
             if (user.emailVerified) return res.status(400).send('Email already verified');
@@ -145,7 +144,7 @@ class UserController {
             const htmlMessage = `<h1>Hi ${user.fullName}, welcome to FinEase!</h1>`;
             sendMail(user.email, 'Welcome to FinEase', htmlMessage);
             token.deleteOne();
-            return res.send('Email verified successfully. Proceed to login');
+            return res.send('Email verified successfully');
 
         } catch (err) {
             errorHandler(err, res);
@@ -351,7 +350,7 @@ class UserController {
         }
     }
 
-    async sendPasswordResetOtp(req: Request, res: Response) {
+    async sendPasswordResetLink(req: Request, res: Response) {
         try {
             const { error } = validators.forgotPassword.validate(req.body, validators.options);
             if (error) return res.status(400).json({ message: error.message });

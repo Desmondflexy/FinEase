@@ -8,8 +8,8 @@ router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.post('/admin-signup', userController.signup);
 router.get('/check/:field/:value', userController.isAvailable);
-router.get('/email-verify/:tokenId', userController.verifyEmail);
-router.post('/forgot-password', userController.sendPasswordResetOtp);
+router.post('/email-verify/:verifyId', userController.verifyEmail);
+router.post('/forgot-password', userController.sendPasswordResetLink);
 router.post('/reset-password/:resetId', userController.resetPassword);
 
 export default router;

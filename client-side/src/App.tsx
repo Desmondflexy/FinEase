@@ -16,6 +16,7 @@ import { Login } from './components/pages/onboarding/Login';
 import { Logout } from './components/Logout';
 import ForgotPassword from './components/pages/onboarding/ForgotPassword';
 import { ResetPassword } from './components/pages/onboarding/ResetPassword';
+import VerifyEmail from './components/VerifyEmail';
 
 export default function App() {
     return (
@@ -29,6 +30,7 @@ export default function App() {
                     <Route path='logout' element={<Logout />} />
                     <Route path='forgot-password' element={<ForgotPassword />} />
                     <Route path='reset-password/:resetId' element={<ResetPassword />} />
+                    <Route path='verify-email/:verifyId' element={<VerifyEmail/>}/>
                 </Route>
                 <Route path='/account' element={<Account />}>
                     <Route path='dashboard' element={<Dashboard />} />
