@@ -26,13 +26,13 @@ class Blochq {
 
     async getOperators(bill: string) {
         const url = `${this.billsUrl}/operators?bill=${bill}`;
-
         try {
             const response = await axios.get(url, this.reqHeadersConfig);
             return response.data.data;
 
-        } catch (error) {
-            this.handleError(error, 'Error getting operators');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            this.handleError(error, error.response.data.message);
         }
     }
 
@@ -153,7 +153,7 @@ class Blochq {
 
             return { result: response.data.data, error: null };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error(error);
             return { result: null, error: { message: error.response.data.message } };

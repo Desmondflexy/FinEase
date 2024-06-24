@@ -65,8 +65,8 @@ export async function isFieldAvailable(field: string, value: string) {
     return !found;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function errorHandler(error: any, res: Response) {
-    console.error(error);
     res.status(500)
     return res.json({
         success: false,
