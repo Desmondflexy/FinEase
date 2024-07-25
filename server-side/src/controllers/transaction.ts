@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import database from "../models";
 import * as validators from "../utils/validators";
-import { calcBalance, verifyTransaction, generateReference, errorHandler } from "../utils/utils";
-import { blocApi } from "../utils/blochq-api";
+import { calcBalance, generateReference, errorHandler } from "../utils/utils";
+import blocApi from "../utils/blochq-api";
 import { phoneNetworks } from "../utils/constants";
 import bcrypt from 'bcryptjs';
+import paystack from "../utils/paystack";
 
 const { Transaction, User } = database;
 
@@ -52,8 +53,8 @@ class TransactionController {
                     error: 'This transaction has already been processed',
                 });
             }
-
-            const response = await verifyTransaction(reference);
+            const response = await paystack.verifyTransaction(reference);
+            console.log(response);
 
             if (!response.status) {
                 res.status(422);

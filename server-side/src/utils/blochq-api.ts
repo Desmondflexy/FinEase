@@ -198,4 +198,4 @@ class Blochq {
     }
 }
 
-export const blocApi = new Blochq();
+export default new Blochq();

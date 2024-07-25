@@ -30,7 +30,7 @@ export default function UsersList() {
     if (apiStatus === 'success') {
         return <section id="admin">
             <h1>Active Users</h1>
-            <input type="search" placeholder="Search for user..." onChange={handleSearch} value={searchTerm} />
+            <input type="search" placeholder="Search for user" onChange={handleSearch} value={searchTerm} />
             <hr />
             <div className="table-container">
                 <table>

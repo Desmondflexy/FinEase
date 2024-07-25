@@ -1,6 +1,5 @@
 import { Response } from "express";
 import db from "../models";
-import axios from "axios";
 
 export async function generateAcctNo() {
     let acctNo = Math.floor(Math.random() * 10000000000);
@@ -46,18 +45,6 @@ export function generateRandomToken() {
     return arr.join('-');
 }
 
-
-export async function verifyTransaction(ref: string) {
-    const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` } }
-    const url = `https://api.paystack.co/transaction/verify/${ref}`;
-    try {
-        const response = await axios.get(url, authorizationHeaders);
-        return response.data;
-    }
-    catch {
-        throw new Error("Error verifying transaction");
-    }
-}
 
 /**Used during user registration to check if the value of a given field has not been taken. */
 export async function isFieldAvailable(field: string, value: string) {
