@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const baseURL = import.meta.env.VITE_NODE_ENV === "production" ? import.meta.env.VITE_SERVER_URL : "http://localhost:8080";
+let baseURL = "http://localhost:8080";
+if (import.meta.env.VITE_NODE_ENV === "production") {
+    baseURL = import.meta.env.VITE_SERVER_URL;
+}
 
 const Api = axios.create({
     baseURL,
