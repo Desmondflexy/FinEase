@@ -1,7 +1,6 @@
 import { Response } from "express";
 import db from "../models";
 import axios from 'axios';
-import cron from 'node-cron';
 
 export async function generateAcctNo() {
     let acctNo = Math.floor(Math.random() * 10000000000);
@@ -66,7 +65,7 @@ export function errorHandler(error: any, res: Response) {
 }
 
 export function keepServerAlive() {
-    cron.schedule('*/7 * * * *', () => {
+    setInterval(() => {
         const serverUrl = process.env.SERVER_URL!;
 
         axios.get(serverUrl)
@@ -76,5 +75,5 @@ export function keepServerAlive() {
             .catch(error => {
                 console.error(`Ping failed: ${error.message}`);
             });
-    });
+    }, 2000);
 }
