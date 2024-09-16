@@ -1,5 +1,7 @@
 import { Response } from "express";
 import db from "../models";
+import axios from 'axios';
+import cron from 'node-cron';
 
 export async function generateAcctNo() {
     let acctNo = Math.floor(Math.random() * 10000000000);
@@ -30,6 +32,7 @@ export async function calcBalance(user: string) {
         }, 0);
         return balance;
     } catch (error) {
+        console.log(error);
         throw new Error("Error getting balance");
     }
 }
@@ -60,4 +63,18 @@ export function errorHandler(error: any, res: Response) {
         message: "Internal Server Error",
         error: error.message
     })
+}
+
+export function keepServerAlive() {
+    cron.schedule('*/7 * * * *', () => {
+        const serverUrl = process.env.SERVER_URL!;
+
+        axios.get(serverUrl)
+            .then(response => {
+                console.log(`Ping successful: ${response.status}`);
+            })
+            .catch(error => {
+                console.error(`Ping failed: ${error.message}`);
+            });
+    });
 }

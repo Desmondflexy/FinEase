@@ -19,13 +19,13 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
         req.user = decodedPayload as IPayload;
         next();
 
-    } catch (error: any) {
+    } catch (error) {
         console.error(error);
         res.status(401);
         return res.json({
             success: false,
             message: 'Unauthorized',
-            error: error.message
+            error
         });
     }
 }
