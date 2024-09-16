@@ -75,5 +75,5 @@ export function keepServerAlive() {
             .catch(error => {
                 console.error(`Ping failed: ${error.message}`);
             });
-    }, 2000);
+    }, 5000);
 }
