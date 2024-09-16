@@ -12,10 +12,12 @@ const tokenSchema = new mongoose.Schema<IToken>(
             enum: ["email", "password"],
         },
         expires: {
-            type: Date,
-            required: true,
-            default: Date.now() + 10 * 60 * 1000, // 10mins for password reset
+            type: Number,
         },
+        token: {
+            type: String,
+            required: true,
+        }
     }
 );
 

@@ -14,7 +14,8 @@ interface IToken extends mongoose.Document {
     email: string;
     // otp: string;
     type: string;
-    expires: Date;
+    expires: number;
+    token: string;
 }
 
 interface ITransaction extends mongoose.Document {

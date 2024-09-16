@@ -7,7 +7,7 @@ import { calcBalance } from "../utils/utils";
 import sendMail, { getEmailVerifyHTML, getPasswordResetHTML } from "../services/sendMail";
 import { clientUrl } from "../utils/constants";
 import database from "../models";
-import mongoose from "mongoose";
+import crypto from "crypto";
 
 const { User, Token } = database;
 
@@ -107,8 +107,9 @@ class UserController {
             });
 
             // send verification email
-            const token = await Token.create({ email, type: 'email' });
-            const message = getEmailVerifyHTML(user.fullName, `${clientUrl}/auth/verify-email/${token.id}`);
+            const verifyToken = crypto.randomBytes(32).toString('hex');
+            await Token.create({ email, type: 'email', token: verifyToken });
+            const message = getEmailVerifyHTML(user.fullName, `${clientUrl}/auth/verify-email/${verifyToken}`);
 
             sendMail(email, 'FinEase: Email Verification', message);
 
@@ -128,11 +129,7 @@ class UserController {
     async verifyEmail(req: Request, res: Response) {
         try {
             const { verifyId } = req.params;
-            // check if the verification link is valid
-            if (!mongoose.Types.ObjectId.isValid(verifyId)) {
-                return res.status(400).send('The verification link is invalid');
-            }
-            const token = await Token.findById(verifyId);
+            const token = await Token.findOne({type: 'email', token: verifyId});
             if (!token) return res.status(400).send('The verification link is invalid');
             const user = await User.findOne({ email: token.email });
             if (!user) return res.status(404).send('user not found');
@@ -360,14 +357,15 @@ class UserController {
 
             if (!user) return res.status(404).json({ message: 'User with given email does not exist' });
 
-            let token = await Token.findOne({ email, type: 'password' });
-            if (token) await token.deleteOne();
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            await Token.findOneAndUpdate(
+                { email, type: 'password' },
+                { token: resetToken, expires: Date.now() + 10 * 60 * 1000 },
+                { upsert: true }
+            );
 
-            token = new Token({ email, type: 'password' });
-            await token.save();
-
-            const resetLink = `${clientUrl}/auth/reset-password/${token.id}`;
-            sendMail(email, 'Finease: Password', getPasswordResetHTML(user.fullName, resetLink));
+            const resetLink = `${clientUrl}/auth/reset-password/${resetToken}`;
+            sendMail(email, 'Finease: Password Reset', getPasswordResetHTML(user.fullName, resetLink));
             return res.json({
                 message: 'Check your email for password reset link'
             });
@@ -385,7 +383,7 @@ class UserController {
             const { password } = req.body;
             const { resetId } = req.params;
 
-            const token = await Token.findOne({ _id: resetId, type: 'password', expires: { $gt: new Date() } });
+            const token = await Token.findOne({ token: resetId, type: 'password', expires: { $gt: Date.now() } });
             if (!token) return res.status(404).json({ message: 'Invalid or expired token' });
 
             const user = await User.findOne({ email: token.email });
