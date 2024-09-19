@@ -1,7 +1,5 @@
 import { Response } from "express";
 import db from "../models";
-import axios from 'axios';
-
 export async function generateAcctNo() {
     let acctNo = Math.floor(Math.random() * 10000000000);
     let user = await db.User.findOne({ acctNo });
@@ -62,18 +60,4 @@ export function errorHandler(error: any, res: Response) {
         message: "Internal Server Error",
         error: error.message
     })
-}
-
-export function keepServerAlive() {
-    setInterval(() => {
-        const serverUrl = process.env.SERVER_URL!;
-
-        axios.get(serverUrl)
-            .then(response => {
-                console.log(`Ping successful: ${response.status}`);
-            })
-            .catch(error => {
-                console.error(`Ping failed: ${error.message}`);
-            });
-    }, 5000);
 }

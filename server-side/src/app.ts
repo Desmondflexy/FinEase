@@ -6,7 +6,6 @@ import path from 'path';
 import router from './routes';
 import database from './models';
 import cookieParser from 'cookie-parser';
-import { keepServerAlive } from './utils/utils';
 
 dotenv.config();
 
@@ -32,5 +31,3 @@ app.use('/transaction', router.transaction);
 
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
-
-keepServerAlive();
