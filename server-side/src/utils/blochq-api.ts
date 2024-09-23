@@ -198,4 +198,6 @@ class Blochq {
     }
 }
 
-export default new Blochq();
+const blochq = new Blochq();
+
+export default blochq;

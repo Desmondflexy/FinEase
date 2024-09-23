@@ -52,6 +52,11 @@ export async function isFieldAvailable(field: string, value: string) {
     return !found;
 }
 
+/** Always throw this error object */
+export function appError(statusCode: number, message: string) {
+    return { statusCode, message }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function errorHandler(error: any, res: Response) {
     res.status(500)

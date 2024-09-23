@@ -56,7 +56,7 @@ function TransferWalletModal({ closeModal }: Prop) {
     function confirmUser(e: React.FocusEvent<HTMLInputElement>) {
         Api.get(`account/confirm-user?acctNoOrUsername=${e.target.value}`)
             .then(res => {
-                setState(s => ({ ...s, feedback: res.data }));
+                setState(s => ({ ...s, feedback: res.data.fullName }));
             })
             .catch(() => {
                 setState(s => ({ ...s, feedback: 'Invalid username or account number' }));

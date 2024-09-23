@@ -49,3 +49,15 @@ interface IReqHeadersConfig {
         Authorization: string;
     }
 }
+
+type ServiceResponseType = Promise<{
+    statusCode: number;
+    message: string;
+    data?: object;
+}>;
+
+type ServiceResponseTypeSync = {
+    statusCode: number;
+    message: string;
+    data?: object;
+};
