@@ -1,20 +1,31 @@
-import express, { Request, Response } from 'express';
-import auth from './auth';
-import users from './users';
-import transaction from './transaction';
+import express, { Request, Response, Router } from 'express';
+import authRouter from "./auth";
+import usersRouter from "./users";
+import transactionRouter from "./transaction";
 
 const router = express.Router();
 
-class Router {
-    index = router.get('/', async function (req: Request, res: Response) {
-        return res.render('index', {
-            title: 'FinEase API'
-        });
+type RoutesListType = {
+    path: string;
+    route: Router;
+}[];
+
+const defaultRoutes: RoutesListType = [
+    { path: "/auth", route: authRouter },
+    { path: "/account", route: usersRouter },
+    { path: "/transaction", route: transactionRouter },
+];
+
+defaultRoutes.forEach((route) => {
+    router.use(route.path, route.route);
+});
+
+
+export const homeRouter = express.Router();
+homeRouter.get('/', async function (req: Request, res: Response) {
+    return res.render('index', {
+        title: 'FinEase API'
     });
+});
 
-    auth = auth;
-    users = users;
-    transaction = transaction;
-}
-
-export default new Router();
+export default router;

@@ -3,13 +3,13 @@ import logger from 'morgan';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
-import router from './routes';
-import database from './models';
+import router, { homeRouter } from './routes';
 import cookieParser from 'cookie-parser';
+import connectDb from './config/db';
 
 dotenv.config();
 
-database.connect()
+connectDb();
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -24,10 +24,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.use('/', router.index);
-app.use('/account', router.users);
-app.use('/auth', router.auth);
-app.use('/transaction', router.transaction);
+app.use('/', homeRouter);
+app.use('/', router);
 
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');

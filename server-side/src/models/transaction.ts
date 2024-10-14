@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
+import { MODELS, TRX_SERVICES, TRX_TYPES } from '../utils/constants';
 
 const transactionSchema = new mongoose.Schema<ITransaction>({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: MODELS.user,
         required: true
     },
     amount: {
@@ -13,12 +14,12 @@ const transactionSchema = new mongoose.Schema<ITransaction>({
     type: {
         type: String,
         required: true,
-        enum: ['credit', 'debit']
+        enum: Object.values(TRX_TYPES)
     },
     service: {
         type: String,
         required: true,
-        enum: ['wallet transfer', 'funding', 'airtime purchase', 'bill payment', 'data purchase']
+        enum: Object.values(TRX_SERVICES)
     },
     description: {
         type: String,
@@ -35,15 +36,15 @@ const transactionSchema = new mongoose.Schema<ITransaction>({
     },
     sender: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: MODELS.user,
     },
     recipient: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: MODELS.user,
     },
 }, {
     timestamps: true
 });
 
-const Transaction = mongoose.model<ITransaction>('Transaction', transactionSchema);
+const Transaction = mongoose.model<ITransaction>(MODELS.transaction, transactionSchema);
 export default Transaction;

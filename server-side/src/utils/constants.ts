@@ -55,3 +55,28 @@ export const baseUrl = process.env.NODE_ENV === 'development'
 export const clientUrl = process.env.NODE_ENV === 'development'
     ? 'http://localhost:3200'
     : process.env.CLIENT_URL;
+
+
+export const MODELS = {
+    user: 'User',
+    transaction: 'Transaction',
+    token: 'Token'
+}
+
+export const TOKEN_TYPES = {
+    email: 'email',
+    password: 'password'
+}
+
+export const TRX_TYPES = {
+    credit: 'credit',
+    debit: 'debit'
+}
+
+export const TRX_SERVICES = {
+    walletTransfer: 'wallet transfer',
+    funding: 'funding',
+    airtimePurchase: 'airtime purchase',
+    billPayment: 'bill payment',
+    dataPurchase: 'data purchase'
+}

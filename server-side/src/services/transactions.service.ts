@@ -1,15 +1,15 @@
 import { Request } from 'express';
-import Transaction from '../models/transaction';
-import { appError, calcBalance, generateReference } from '../utils/utils';
+import { Transaction } from '../models';
+import { appError, calcBalance, generateReference } from '../utils';
 import paystack from '../utils/paystack';
 import validators from '../utils/validators';
 import User from '../models/users';
 import bcrypt from 'bcryptjs';
 import blochq from '../utils/blochq-api';
-import { phoneNetworks } from '../utils/constants';
+import { phoneNetworks, TRX_TYPES, TRX_SERVICES } from '../utils/constants';
 
 class TransactionsService {
-    async getTransactions(req: Request) {
+    async getTransactions(req: Request): ServiceResponseType {
         const user = req.user.id;
         const requiredInfo = 'amount type reference createdAt description';
         const limit = Number(req.query.limit) || 10;
@@ -24,7 +24,6 @@ class TransactionsService {
         const totalTransactions = await Transaction.countDocuments({ user })
 
         return {
-            statusCode: 200,
             message: `Transaction history for ${req.user.username}`,
             data: {
                 transactionCount: transactions.length,
@@ -36,7 +35,7 @@ class TransactionsService {
         };
     }
 
-    async fundWallet(req: Request) {
+    async fundWallet(req: Request): ServiceResponseType {
         const user = req.user.id;
         const { reference } = req.body;
 
@@ -55,8 +54,8 @@ class TransactionsService {
         await Transaction.create({
             user,
             amount,
-            type: 'credit',
-            service: 'funding',
+            type: TRX_TYPES.credit,
+            service: TRX_SERVICES.funding,
             description: 'Funding via Paystack',
             reference,
             serviceProvider: 'Paystack',
@@ -69,7 +68,7 @@ class TransactionsService {
         }
     }
 
-    async transferFunds(req: Request) {
+    async transferFunds(req: Request): ServiceResponseType {
         const userId = req.user.id;
         const { error } = validators.transferFunds.validate(req.body, validators.options);
 
@@ -103,8 +102,8 @@ class TransactionsService {
         const transaction = await Transaction.create({
             user: userId,
             amount,
-            type: 'debit',
-            service: 'wallet transfer',
+            type: TRX_TYPES.debit,
+            service: TRX_SERVICES.walletTransfer,
             description: `Wallet transfer to ${recipient.username}`,
             reference: await generateReference('WTR'),
             serviceProvider: 'Wallet2Wallet',
@@ -115,8 +114,8 @@ class TransactionsService {
         await Transaction.create({
             user: recipient._id,
             amount,
-            type: 'credit',
-            service: 'wallet transfer',
+            type: TRX_TYPES.credit,
+            service: TRX_SERVICES.walletTransfer,
             description: `Wallet transfer from ${req.user.username}`,
             reference: await generateReference('RW'),
             serviceProvider: 'Wallet2Wallet',
@@ -124,7 +123,6 @@ class TransactionsService {
         });
 
         return {
-            statusCode: 200,
             message: `Funds sent to ${recipient.username} successfully!`,
             data: {
                 balance: await calcBalance(userId),
@@ -134,10 +132,9 @@ class TransactionsService {
         }
     }
 
-    async getNetworks() {
+    async getNetworks(): ServiceResponseType {
         const networks = await blochq.getOperators('telco');
         return {
-            statusCode: 200,
             message: 'Telecom operators',
             data: networks
         }
@@ -184,7 +181,7 @@ class TransactionsService {
         }
     }
 
-    getPhoneNetwork(req: Request): ServiceResponseTypeSync {
+    async getPhoneNetwork(req: Request): ServiceResponseType {
         const phone = req.query.phone as string;
         const network = phoneNetworks[phone.slice(0, 4)];
 
@@ -192,7 +189,6 @@ class TransactionsService {
             throw appError(404, `Cannot determine network for ${phone}`)
 
         return {
-            statusCode: 200,
             message: 'Phone network',
             data: { network, phone }
         }

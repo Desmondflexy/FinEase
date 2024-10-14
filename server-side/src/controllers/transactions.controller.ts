@@ -1,126 +1,50 @@
 import { Request, Response } from 'express';
-import response from '../utils/response';
+import handleRequest from '../utils/response';
 import transactionsService from '../services/transactions.service';
 
 class TransactionsController {
     async getTransactions(req: Request, res: Response) {
-        try {
-            const result = await transactionsService.getTransactions(req);
-            const { data, statusCode, message } = result;
-            return response.handleSuccess(statusCode, message, res, { ...data });
-        }
-        catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+        handleRequest(req, res, transactionsService.getTransactions);
     }
 
-    async fundWallet(req: Request, res: Response) {
-        try {
-            const result = await transactionsService.fundWallet(req);
-            const { statusCode, message, data } = result;
-            return response.handleSuccess(statusCode, message, res, { ...data });
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    fundWallet(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.fundWallet);
     }
 
-    async transferFunds(req: Request, res: Response) {
-        try {
-            const result = await transactionsService.transferFunds(req);
-            const { statusCode, message, data } = result;
-            return response.handleSuccess(statusCode, message, res, { ...data });
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    transferFunds(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.transferFunds);
     }
 
-    async getNetworks(req: Request, res: Response) {
-        try {
-            const result = await transactionsService.getNetworks();
-            const { statusCode, message, data } = result;
-            return response.handleSuccess(statusCode, message, res, { networks: data });
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    getNetworks(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.getNetworks, 'networks');
     }
 
-    async buyAirtime(req: Request, res: Response) {
-        try {
-            const result = await transactionsService.buyAirtime(req);
-            const { statusCode, message, data } = result;
-            return response.handleSuccess(statusCode, message, res, { ...data });
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    buyAirtime(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.buyAirtime);
     }
 
     getPhoneNetwork(req: Request, res: Response) {
-        try {
-            const result = transactionsService.getPhoneNetwork(req);
-            const { statusCode, message, data } = result;
-            return response.handleSuccess(statusCode, message, res, { ...data });
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+        handleRequest(req, res, transactionsService.getPhoneNetwork);
     }
 
-    async getDataPlans(req: Request, res: Response) {
-        try {
-            const result = await transactionsService.getDataPlans(req);
-            const { statusCode, message, data } = result;
-            return response.handleSuccess(statusCode, message, res, { dataPlans: data });
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    getDataPlans(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.getDataPlans, 'dataPlans');
     }
 
-    async buyData(req: Request, res: Response) {
-        try {
-            const result = await transactionsService.buyData(req);
-            const { statusCode, message, data } = result;
-            return response.handleSuccess(statusCode, message, res, { ...data });
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    buyData(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.buyData);
     }
 
-    async validateCustomer(req: Request, res: Response) {
-        try {
-            const result = await transactionsService.validateCustomer(req);
-            const { statusCode, message, data } = result;
-            return response.handleSuccess(statusCode, message, res, { customer: data });
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    validateCustomer(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.validateCustomer);
     }
 
-    async buyElectricity(req: Request, res: Response) {
-        try {
-            const result = await transactionsService.buyElectricity(req);
-            const { statusCode, message, data } = result;
-            return response.handleSuccess(statusCode, message, res, { ...data });
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    buyElectricity(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.buyElectricity,);
     }
 
-    async getDiscos(req:Request, res:Response) {
-        try {
-            const result = await transactionsService.getDiscos();
-            const {statusCode, message, data} = result;
-            return response.handleSuccess(statusCode, message, res, {discos: data});
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    getDiscos(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.getDiscos, 'discos');
     }
 }
 

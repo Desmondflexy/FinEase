@@ -148,7 +148,7 @@ export default function Signup({ admin }: { admin: boolean }) {
                     {loading ? <>
                         <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
                         <span role="status">Preparing your account... Please wait</span>
-                    </> : "Login"}
+                    </> : "Signup"}
                 </button>
             </div>
 

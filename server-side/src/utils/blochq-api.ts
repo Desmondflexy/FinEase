@@ -1,22 +1,14 @@
 import axios from 'axios';
 import { phoneNetworks } from './constants';
-import { generateRandomToken } from './utils';
+import { generateRandomToken } from '.';
 
 /**The Blochq Api class */
 class Blochq {
-    private dataCategoryId: string;
-    private airtimeCategoryId: string;
-    private billsUrl: string;
-    private fakeResponse: boolean;
-    private reqHeadersConfig: IReqHeadersConfig;
-
-    constructor() {
-        this.dataCategoryId = 'pctg_ftZLPijqrVsTan5Ag7khQx';
-        this.airtimeCategoryId = 'pctg_xkf8nz3rFLjbooWzppWBG6';
-        this.billsUrl = 'https://api.blochq.io/v1/bills';
-        this.fakeResponse = Boolean(Number(process.env.FAKE_API));
-        this.reqHeadersConfig = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } }
-    }
+    private dataCategoryId = 'pctg_ftZLPijqrVsTan5Ag7khQx';
+    private airtimeCategoryId = 'pctg_xkf8nz3rFLjbooWzppWBG6';
+    private billsUrl = 'https://api.blochq.io/v1/bills';
+    private fakeResponse = Boolean(Number(process.env.FAKE_API));
+    private reqHeadersConfig = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private handleError(error: any, message: string) {
@@ -30,7 +22,6 @@ class Blochq {
             const response = await axios.get(url, this.reqHeadersConfig);
             return response.data.data;
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             this.handleError(error, error.response.data.message);
         }
@@ -153,7 +144,6 @@ class Blochq {
 
             return { result: response.data.data, error: null };
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error(error);
             return { result: null, error: { message: error.response.data.message } };

@@ -1,129 +1,58 @@
 import { Request, Response } from 'express';
-import response from '../utils/response';
+import handleRequest from '../utils/response';
 import userService from '../services/users.service';
-import { attachToken } from '../utils/jwt';
 
 class UserController {
-    async allUsers(req: Request, res: Response) {
-        try {
-            const result = await userService.allUsers(req);
-            const { users, totalUsers, totalPages, currentPage } = result;
-            return response.handleSuccess(result.statusCode, result.message, res, { totalUsers, totalPages, currentPage, users });
-        }
-        catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    allUsers(req: Request, res: Response) {
+        handleRequest(req, res, userService.allUsers);
     }
 
-    async signup(req: Request, res: Response) {
-        try {
-            const result = await userService.signup(req);
-            return response.handleSuccess(result.statusCode, result.message, res, { userId: result.userId });
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    signup(req: Request, res: Response) {
+        handleRequest(req, res, userService.signup, 'userId');
     }
 
-    async login(req: Request, res: Response) {
-        try {
-            const result = await userService.login(req);
-            attachToken(res, result.token);
-            return response.handleSuccess(result.statusCode, result.message, res, { token: result.token });
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    login(req: Request, res: Response) {
+        handleRequest(req, res, () => userService.login(req, res));
     }
 
-    async logout(req: Request, res: Response) {
-        try {
-            const result = await userService.logout(req);
-            res.clearCookie('token');
-            return response.handleSuccess(result.statusCode, result.message, res);
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    logout(req: Request, res: Response) {
+        handleRequest(req, res, () => userService.logout(req, res));
     }
 
-    async isAvailable(req: Request, res: Response) {
-        try {
-            const result = await userService.isAvailable(req);
-            return response.handleSuccess(result.statusCode, result.message, res);
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    isAvailable(req: Request, res: Response) {
+        handleRequest(req, res, userService.isAvailable);
     }
 
-    async verifyEmail(req: Request, res: Response) {
-        try {
-            const result = await userService.verifyEmail(req);
-            return response.handleSuccess(result.statusCode, result.message, res);
-
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    verifyEmail(req: Request, res: Response) {
+        handleRequest(req, res, userService.verifyEmail);
     }
 
-    async sendPasswordResetLink(req: Request, res: Response) {
-        try {
-            const result = await userService.sendPasswordResetLink(req);
-            return response.handleSuccess(result.statusCode, result.message, res)
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    sendPasswordResetLink(req: Request, res: Response) {
+        handleRequest(req, res, userService.sendPasswordResetLink);
     }
 
-    async resetPassword(req: Request, res: Response) {
-        try {
-            const result = await userService.resetPassword(req);
-            return response.handleSuccess(result.statusCode, result.message, res);
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    resetPassword(req: Request, res: Response) {
+        handleRequest(req, res, userService.resetPassword);
     }
 
-    async me(req: Request, res: Response) {
-        try {
-            const result = await userService.me(req);
-            return response.handleSuccess(result.statusCode, result.message, res, result.data);
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    me(req: Request, res: Response) {
+        handleRequest(req, res, userService.me, 'user');
     }
 
-    async getBalance(req: Request, res: Response) {
-        try {
-            const result = await userService.getBalance(req);
-            return response.handleSuccess(result.statusCode, result.message, res, result.data);
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    getBalance(req: Request, res: Response) {
+        handleRequest(req, res, userService.getBalance, 'balance');
     }
 
-    async getUserFullName(req: Request, res: Response) {
-        try {
-            const result = await userService.getUserFullName(req);
-            return response.handleSuccess(result.statusCode, result.message, res, result.data);
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    getUserFullName(req: Request, res: Response) {
+        handleRequest(req, res, userService.getUserFullName, 'fullName');
     }
 
-    async updateUser(req: Request, res: Response) {
-        try {
-            const result = await userService.updateUser(req);
-            return response.handleSuccess(result.statusCode, result.message, res, result.data);
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    updateUser(req: Request, res: Response) {
+        handleRequest(req, res, userService.updateUser, 'user');
     }
 
-    async accountInfo(req: Request, res: Response) {
-        try {
-            const result = await userService.accountInfo(req);
-            return response.handleSuccess(result.statusCode, result.message, res, { user: result.data });
-        } catch (error: any) {
-            return response.handleError(error.statusCode, error.message, res);
-        }
+    accountInfo(req: Request, res: Response) {
+        handleRequest(req, res, userService.accountInfo, 'user');
     }
 }
 

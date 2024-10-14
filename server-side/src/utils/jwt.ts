@@ -1,3 +1,4 @@
+import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 export function signToken(user: IUser) {
@@ -19,8 +20,14 @@ export function verifyToken(token: string) {
     return jwt.verify(token, secretKey);
 }
 
-export function attachToken(res: any, token: string) {
+export function attachToken(res: Response, token: string) {
     const expiresIn = Number(process.env.JWT_EXPIRES_IN) * 3600;
     res.setHeader('Authorization', `Bearer ${token}`);
     res.cookie("token", token, { maxAge: expiresIn * 1000, httpOnly: true });
+}
+
+/** Remove the token from the authorization headers and cookies */
+export function removeToken(res: Response) {
+    res.setHeader("Authorization", "");
+    res.clearCookie("token");
 }

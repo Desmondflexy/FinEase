@@ -1,28 +1,30 @@
-import { Response } from "express";
-import db from "../models";
+import { Request } from "express";
+import { User, Transaction } from "../models";
+import Joi from "joi";
+
 export async function generateAcctNo() {
     let acctNo = Math.floor(Math.random() * 10000000000);
-    let user = await db.User.findOne({ acctNo });
+    let user = await User.findOne({ acctNo });
     while (user) {
         acctNo = Math.floor(Math.random() * 10000000000);
-        user = await db.User.findOne({ acctNo });
+        user = await User.findOne({ acctNo });
     }
     return String(acctNo);
 }
 
 export async function generateReference(prefix: string) {
     let ref = Math.floor(Math.random() * 10000000000);
-    let trx = await db.Transaction.findOne({ reference: prefix + ref });
+    let trx = await Transaction.findOne({ reference: prefix + ref });
     while (trx) {
         ref = Math.floor(Math.random() * 10000000000);
-        trx = await db.Transaction.findOne({ reference: prefix + ref });
+        trx = await Transaction.findOne({ reference: prefix + ref });
     }
     return prefix + ref;
 }
 
 export async function calcBalance(user: string) {
     try {
-        const transactions = await db.Transaction.find({ user });
+        const transactions = await Transaction.find({ user });
         const balance = transactions.reduce((acc, curr) => {
             if (curr.type === 'credit') return acc + curr.amount;
             return acc - curr.amount;
@@ -48,7 +50,7 @@ export function generateRandomToken() {
 
 /**Used during user registration to check if the value of a given field has not been taken. */
 export async function isFieldAvailable(field: string, value: string) {
-    const found = Boolean(await db.User.findOne({ [field]: value }));
+    const found = Boolean(await User.findOne({ [field]: value }));
     return !found;
 }
 
@@ -57,12 +59,9 @@ export function appError(statusCode: number, message: string) {
     return { statusCode, message }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function errorHandler(error: any, res: Response) {
-    res.status(500)
-    return res.json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message
-    })
+/**Validates request data (body, query or params) against schema. Returns request data if valid otherwise throws an error */
+export function validateRequestData(req: Request, validatorSchema: Joi.ObjectSchema<any>, reqType: 'body' | 'query' | 'params' = 'body') {
+    const { error } = validatorSchema.validate(req[reqType]);
+    if (error) throw appError(400, error.message);
+    return req[reqType];
 }

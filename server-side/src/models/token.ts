@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { MODELS, TOKEN_TYPES } from "../utils/constants";
 
 const tokenSchema = new mongoose.Schema<IToken>(
     {
@@ -9,7 +10,7 @@ const tokenSchema = new mongoose.Schema<IToken>(
         type: {
             type: String,
             required: true,
-            enum: ["email", "password"],
+            enum: Object.values(TOKEN_TYPES),
         },
         expires: {
             type: Number,
@@ -21,6 +22,6 @@ const tokenSchema = new mongoose.Schema<IToken>(
     }
 );
 
-const Token = mongoose.model<IToken>("Token", tokenSchema);
+const Token = mongoose.model<IToken>(MODELS.token, tokenSchema);
 
 export default Token;
