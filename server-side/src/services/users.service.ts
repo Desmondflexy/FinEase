@@ -204,7 +204,7 @@ class UserService {
         const { acctNoOrUsername } = req.query;
         const user = await User.findOne({ acctNo: acctNoOrUsername }).select('fullName') || await User.findOne({ username: acctNoOrUsername }).select('fullName');
         if (!user) throw appError(404, 'User not found');
-        return { data: { fullName: user.fullName }, message: "User full name" }
+        return { data: { fullName: user.fullName }, message: "User fullname" }
     }
 
     async updateUser(req: Request) {

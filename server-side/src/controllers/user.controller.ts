@@ -44,7 +44,7 @@ class UserController {
     }
 
     getUserFullName(req: Request, res: Response) {
-        handleRequest(req, res, userService.getUserFullName, 'fullName');
+        handleRequest(req, res, userService.getUserFullName);
     }
 
     updateUser(req: Request, res: Response) {

@@ -64,7 +64,7 @@ export default function Transactions() {
                     </tbody>
                 </table>
             </div>
-            {page === state.totalPages && page === 1 ? null :
+            {(page === state.totalPages && page === 1) || state.totalPages === 0 ? null :
                 <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
                     <button disabled={page === 1} onClick={handlePrevious}>Prev Page</button>
                     <span>{state.fetchingTransactions ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
