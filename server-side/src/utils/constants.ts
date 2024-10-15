@@ -2,6 +2,24 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// export const ENV = {
+//     NODE_ENV: process.env.NODE_ENV,
+//     PORT: process.env.PORT,
+//     DATABASE_URL: process.env.DATABASE_URL,
+//     JWT_SECRET: process.env.JWT_SECRET,
+//     JWT_EXPIRES_IN: Number(process.env.JWT_EXPIRES_IN),
+//     CLIENT_URL: process.env.CLIENT_URL,
+//     SERVER_URL: process.env.SERVER_URL,
+//     ADMIN_KEY: process.env.ADMIN_KEY,
+//     PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
+//     BLOCHQ_SECRET: process.env.BLOCHQ_SECRET,
+//     GMAIL: process.env.GMAIL,
+//     GMAIL_PASSWORD: process.env.GMAIL_PASSWORD,
+//     GMAIL_PORT: process.env.GMAIL_PORT,
+//     GMAIL_HOST: process.env.GMAIL_HOST,
+//     FAKE_API: process.env.FAKE_API
+// }
+
 export const phoneNetworks: { [key: string]: string } = {
     "0701": "Airtel",
     "0702": "MTN",
