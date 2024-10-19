@@ -1,51 +1,31 @@
 import axios from "axios";
-
-// export async function verifyTransaction(ref: string) {
-//     const authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` } }
-//     const url = `https://api.paystack.co/transaction/verify/${ref}`;
-//     try {
-//         const response = await axios.get(url, authorizationHeaders);
-//         return response.data;
-//     }
-//     catch {
-//         throw new Error("Error verifying transaction");
-//     }
-// }
+import { appError } from ".";
 
 class Paystack {
     private authorizationHeaders = { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` } }
     private baseUrl = "https://api.paystack.co";
 
-    async verifyTransaction(ref: string) {
+    async initialize(amount: number, email: string) {
+        const url = `${this.baseUrl}/transaction/initialize`;
+        try {
+            const response = await axios.post(url, { amount, email }, this.authorizationHeaders);
+            return response.data.data;
+        } catch (error: any) {
+            throw appError(500, "Error initializing transaction");
+        }
+    }
+
+    async verify(ref: string) {
         const url = `${this.baseUrl}/transaction/verify/${ref}`;
         try {
             const response = await axios.get(url, this.authorizationHeaders);
-            return response.data;
-        }
-        catch {
-            throw new Error("Error verifying transaction");
-        }
-    }
-
-    async initiateTransfer(data: { amount: number, recipient: string, source: string }) {
-        const url = `${this.baseUrl}/transfer`;
-        try {
-            const response = await axios.post(url, data, this.authorizationHeaders);
-            return response.data;
-        }
-        catch {
-            throw new Error("Error initiating transfer");
-        }
-    }
-
-    async finalizeTransfer(ref: string, otp: string) {
-        const url = `${this.baseUrl}/transfer/finalize_transfer/${ref}`;
-        try {
-            const response = await axios.post(url, { otp }, this.authorizationHeaders);
-            return response.data;
-        }
-        catch {
-            throw new Error("Error finalizing transfer");
+            const result = response.data.data;
+            if (result.status !== 'success') {
+                throw new Error(result.gateway_response);
+            }
+            return result.amount;
+        } catch (error: any) {
+            throw appError(400, 'Could not verify transaction', error.message);
         }
     }
 }

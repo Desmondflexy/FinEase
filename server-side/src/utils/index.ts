@@ -55,13 +55,13 @@ export async function isFieldAvailable(field: string, value: string) {
 }
 
 /** Always throw this error object */
-export function appError(statusCode: number, message: string) {
-    return { statusCode, message }
+export function appError(statusCode: number, message: string, details?: any) {
+    return { statusCode, message, details }
 }
 
 /**Validates request data (body, query or params) against schema. Returns request data if valid otherwise throws an error */
 export function validateRequestData(req: Request, validatorSchema: Joi.ObjectSchema<any>, reqType: 'body' | 'query' | 'params' = 'body') {
-    const { error } = validatorSchema.validate(req[reqType]);
+    const { error } = validatorSchema.validate(req[reqType], { abortEarly: true, errors: { wrap: { label: "" } } });
     if (error) throw appError(400, error.message);
     return req[reqType];
 }

@@ -53,17 +53,12 @@ class UserService {
         return {
             statusCode: 201,
             message: "User created successfully",
-            data: user.id
+            data: { userId: user.id }
         };
     }
 
     async login(req: Request, res: Response): ServiceResponseType {
-        const { error } = validators.login.validate(req.body, validators.options);
-        if (error) {
-            throw { statusCode: 400, message: error.message }
-        }
-
-        const { emailOrUsername, password } = req.body;
+        const { emailOrUsername, password } = validateRequestData(req, validators.login);
 
         // check if user exists
         const user = await User.findOne({ email: emailOrUsername }) || await User.findOne({ username: emailOrUsername });
@@ -97,11 +92,10 @@ class UserService {
         const { field, value } = req.params;
         const available = await isFieldAvailable(field, value);
 
-        if (available) {
-            return { message: `${field} is available` };
-        } else {
+        if (!available)
             throw appError(409, `${field} is not available`);
-        }
+
+        return { message: `${field} is available` };
     }
 
     async verifyEmail(req: Request): ServiceResponseType {
@@ -143,9 +137,6 @@ class UserService {
     }
 
     async resetPassword(req: Request): ServiceResponseType {
-        const { error } = validators.resetPassword.validate(req.body, validators.options);
-        if (error) throw appError(400, error.message);
-
         const { password } = validateRequestData(req, validators.resetPassword);
         const { resetId } = req.params;
 
@@ -165,6 +156,7 @@ class UserService {
     }
 
     async allUsers(req: Request): ServiceResponseType {
+        console.log(123);
         const requiredInfo = '_id username fullName email phone acctNo createdAt';
         const limit = Number(req.query.limit) || 10;
         const page = Number(req.query.page) || 1;
@@ -190,28 +182,29 @@ class UserService {
     async me(req: Request): ServiceResponseType {
         return {
             message: "Logged in user",
-            data: req.user
+            data: { user: req.user }
         }
     }
 
     async getBalance(req: Request) {
         const user = req.user.id;
         const balance = await calcBalance(user);
-        return { data: { balance }, message: "User account balance" }
+        return {
+            data: { balance },
+            message: "User account balance"
+        }
     }
 
     async getUserFullName(req: Request) {
         const { acctNoOrUsername } = req.query;
+        if (!acctNoOrUsername) throw appError(400, 'acctNoOrUsername is required');
         const user = await User.findOne({ acctNo: acctNoOrUsername }).select('fullName') || await User.findOne({ username: acctNoOrUsername }).select('fullName');
         if (!user) throw appError(404, 'User not found');
         return { data: { fullName: user.fullName }, message: "User fullname" }
     }
 
     async updateUser(req: Request) {
-        const { error } = validators.updateUser.validate(req.body, validators.options);
-        if (error) throw appError(400, error.message);
-
-        const { first, last, phone, email, password, oldPassword } = req.body;
+        const { first, last, phone, email, password, oldPassword } = validateRequestData(req, validators.updateUser);
         const user = await User.findById(req.user.id);
 
         if (!user) throw appError(404, 'User not found');
@@ -243,7 +236,7 @@ class UserService {
         await user.save();
         return {
             message: 'User updated successfully',
-            data: user
+            data: { user }
         };
     }
 
@@ -256,9 +249,11 @@ class UserService {
         return {
             message: "User profile",
             data: {
-                ...user.toJSON(),
-                balance: await calcBalance(userId)
-            },
+                user: {
+                    ...user.toJSON(),
+                    balance: await calcBalance(userId)
+                },
+            }
         }
     }
 

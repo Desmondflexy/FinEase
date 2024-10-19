@@ -14,8 +14,9 @@ router.post('/airtime', transactionsController.buyAirtime);
 router.get('/phone-network', transactionsController.getPhoneNetwork);
 router.get('/data-plans', transactionsController.getDataPlans);
 router.post('/buy-data', transactionsController.buyData);
+router.get('/discos', transactionsController.getDiscos);
 router.get('/customer-validate/:operatorId', transactionsController.validateCustomer);
 router.post('/electricity', transactionsController.buyElectricity);
-router.get('/discos', transactionsController.getDiscos);
+router.post('/initialize-payment', transactionsController.initializePayment);
 
 export default router;

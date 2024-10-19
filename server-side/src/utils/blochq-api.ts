@@ -2,6 +2,8 @@ import axios from 'axios';
 import { phoneNetworks } from './constants';
 import { generateRandomToken } from '.';
 
+type Product = 'electricity' | 'telco' | 'television';
+
 /**The Blochq Api class */
 class Blochq {
     private dataCategoryId = 'pctg_ftZLPijqrVsTan5Ag7khQx';
@@ -16,7 +18,7 @@ class Blochq {
         throw new Error(message);
     }
 
-    async getOperators(bill: string) {
+    async getOperators(bill: Product) {
         const url = `${this.billsUrl}/operators?bill=${bill}`;
         try {
             const response = await axios.get(url, this.reqHeadersConfig);
@@ -40,15 +42,23 @@ class Blochq {
     }
 
     async getDataPlans(operatorId: string) {
+        type DataPlan = {
+            id: string;
+            name: string;
+            meta: {
+                fee: string;
+                data_expiry: string;
+                data_value: string
+            };
+        }
         const products = await this.getProducts(operatorId);
-        return products
-            .filter((product: { category: string }) => product.category === this.dataCategoryId)
-            .map((product: { id: string; meta: { fee: string; data_expiry: string; data_value: string }; name: string }) => {
-                const { id, meta } = product;
-                const { fee, data_value } = meta;
-                const dataPlanName = `${data_value} for ${repairKey(meta, 'data_expiry')} at ₦${Number(fee)}`
-                return { id, name: dataPlanName, amount: Number(meta.fee) * 100, meta };
-            });
+        const telcoDataPlans = products.filter((product: { category: string }) => product.category === this.dataCategoryId);
+        return telcoDataPlans.map((product: DataPlan) => {
+            const { id, meta } = product;
+            const { fee, data_value } = meta;
+            const dataPlanName = `${data_value} for ${repairKey(meta, 'data_expiry')} at ₦${Number(fee)}`
+            return { id, name: dataPlanName, amount: Number(meta.fee) * 100, meta };
+        });
 
         /**Remove extra spaces from an object key */
         function repairKey(obj: { [key: string]: string }, normalKey: string) {
@@ -61,6 +71,8 @@ class Blochq {
         const phoneNetwork = phoneNetworks[phone.slice(0, 4)]?.toLowerCase();
         const operators = await this.getOperators('telco');
         const operator: { name: string } = operators.find((i: { id: string }) => i.id === operatorId);
+        if (!operator) throw new Error('Invalid operator ID');
+
         const response = {
             isMatch: phoneNetwork?.includes(operator.name.toLowerCase()),
             selectedOperator: operator.name,
@@ -124,11 +136,12 @@ class Blochq {
     async getDataPlanMeta(dataPlanId: string, operatorId: string) {
         const products = await this.getProducts(operatorId);
         const targetPlan = products.find((product: { id: string }) => product.id === dataPlanId);
+        if (!targetPlan) throw new Error('Data plan not found with the given ID');
         const { data_value, fee } = targetPlan.meta;
         return { data_value, amount: fee * 100, operator_name: await this.getOperatorNameById(operatorId) }
     }
 
-    async getOperatorNameById(operatorId: string, bill: string = 'telco') {
+    async getOperatorNameById(operatorId: string, bill: Product = 'telco') {
         const operators = await this.getOperators(bill);
         return operators.find((i: { id: string }) => i.id === operatorId).name;
     }
@@ -145,7 +158,7 @@ class Blochq {
             return { result: response.data.data, error: null };
 
         } catch (error: any) {
-            console.error(error);
+            // console.error(error);
             return { result: null, error: { message: error.response.data.message } };
         }
     }

@@ -16,7 +16,7 @@ class TransactionsController {
     }
 
     getNetworks(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.getNetworks, 'networks');
+        handleRequest(req, res, transactionsService.getNetworks);
     }
 
     buyAirtime(req: Request, res: Response) {
@@ -28,7 +28,7 @@ class TransactionsController {
     }
 
     getDataPlans(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.getDataPlans, 'dataPlans');
+        handleRequest(req, res, transactionsService.getDataPlans);
     }
 
     buyData(req: Request, res: Response) {
@@ -44,7 +44,11 @@ class TransactionsController {
     }
 
     getDiscos(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.getDiscos, 'discos');
+        handleRequest(req, res, transactionsService.getDiscos);
+    }
+
+    initializePayment(req: Request, res: Response) {
+        handleRequest(req, res, transactionsService.initializePayment);
     }
 }
 

@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { Transaction } from '../models';
-import { appError, calcBalance, generateReference } from '../utils';
+import { appError, calcBalance, generateReference, validateRequestData } from '../utils';
 import paystack from '../utils/paystack';
 import validators from '../utils/validators';
 import User from '../models/users';
@@ -35,21 +35,26 @@ class TransactionsService {
         };
     }
 
+    async initializePayment(req: Request): ServiceResponseType {
+        const { amount } = validateRequestData(req, validators.initializePayment);
+        const userId = req.user.id;
+        const user = await User.findById(userId) as IUser;
+        const email = user.email;
+        return {
+            message: 'Payment initialized successfully',
+            data: await paystack.initialize(amount * 100, email)
+        };
+    }
+
     async fundWallet(req: Request): ServiceResponseType {
         const user = req.user.id;
-        const { reference } = req.body;
+        const { reference } = validateRequestData(req, validators.fundWallet);
 
         const processed = await Transaction.findOne({ reference });
         if (processed) {
             throw appError(409, 'This transaction has already been processed');
         }
-        const response = await paystack.verifyTransaction(reference);
-
-        if (!response.status) {
-            throw appError(422, "Could not confirm transaction")
-        }
-
-        const { amount } = response.data;
+        const amount = await paystack.verify(reference);
 
         await Transaction.create({
             user,
@@ -70,13 +75,8 @@ class TransactionsService {
 
     async transferFunds(req: Request): ServiceResponseType {
         const userId = req.user.id;
-        const { error } = validators.transferFunds.validate(req.body, validators.options);
-
-        if (error) throw appError(400, error.message);
-
-        const { acctNoOrUsername } = req.body;
+        const { acctNoOrUsername, password } = validateRequestData(req, validators.transferFunds);
         const amount = req.body.amount * 100;  // convert to kobo
-        const password = req.body.password;
 
         const requiredInfo = 'username fullName email phone';
         const recipient = await User.findOne({ acctNo: acctNoOrUsername }).select(requiredInfo) || await User.findOne({ username: acctNoOrUsername }).select(requiredInfo);
@@ -136,17 +136,14 @@ class TransactionsService {
         const networks = await blochq.getOperators('telco');
         return {
             message: 'Telecom operators',
-            data: networks
+            data: { networks }
         }
     }
 
     async buyAirtime(req: Request): ServiceResponseType {
         const user = req.user.id;
-        const { error } = validators.rechargeAirtime.validate(req.body, validators.options);
 
-        if (error) throw appError(400, error.message)
-
-        const { operatorId, phone } = req.body;
+        const { operatorId, phone } = validateRequestData(req, validators.rechargeAirtime);
         const amount = req.body.amount * 100;
 
         const userBalance = await calcBalance(user);
@@ -183,10 +180,11 @@ class TransactionsService {
 
     async getPhoneNetwork(req: Request): ServiceResponseType {
         const phone = req.query.phone as string;
+        if (!phone) throw appError(400, 'phone is required in query params');
         const network = phoneNetworks[phone.slice(0, 4)];
 
         if (!network)
-            throw appError(404, `Cannot determine network for ${phone}`)
+            throw appError(400, `Cannot determine network for ${phone}`)
 
         return {
             message: 'Phone network',
@@ -196,20 +194,17 @@ class TransactionsService {
 
     async getDataPlans(req: Request): ServiceResponseType {
         const operatorId = req.query.operatorId as string;
+        if (!operatorId) throw appError(400, 'operatorId is required in query params');
         const dataPlans = await blochq.getDataPlans(operatorId);
         return {
-            statusCode: 200,
             message: 'Data plans',
-            data: dataPlans
+            data: { dataPlans }
         }
     }
 
     async buyData(req: Request): ServiceResponseType {
         const user = req.user.id;
-        const { error } = validators.buyData.validate(req.body, validators.options);
-        if (error) throw appError(400, error.message);
-
-        const { operatorId, phone, dataPlanId } = req.body;
+        const { operatorId, phone, dataPlanId } = validateRequestData(req, validators.buyData);
         const { amount, operator_name, data_value } = await blochq.getDataPlanMeta(dataPlanId, operatorId);
 
         const userBalance = await calcBalance(user);
@@ -247,32 +242,26 @@ class TransactionsService {
     async validateCustomer(req: Request): ServiceResponseType {
         const { operatorId } = req.params;
         const { bill, deviceNumber } = req.query;
-        console.log('>>>>validate customer', operatorId, bill, deviceNumber);
         const { error, result } = await blochq.validateCustomerDevice(operatorId as string, bill as string, deviceNumber as string);
 
         if (error) throw appError(404, error.message);
 
         return {
-            statusCode: 200,
             message: "Customer details",
-            data: result
+            data: { customer: result }
         }
     }
 
     async getDiscos(): ServiceResponseType {
         const discos = await blochq.getOperators('electricity');
         return {
-            statusCode: 200,
             message: 'Electricity distribution companies',
-            data: discos
+            data: { discos }
         };
     }
 
     async buyElectricity(req: Request): ServiceResponseType {
-        const { error } = validators.buyElectricity.validate(req.body, validators.options);
-        if (error) throw appError(400, error.message);
-
-        const { amount, operatorId, meterType, meterNumber } = req.body;
+        const { amount, operatorId, meterType, meterNumber } = validateRequestData(req, validators.buyElectricity);
         if (amount < 500) {
             throw appError(400, 'Minimum amount is 500');
         }

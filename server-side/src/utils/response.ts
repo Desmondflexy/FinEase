@@ -7,24 +7,22 @@ class ApiResponse {
     }
 
     // not private because it will be used in other places like the auth middleware
-    handleError = (res: Response, statusCode: number = 500, message: string) => {
+    handleError = (res: Response, statusCode: number = 500, message: string, error: string) => {
         const success = false;
-        return res.status(statusCode).json({ success, message });
+        return res.status(statusCode).json({ success, message, error });
     }
 
     /**
      * Handle HTTP request and return an HTTP response for the given service method.
-     * Use dataName to wrap the response data inside an object if needed.
      */
-    handleRequest = async (req: Request, res: Response, serviceMethod: ServiceMethod, dataName?: string) => {
+    handleRequest = async (req: Request, res: Response, serviceMethod: ServiceMethod) => {
         try {
             const result = await serviceMethod(req);
             const { data, statusCode, message } = result;
-            const responseData = dataName ? { [dataName]: data } : { ...data };
-            return this.handleSuccess(res, statusCode, message, responseData);
+            return this.handleSuccess(res, statusCode, message, data);
         } catch (error: any) {
             console.log(error);
-            return this.handleError(res, error.statusCode, error.message);
+            return this.handleError(res, error.statusCode, error.message, error.details);
         }
     }
 }

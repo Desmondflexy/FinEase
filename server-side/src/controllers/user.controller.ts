@@ -8,7 +8,7 @@ class UserController {
     }
 
     signup(req: Request, res: Response) {
-        handleRequest(req, res, userService.signup, 'userId');
+        handleRequest(req, res, userService.signup);
     }
 
     login(req: Request, res: Response) {
@@ -36,11 +36,11 @@ class UserController {
     }
 
     me(req: Request, res: Response) {
-        handleRequest(req, res, userService.me, 'user');
+        handleRequest(req, res, userService.me);
     }
 
     getBalance(req: Request, res: Response) {
-        handleRequest(req, res, userService.getBalance, 'balance');
+        handleRequest(req, res, userService.getBalance);
     }
 
     getUserFullName(req: Request, res: Response) {
@@ -48,11 +48,11 @@ class UserController {
     }
 
     updateUser(req: Request, res: Response) {
-        handleRequest(req, res, userService.updateUser, 'user');
+        handleRequest(req, res, userService.updateUser);
     }
 
     accountInfo(req: Request, res: Response) {
-        handleRequest(req, res, userService.accountInfo, 'user');
+        handleRequest(req, res, userService.accountInfo);
     }
 }
 
