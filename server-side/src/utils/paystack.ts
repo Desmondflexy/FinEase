@@ -30,4 +30,4 @@ class Paystack {
     }
 }
 
-export default new Paystack();
+export const paystack = new Paystack();

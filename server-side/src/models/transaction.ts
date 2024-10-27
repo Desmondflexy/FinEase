@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { MODELS, TRX_SERVICES, TRX_TYPES } from '../utils/constants';
+import { MODELS, TRX_SERVICES, TRX_TYPES } from '../utils';
 
 const transactionSchema = new mongoose.Schema<ITransaction>({
     user: {
@@ -46,5 +46,4 @@ const transactionSchema = new mongoose.Schema<ITransaction>({
     timestamps: true
 });
 
-const Transaction = mongoose.model<ITransaction>(MODELS.transaction, transactionSchema);
-export default Transaction;
+export const Transaction = mongoose.model<ITransaction>(MODELS.transaction, transactionSchema);

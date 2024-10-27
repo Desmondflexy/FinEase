@@ -201,6 +201,4 @@ class Blochq {
     }
 }
 
-const blochq = new Blochq();
-
-export default blochq;
+export const blochq = new Blochq();

@@ -1,9 +1,7 @@
 import express, { Request, Response, Router } from 'express';
-import authRouter from "./auth";
-import usersRouter from "./users";
-import transactionRouter from "./transaction";
-
-const router = express.Router();
+import { authRouter } from './auth';
+import { usersRouter } from './users';
+import { transactionRouter } from './transaction';
 
 type RoutesListType = {
     path: string;
@@ -16,10 +14,10 @@ const defaultRoutes: RoutesListType = [
     { path: "/transaction", route: transactionRouter },
 ];
 
+export const appRouter = express.Router();
 defaultRoutes.forEach((route) => {
-    router.use(route.path, route.route);
+    appRouter.use(route.path, route.route);
 });
-
 
 export const homeRouter = express.Router();
 homeRouter.get('/', async function (req: Request, res: Response) {
@@ -27,5 +25,3 @@ homeRouter.get('/', async function (req: Request, res: Response) {
         title: 'FinEase API'
     });
 });
-
-export default router;

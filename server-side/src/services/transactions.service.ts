@@ -1,12 +1,8 @@
 import { Request } from 'express';
-import { Transaction } from '../models';
-import { appError, calcBalance, generateReference, validateRequestData } from '../utils';
-import paystack from '../utils/paystack';
-import validators from '../utils/validators';
-import User from '../models/users';
+import { Transaction, User } from '../models';
 import bcrypt from 'bcryptjs';
-import blochq from '../utils/blochq-api';
-import { phoneNetworks, TRX_TYPES, TRX_SERVICES } from '../utils/constants';
+import { phoneNetworks, TRX_TYPES, TRX_SERVICES, blochq, validator, paystack, appError,
+    calcBalance, generateReference, validateRequestData } from '../utils';
 
 class TransactionsService {
     async getTransactions(req: Request): ServiceResponseType {
@@ -36,7 +32,7 @@ class TransactionsService {
     }
 
     async initializePayment(req: Request): ServiceResponseType {
-        const { amount } = validateRequestData(req, validators.initializePayment);
+        const { amount } = validateRequestData(req, validator.initializePayment);
         const userId = req.user.id;
         const user = await User.findById(userId) as IUser;
         const email = user.email;
@@ -48,7 +44,7 @@ class TransactionsService {
 
     async fundWallet(req: Request): ServiceResponseType {
         const user = req.user.id;
-        const { reference } = validateRequestData(req, validators.fundWallet);
+        const { reference } = validateRequestData(req, validator.fundWallet);
 
         const processed = await Transaction.findOne({ reference });
         if (processed) {
@@ -75,7 +71,7 @@ class TransactionsService {
 
     async transferFunds(req: Request): ServiceResponseType {
         const userId = req.user.id;
-        const { acctNoOrUsername, password } = validateRequestData(req, validators.transferFunds);
+        const { acctNoOrUsername, password } = validateRequestData(req, validator.transferFunds);
         const amount = req.body.amount * 100;  // convert to kobo
 
         const requiredInfo = 'username fullName email phone';
@@ -143,7 +139,7 @@ class TransactionsService {
     async buyAirtime(req: Request): ServiceResponseType {
         const user = req.user.id;
 
-        const { operatorId, phone } = validateRequestData(req, validators.rechargeAirtime);
+        const { operatorId, phone } = validateRequestData(req, validator.rechargeAirtime);
         const amount = req.body.amount * 100;
 
         const userBalance = await calcBalance(user);
@@ -204,7 +200,7 @@ class TransactionsService {
 
     async buyData(req: Request): ServiceResponseType {
         const user = req.user.id;
-        const { operatorId, phone, dataPlanId } = validateRequestData(req, validators.buyData);
+        const { operatorId, phone, dataPlanId } = validateRequestData(req, validator.buyData);
         const { amount, operator_name, data_value } = await blochq.getDataPlanMeta(dataPlanId, operatorId);
 
         const userBalance = await calcBalance(user);
@@ -261,7 +257,7 @@ class TransactionsService {
     }
 
     async buyElectricity(req: Request): ServiceResponseType {
-        const { amount, operatorId, meterType, meterNumber } = validateRequestData(req, validators.buyElectricity);
+        const { amount, operatorId, meterType, meterNumber } = validateRequestData(req, validator.buyElectricity);
         if (amount < 500) {
             throw appError(400, 'Minimum amount is 500');
         }
@@ -304,5 +300,4 @@ class TransactionsService {
     }
 }
 
-const transactionsService = new TransactionsService();
-export default transactionsService;
+export const transactionService = new TransactionsService();

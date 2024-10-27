@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import handleRequest from '../utils/response';
-import userService from '../services/users.service';
+import { handleRequest } from '../utils';
+import { userService } from '../services';
 
 class UserController {
     allUsers(req: Request, res: Response) {
@@ -56,5 +56,4 @@ class UserController {
     }
 }
 
-const userController = new UserController;
-export default userController;
+export const userController = new UserController;

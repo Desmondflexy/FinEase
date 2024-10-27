@@ -1,15 +1,12 @@
 import express from 'express';
-import { authenticate, adminPass } from '../middleware/auth';
-import userController from '../controllers/user.controller';
-const router = express.Router();
+import { authenticate, adminPass } from '../middleware';
+import { userController } from '../controllers';
 
-// /account
-router.use(authenticate)
-router.get('/', userController.accountInfo);
-router.get('/me', userController.me);
-router.get('/all-users', adminPass, userController.allUsers);
-router.get("/balance", userController.getBalance);
-router.get('/confirm-user', userController.getUserFullName);
-router.put('/', userController.updateUser);
-
-export default router;
+export const usersRouter = express.Router();
+usersRouter.use(authenticate)
+usersRouter.get('/', userController.accountInfo);
+usersRouter.get('/me', userController.me);
+usersRouter.get('/all-users', adminPass, userController.allUsers);
+usersRouter.get("/balance", userController.getBalance);
+usersRouter.get('/confirm-user', userController.getUserFullName);
+usersRouter.put('/', userController.updateUser);

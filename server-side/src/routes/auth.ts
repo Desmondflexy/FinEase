@@ -1,14 +1,12 @@
 import express from 'express';
-import userController from '../controllers/user.controller';
-const router = express.Router();
+import { userController } from '../controllers';
 
-router.post('/signup', userController.signup);
-router.post('/login', userController.login);
-router.post('/logout', userController.logout);
-router.post('/admin-signup', userController.signup);
-router.get('/check/:field/:value', userController.isAvailable);
-router.post('/email-verify/:verifyId', userController.verifyEmail);
-router.post('/forgot-password', userController.sendPasswordResetLink);
-router.post('/reset-password/:resetId', userController.resetPassword);
-
-export default router;
+export const authRouter = express.Router();
+authRouter.post('/signup', userController.signup);
+authRouter.post('/login', userController.login);
+authRouter.post('/logout', userController.logout);
+authRouter.post('/admin-signup', userController.signup);
+authRouter.get('/check/:field/:value', userController.isAvailable);
+authRouter.post('/email-verify/:verifyId', userController.verifyEmail);
+authRouter.post('/forgot-password', userController.sendPasswordResetLink);
+authRouter.post('/reset-password/:resetId', userController.resetPassword);

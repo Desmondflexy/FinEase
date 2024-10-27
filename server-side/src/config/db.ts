@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-async function connectDb() {
+export async function connectDb() {
     const databaseUrl = process.env.NODE_ENV === 'development'
         ? 'mongodb://localhost:27017/finEase'
         : process.env.DATABASE_URL as string;
@@ -11,5 +11,3 @@ async function connectDb() {
         console.error('Database connection failed', error);
     }
 }
-
-export default connectDb;

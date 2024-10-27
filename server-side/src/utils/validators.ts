@@ -1,7 +1,7 @@
 import joi from "joi";
 import { phoneNumberRegex } from "./constants";
 
-class Validators {
+class JoiValidator {
     signup = joi.object().keys({
         first: joi.string().required(),
         last: joi.string().required(),
@@ -10,6 +10,16 @@ class Validators {
         phone: joi.string().required().length(11),
         password: joi.string().min(6).required(),
         confirm: joi.string().valid(joi.ref('password')).required().messages({ 'any.only': 'Passwords do not match' }),
+    });
+
+    updateUser = joi.object().keys({
+        first: joi.string().max(50),
+        last: joi.string().max(50),
+        email: joi.string().email(),
+        phone: joi.string().regex(phoneNumberRegex).messages({ 'string.pattern.base': 'Invalid phone number' }),
+        password: joi.string().min(6),
+        confirm: joi.string().valid(joi.ref('password')).messages({ 'any.only': 'Passwords do not match' }),
+        oldPassword: joi.string(),
     });
 
     login = joi.object().keys({
@@ -53,15 +63,6 @@ class Validators {
         meterNumber: joi.string().required(),
     });
 
-    updateUser = joi.object().keys({
-        first: joi.string().max(50),
-        last: joi.string().max(50),
-        email: joi.string().email(),
-        phone: joi.string().regex(phoneNumberRegex).messages({ 'string.pattern.base': 'Invalid phone number' }),
-        password: joi.string().min(6),
-        confirm: joi.string().valid(joi.ref('password')).messages({ 'any.only': 'Passwords do not match' }),
-        oldPassword: joi.string(),
-    });
 
     forgotPassword = joi.object().keys({
         email: joi.string().email().required().trim(),
@@ -81,5 +82,4 @@ class Validators {
     });
 }
 
-const validators = new Validators();
-export default validators;
+export const validator = new JoiValidator();

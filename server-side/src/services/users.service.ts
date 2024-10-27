@@ -1,21 +1,19 @@
 import { User, Token } from "../models";
-import sendMail, { getEmailVerifyHTML, getPasswordResetHTML } from "../utils/sendMail";
-import validators from "../utils/validators";
 import { Request, Response } from "express";
 import bcrypt from 'bcryptjs';
-import { generateAcctNo, isFieldAvailable, appError, calcBalance, validateRequestData } from "../utils";
 import crypto from 'crypto';
-import { attachToken, removeToken, signToken } from "../utils/jwt";
-import { clientUrl } from "../utils/constants";
+import { attachToken, removeToken, signToken, validator, clientUrl, generateAcctNo,
+    isFieldAvailable, appError, calcBalance, validateRequestData, getEmailVerifyHTML,
+    getPasswordResetHTML, sendMail } from "../utils";
 
 class UserService {
     async signup(req: Request): ServiceResponseType {
         const isAdmin = req.url === '/admin-signup';
 
         if (isAdmin)
-            validateRequestData(req, validators.adminSignup);
+            validateRequestData(req, validator.adminSignup);
         else
-            validateRequestData(req, validators.signup);
+            validateRequestData(req, validator.signup);
 
         // Admin key validation
         if (isAdmin && req.body.adminKey !== process.env.ADMIN_KEY)
@@ -58,7 +56,7 @@ class UserService {
     }
 
     async login(req: Request, res: Response): ServiceResponseType {
-        const { emailOrUsername, password } = validateRequestData(req, validators.login);
+        const { emailOrUsername, password } = validateRequestData(req, validator.login);
 
         // check if user exists
         const user = await User.findOne({ email: emailOrUsername }) || await User.findOne({ username: emailOrUsername });
@@ -118,7 +116,7 @@ class UserService {
     }
 
     async sendPasswordResetLink(req: Request): ServiceResponseType {
-        const { email } = validateRequestData(req, validators.forgotPassword);
+        const { email } = validateRequestData(req, validator.forgotPassword);
 
         const user = await User.findOne({ email });
 
@@ -137,7 +135,7 @@ class UserService {
     }
 
     async resetPassword(req: Request): ServiceResponseType {
-        const { password } = validateRequestData(req, validators.resetPassword);
+        const { password } = validateRequestData(req, validator.resetPassword);
         const { resetId } = req.params;
 
         const token = await Token.findOne({ token: resetId, type: 'password', expires: { $gt: Date.now() } });
@@ -156,7 +154,6 @@ class UserService {
     }
 
     async allUsers(req: Request): ServiceResponseType {
-        console.log(123);
         const requiredInfo = '_id username fullName email phone acctNo createdAt';
         const limit = Number(req.query.limit) || 10;
         const page = Number(req.query.page) || 1;
@@ -204,7 +201,7 @@ class UserService {
     }
 
     async updateUser(req: Request) {
-        const { first, last, phone, email, password, oldPassword } = validateRequestData(req, validators.updateUser);
+        const { first, last, phone, email, password, oldPassword } = validateRequestData(req, validator.updateUser);
         const user = await User.findById(req.user.id);
 
         if (!user) throw appError(404, 'User not found');
@@ -259,5 +256,4 @@ class UserService {
 
 }
 
-const userServices = new UserService();
-export default userServices;
+export const userService = new UserService();

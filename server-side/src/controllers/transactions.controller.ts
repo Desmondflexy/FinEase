@@ -1,56 +1,55 @@
 import { Request, Response } from 'express';
 import handleRequest from '../utils/response';
-import transactionsService from '../services/transactions.service';
+import {transactionService} from '../services';
 
 class TransactionsController {
     async getTransactions(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.getTransactions);
+        handleRequest(req, res, transactionService.getTransactions);
     }
 
     fundWallet(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.fundWallet);
+        handleRequest(req, res, transactionService.fundWallet);
     }
 
     transferFunds(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.transferFunds);
+        handleRequest(req, res, transactionService.transferFunds);
     }
 
     getNetworks(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.getNetworks);
+        handleRequest(req, res, transactionService.getNetworks);
     }
 
     buyAirtime(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.buyAirtime);
+        handleRequest(req, res, transactionService.buyAirtime);
     }
 
     getPhoneNetwork(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.getPhoneNetwork);
+        handleRequest(req, res, transactionService.getPhoneNetwork);
     }
 
     getDataPlans(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.getDataPlans);
+        handleRequest(req, res, transactionService.getDataPlans);
     }
 
     buyData(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.buyData);
+        handleRequest(req, res, transactionService.buyData);
     }
 
     validateCustomer(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.validateCustomer);
+        handleRequest(req, res, transactionService.validateCustomer);
     }
 
     buyElectricity(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.buyElectricity,);
+        handleRequest(req, res, transactionService.buyElectricity,);
     }
 
     getDiscos(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.getDiscos);
+        handleRequest(req, res, transactionService.getDiscos);
     }
 
     initializePayment(req: Request, res: Response) {
-        handleRequest(req, res, transactionsService.initializePayment);
+        handleRequest(req, res, transactionService.initializePayment);
     }
 }
 
-const transactionsController = new TransactionsController;
-export default transactionsController;
+export const transactionController = new TransactionsController;

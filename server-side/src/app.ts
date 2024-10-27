@@ -3,9 +3,9 @@ import logger from 'morgan';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
-import router, { homeRouter } from './routes';
+import { homeRouter, appRouter } from './routes';
 import cookieParser from 'cookie-parser';
-import connectDb from './config/db';
+import { connectDb } from './config';
 
 dotenv.config();
 
@@ -25,7 +25,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/', homeRouter);
-app.use('/', router);
+app.use('/', appRouter);
 
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');

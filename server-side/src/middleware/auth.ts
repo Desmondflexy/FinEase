@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { handleError } from '../utils/response';
+import { handleError } from '../utils';
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.authorization?.split(' ')[1] || req.cookies.token;
