@@ -13,6 +13,6 @@ transactionRouter.get('/phone-network', transactionController.getPhoneNetwork);
 transactionRouter.get('/data-plans', transactionController.getDataPlans);
 transactionRouter.post('/buy-data', transactionController.buyData);
 transactionRouter.get('/discos', transactionController.getDiscos);
-transactionRouter.get('/customer-validate/:operatorId', transactionController.validateCustomer);
+transactionRouter.get('/customer-validate', transactionController.validateCustomer);
 transactionRouter.post('/electricity', transactionController.buyElectricity);
 transactionRouter.post('/initialize-payment', transactionController.initializePayment);

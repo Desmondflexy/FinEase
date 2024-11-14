@@ -1,21 +1,21 @@
 import axios from 'axios';
 import { phoneNetworks } from './constants';
-import { generateRandomToken } from '.';
+import { appError, generateRandomToken } from '.';
 
 type Product = 'electricity' | 'telco' | 'television';
 
 /**The Blochq Api class */
 class Blochq {
-    private dataCategoryId = 'pctg_ftZLPijqrVsTan5Ag7khQx';
-    private airtimeCategoryId = 'pctg_xkf8nz3rFLjbooWzppWBG6';
-    private billsUrl = 'https://api.blochq.io/v1/bills';
-    private fakeResponse = Boolean(Number(process.env.FAKE_API));
-    private reqHeadersConfig = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } };
+    private readonly dataCategoryId = 'pctg_ftZLPijqrVsTan5Ag7khQx';
+    private readonly airtimeCategoryId = 'pctg_xkf8nz3rFLjbooWzppWBG6';
+    private readonly billsUrl = 'https://api.blochq.io/v1/bills';
+    private readonly fakeResponse = Boolean(Number(process.env.FAKE_API));
+    private readonly reqHeadersConfig = { headers: { Authorization: `Bearer ${process.env.BLOCHQ_SECRET}` } };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private handleError(error: any, message: string) {
-        console.error(error);
-        throw new Error(message);
+        type MyError = { status: number, statusText: string, data: string }
+        const myError: MyError = error.response;
+        throw appError(myError.status, message, myError.data);
     }
 
     async getOperators(bill: Product) {
@@ -25,7 +25,7 @@ class Blochq {
             return response.data.data;
 
         } catch (error: any) {
-            this.handleError(error, error.response.data.message);
+            this.handleError(error, error.message);
         }
     }
 
@@ -112,7 +112,6 @@ class Blochq {
 
     async buyData(dataPlanId: string, amount: number, operatorId: string, phone: string) {
         const url = `${this.billsUrl}/payment?bill=telco`;
-
         const data = {
             amount,
             operator_id: operatorId,
@@ -136,9 +135,13 @@ class Blochq {
     async getDataPlanMeta(dataPlanId: string, operatorId: string) {
         const products = await this.getProducts(operatorId);
         const targetPlan = products.find((product: { id: string }) => product.id === dataPlanId);
-        if (!targetPlan) throw new Error('Data plan not found with the given ID');
+        if (!targetPlan) throw appError(404, 'Data plan not found');
         const { data_value, fee } = targetPlan.meta;
-        return { data_value, amount: fee * 100, operator_name: await this.getOperatorNameById(operatorId) }
+        return {
+            data_value,
+            amount: fee * 100,
+            operator_name: await this.getOperatorNameById(operatorId)
+        };
     }
 
     async getOperatorNameById(operatorId: string, bill: Product = 'telco') {
@@ -158,7 +161,6 @@ class Blochq {
             return { result: response.data.data, error: null };
 
         } catch (error: any) {
-            // console.error(error);
             return { result: null, error: { message: error.response.data.message } };
         }
     }

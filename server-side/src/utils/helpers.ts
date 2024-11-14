@@ -13,6 +13,7 @@ export async function generateAcctNo() {
 }
 
 export async function generateReference(prefix: string) {
+    // throw new Error("Not implemented");
     let ref = Math.floor(Math.random() * 10000000000);
     let trx = await Transaction.findOne({ reference: prefix + ref });
     while (trx) {

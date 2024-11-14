@@ -1,17 +1,16 @@
 import express from 'express';
 import logger from 'morgan';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import { homeRouter, appRouter } from './routes';
 import cookieParser from 'cookie-parser';
 import { connectDb } from './config';
+import dotenv from 'dotenv';
 
 dotenv.config();
-
 connectDb();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || '3000';
 const app = express();
 app.listen(port, () => {
     console.log(`App is running on port ${port} in ${process.env.NODE_ENV} mode`);

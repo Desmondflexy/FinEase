@@ -29,4 +29,3 @@ class ApiResponse {
 
 const apiResponse = new ApiResponse();
 export const { handleRequest, handleError } = apiResponse;
-export default handleRequest;

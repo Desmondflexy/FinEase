@@ -78,7 +78,7 @@ function ElectricityForm() {
             return;
         }
         setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Validating customer info. Please wait...', error: false, loading: true } }));
-        Api.get(`transaction/customer-validate/${operatorId}?bill=electricity&deviceNumber=${meterNumber}`)
+        Api.get(`transaction/customer-validate?operatorId=${operatorId}&bill=electricity&deviceNumber=${meterNumber}`)
             .then(res => {
                 const { address, name } = res.data.customer;
                 setState(s => ({ ...s, feedback: { ...s.feedback, message: '', customer: { address, name }, loading: false } }));

@@ -1,8 +1,10 @@
 import { Request } from 'express';
 import { Transaction, User } from '../models';
 import bcrypt from 'bcryptjs';
-import { phoneNetworks, TRX_TYPES, TRX_SERVICES, blochq, validator, paystack, appError,
-    calcBalance, generateReference, validateRequestData } from '../utils';
+import {
+    phoneNetworks, TRX_TYPES, TRX_SERVICES, blochq, validator, paystack, appError,
+    calcBalance, generateReference, validateRequestData
+} from '../utils';
 
 class TransactionsService {
     async getTransactions(req: Request): ServiceResponseType {
@@ -189,8 +191,8 @@ class TransactionsService {
     }
 
     async getDataPlans(req: Request): ServiceResponseType {
-        const operatorId = req.query.operatorId as string;
-        if (!operatorId) throw appError(400, 'operatorId is required in query params');
+        // const operatorId = req.query.operatorId as string;
+        const { operatorId } = validateRequestData(req, validator.getDataPlans, 'query');
         const dataPlans = await blochq.getDataPlans(operatorId);
         return {
             message: 'Data plans',
@@ -236,9 +238,8 @@ class TransactionsService {
     }
 
     async validateCustomer(req: Request): ServiceResponseType {
-        const { operatorId } = req.params;
-        const { bill, deviceNumber } = req.query;
-        const { error, result } = await blochq.validateCustomerDevice(operatorId as string, bill as string, deviceNumber as string);
+        const { operatorId, deviceNumber, bill } = validateRequestData(req, validator.validateCustomer, 'query');
+        const { error, result } = await blochq.validateCustomerDevice(operatorId, bill, deviceNumber);
 
         if (error) throw appError(404, error.message);
 

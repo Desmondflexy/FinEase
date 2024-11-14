@@ -80,6 +80,16 @@ class JoiValidator {
     initializePayment = joi.object().keys({
         amount: joi.number().min(1).required(),
     });
+
+    validateCustomer = joi.object().keys({
+        operatorId: joi.string().required(),
+        deviceNumber: joi.string().required(),
+        bill: joi.string().valid('electricity', 'tv').required(),
+    });
+
+    getDataPlans = joi.object().keys({
+        operatorId: joi.string().required(),
+    });
 }
 
 export const validator = new JoiValidator();

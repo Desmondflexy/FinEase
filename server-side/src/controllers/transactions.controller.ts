@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import handleRequest from '../utils/response';
-import {transactionService} from '../services';
+import { handleRequest } from '../utils/response';
+import { transactionService } from '../services';
 
 class TransactionsController {
     async getTransactions(req: Request, res: Response) {

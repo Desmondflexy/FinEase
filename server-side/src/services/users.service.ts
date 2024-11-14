@@ -19,7 +19,6 @@ class UserService {
         if (isAdmin && req.body.adminKey !== process.env.ADMIN_KEY)
             throw appError(401, 'Invalid admin key');
 
-
         const { first, last, username, email, phone, password } = req.body;
 
         // Check for existing email or username
