@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { attachToken, removeToken, signToken, validator, clientUrl, generateAcctNo,
-    isFieldAvailable, appError, calcBalance, validateRequestData, getEmailVerifyHTML,
+    appError, calcBalance, validateRequestData, getEmailVerifyHTML,
     getPasswordResetHTML, sendMail } from "../utils";
 
 class UserService {
@@ -87,7 +87,7 @@ class UserService {
 
     async isAvailable(req: Request): ServiceResponseType {
         const { field, value } = req.params;
-        const available = await isFieldAvailable(field, value);
+        const available = !Boolean(await User.findOne({ [field]: value }));
 
         if (!available)
             throw appError(409, `${field} is not available`);
