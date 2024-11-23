@@ -51,7 +51,7 @@ export default function Transactions() {
                     <tbody>
                         {searchResults.length
                             ? searchResults.map((trx: ITransaction, index: number) => (
-                                <tr key={trx._id}>
+                                <tr key={trx.id}>
                                     <td>{index + 1}</td>
                                     <td>{formatNumber(+trx.amount).slice(3)}</td>
                                     <td>{trx.type}</td>
