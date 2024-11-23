@@ -9,11 +9,11 @@ export default function VerifyEmail() {
         Api.post(`/auth/email-verify/${verifyId}`)
             .then(res => {
                 navigate('/auth/login');
-                toast.success(res.data);
+                toast.success(res.data.message);
             })
             .catch(error => {
                 navigate('/auth/login');
-                toast.error(error.response.data);
+                toast.error(error.response.data.message);
             });
     });
 
