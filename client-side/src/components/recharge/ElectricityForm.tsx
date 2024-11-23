@@ -4,6 +4,7 @@ import { IDisco, OutletContextType } from "../../types";
 import Api from "../../api.config";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { handleError } from "../../utils/utils";
 
 interface DataInputs {
     operatorId: string;
@@ -80,7 +81,7 @@ function ElectricityForm() {
         setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Validating customer info. Please wait...', error: false, loading: true } }));
         Api.get(`transaction/customer-validate?operatorId=${operatorId}&bill=electricity&deviceNumber=${meterNumber}`)
             .then(res => {
-                const { address, name } = res.data.customer;
+                const { address, name } = res.data;
                 setState(s => ({ ...s, feedback: { ...s.feedback, message: '', customer: { address, name }, loading: false } }));
             })
             .catch((err) => {
@@ -89,7 +90,7 @@ function ElectricityForm() {
     }
 
     function buyElectricity(amount: string, operatorId: string, meterType: string, meterNumber: string) {
-        Api.post('transaction/electricity', { amount, operatorId, meterType, meterNumber })
+        Api.post('transaction/electricity', { amount: Number(amount), operatorId, meterType, meterNumber })
             .then((res) => {
                 const { message, units, token } = res.data;
                 toast.success(message);
@@ -98,7 +99,7 @@ function ElectricityForm() {
                 reset();
             })
             .catch(err => {
-                toast.error(err.response.data.message);
+                handleError(err, toast);
                 setState(s => ({ ...s, processing: false }));
             });
     }

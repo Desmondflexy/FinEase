@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import Api from "../../../api.config";
 import { toast } from "react-toastify";
+import { handleError } from "../../../utils/utils";
 
 interface LoginInputs {
     username_email: string;
@@ -34,7 +35,7 @@ export function Login() {
                 })
                 .catch((err) => {
                     if (err.response) {
-                        toast.error(err.response.data.message);
+                        handleError(err, toast);
                     } else {
                         toast.error(err.message);
                     }

@@ -46,7 +46,7 @@ export default function UsersList() {
                     </thead>
                     <tbody>
                         {searchResults.map((user: IUser, index: number) => (
-                            <tr key={user._id}>
+                            <tr key={user.id}>
                                 <td>{index + 1}</td>
                                 <td>{user.fullName}</td>
                                 <td>{user.username}</td>

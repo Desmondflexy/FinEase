@@ -75,3 +75,17 @@ export async function getTotalMonthly(type: 'debit' | 'credit') {
         .reduce((acc: number, curr: ITransaction) => acc + curr.amount, 0);
     return totalExpense;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function handleError(err: any, toast: any) {
+    if (err.response) {
+        const error = err.response.data.message;
+        if (typeof error === "string") {
+            toast.error(error);
+        } else {
+            toast.error(error[0]);
+        }
+    } else {
+        toast.error(err.message);
+    }
+}

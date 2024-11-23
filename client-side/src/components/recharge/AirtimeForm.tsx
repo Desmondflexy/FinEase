@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import Api from "../../api.config";
 import { networkLogo, phoneNumberRegex } from "../../utils/constants";
 import { useForm } from "react-hook-form";
+import { handleError } from "../../utils/utils";
 
 interface DataInputs {
     operatorId: string;
@@ -30,7 +31,7 @@ function AirtimeForm() {
     function fetchNetworks() {
         Api.get('transaction/networks')
             .then(res => {
-                const { networks } = res.data
+                const networks = res.data
                 setState(s => ({ ...s, networks, errorFeedback: '' }));
             })
             .catch(() => {
@@ -41,7 +42,7 @@ function AirtimeForm() {
     const phone = watch('phone');
 
     function buyAirtime(operatorId: string, amount: number, phone: string) {
-        Api.post('transaction/airtime', { operatorId, amount, phone })
+        Api.post('transaction/airtime', { operatorId, amount: Number(amount), phone })
             .then(res => {
                 toast.success(res.data.message);
                 setState(s => ({ ...s, processing: false, logoUrl: '' }));
@@ -49,7 +50,7 @@ function AirtimeForm() {
                 reset();
             })
             .catch(err => {
-                toast.error(err.response.data.message);
+                handleError(err, toast);
                 setState(s => ({ ...s, processing: false }));
             });
     }

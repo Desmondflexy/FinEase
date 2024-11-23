@@ -3,6 +3,7 @@ import Api from "../../api.config";
 import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
+import { handleError } from "../../utils/utils";
 
 interface Prop {
     closeModal: (id: string) => void;
@@ -32,7 +33,7 @@ function TransferWalletModal({ closeModal }: Prop) {
     }
 
     function transferFunds() {
-        Api.post('transaction/fund-transfer', { acctNoOrUsername, amount, password })
+        Api.post('transaction/fund-transfer', { acctNoOrUsername, amount: Number(amount), password })
             .then(res => {
                 setUser(u => ({ ...u, balance: res.data.balance }));
                 toast.success(res.data.message);
@@ -48,7 +49,7 @@ function TransferWalletModal({ closeModal }: Prop) {
                 }, 3000);
             })
             .catch(err => {
-                toast.error(err.response.data.message);
+                handleError(err, toast);
                 setState(s => ({ ...s, processing: false }));
             });
     }

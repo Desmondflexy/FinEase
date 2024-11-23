@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Api from "../../api.config";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { handleError } from "../../utils/utils";
 
 
 function BasicInfoEditForm({ user }: { user: IUser }) {
@@ -40,7 +41,7 @@ function BasicInfoEditForm({ user }: { user: IUser }) {
                 setState(s => ({ ...s, loading: false }));
             })
             .catch(err => {
-                toast.error(err.response.data.message);
+                handleError(err, toast);
                 setState(s => ({ ...s, loading: false }));
             });
     }
@@ -112,22 +113,25 @@ function PasswordEditForm() {
     });
 
     const { loading } = state;
-    const { register, handleSubmit } = useForm<PasswordInputs>();
+    const { register, handleSubmit, setValue } = useForm<PasswordInputs>();
 
     function onSubmit(data: PasswordInputs) {
         setState(s => ({ ...s, loading: true }));
-        const { oldPassword, newPassword, confirmPassword } = data;
-        editPasswordApi(oldPassword, newPassword, confirmPassword);
+        const { oldPassword, newPassword, confirmNewPassword } = data;
+        editPasswordApi(oldPassword, newPassword, confirmNewPassword);
     }
 
-    function editPasswordApi(oldPassword: string, newPassword: string, confirmPassword: string) {
-        Api.put('account', { password: newPassword, confirm: confirmPassword, oldPassword })
+    function editPasswordApi(oldPassword: string, newPassword: string, confirmNewPassword: string) {
+        Api.put('account', { newPassword, confirmNewPassword, oldPassword })
             .then(res => {
                 toast.success(res.data.message);
+                setValue('oldPassword', '');
+                setValue('newPassword', '');
+                setValue('confirmNewPassword', '');
                 setState(s => ({ ...s, loading: false }));
             })
             .catch(err => {
-                toast.error(err.response.data.message);
+                handleError(err, toast);
                 setState(s => ({ ...s, loading: false }));
             });
     }
@@ -144,7 +148,7 @@ function PasswordEditForm() {
                 </div>
                 <div className="input-group mb-3">
                     <div className="form-floating">
-                        <input {...register('confirmPassword')} placeholder="Confirm New Password" className="form-control" name="confirmPassword" id="confirm-new" type="password" />
+                        <input {...register('confirmNewPassword')} placeholder="Confirm New Password" className="form-control" name="confirmNewPassword" id="confirm-new" type="password" />
                         <label htmlFor="confirn-new">Confirm New Password</label>
                     </div>
                 </div>
@@ -162,7 +166,7 @@ function PasswordEditForm() {
     interface PasswordInputs {
         oldPassword: string;
         newPassword: string;
-        confirmPassword: string;
+        confirmNewPassword: string;
     }
 
     interface State {

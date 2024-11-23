@@ -191,7 +191,6 @@ class TransactionsService {
     }
 
     async getDataPlans(req: Request): ServiceResponseType {
-        // const operatorId = req.query.operatorId as string;
         const { operatorId } = validateRequestData(req, validator.getDataPlans, 'query');
         const dataPlans = await blochq.getDataPlans(operatorId);
         return {
@@ -283,7 +282,6 @@ class TransactionsService {
             amount: amountInKobo,
             type: 'debit',
             service: 'bill payment',
-            description: `Payment of ${amount} electricity bill | ${meterNumber} ${operator_name} | ${token} | ${units} units.`,
             reference: await generateReference('EPT'),
             serviceProvider: operator_name,
         });

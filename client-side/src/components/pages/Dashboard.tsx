@@ -109,7 +109,7 @@ export default function Dashboard() {
                         </thead>
                         <tbody>
                             {recent10.map((trx: ITransaction, index: number) => (
-                                <tr key={trx._id}>
+                                <tr key={trx.id}>
                                     <td>{index + 1}</td>
                                     <td>{trx.type}</td>
                                     <td>{formatNumber(+trx.amount).slice(3)}</td>

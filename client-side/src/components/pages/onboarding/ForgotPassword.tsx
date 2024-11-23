@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Api from "../../../api.config";
 import { toast } from "react-toastify";
+import { handleError } from "../../../utils/utils";
 
 export default function ForgotPassword() {
     const [state, setState] = useState({
@@ -26,7 +27,7 @@ export default function ForgotPassword() {
                 })
                 .catch((err) => {
                     if (err.response) {
-                        toast.error(err.response.data.message);
+                        handleError(err, toast);
                     } else {
                         toast.error(err.message);
                     }

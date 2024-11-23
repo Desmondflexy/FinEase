@@ -5,6 +5,7 @@ import Api from "../../api.config";
 import { networkLogo, phoneNumberRegex } from "../../utils/constants";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { handleError } from "../../utils/utils";
 
 interface DataInputs {
     operatorId: string;
@@ -40,7 +41,7 @@ export default function DataForm() {
     function fetchNetworks() {
         Api.get('transaction/networks')
             .then(res => {
-                setState(s => ({ ...s, networks: res.data.networks, errorFeedback: '' }));
+                setState(s => ({ ...s, networks: res.data, errorFeedback: '' }));
             })
             .catch(() => {
                 setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
@@ -51,14 +52,12 @@ export default function DataForm() {
         if (operatorId)
             Api.get(`transaction/data-plans?operatorId=${operatorId}`)
                 .then(res => {
-                    setState(s => ({ ...s, plans: res.data.dataPlans }));
+                    setState(s => ({ ...s, plans: res.data }));
                 })
                 .catch(err => {
                     console.log(err.response);
                 })
     }
-
-    // console.log(state);
 
     function determineNetwork() {
         if (!phoneNumberRegex.test(phone)) {
@@ -67,7 +66,7 @@ export default function DataForm() {
         }
         Api.get(`transaction/phone-network?phone=${phone}`)
             .then(res => {
-                const network = res.data.network.toLowerCase() as string;
+                const network = res.data.network.toLowerCase();
                 setState(s => ({ ...s, logoUrl: networkLogo[network] }));
             })
             .catch(() => {
@@ -85,7 +84,7 @@ export default function DataForm() {
                 reset();
             })
             .catch(err => {
-                toast.error(err.response.data.message);
+                handleError(err, toast);
                 setState(s => ({ ...s, processing: false }));
             });
     }

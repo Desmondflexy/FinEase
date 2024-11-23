@@ -1,6 +1,6 @@
 // shape for user
 export interface IUser {
-    _id: string;
+    id: number;
     fullName: string;
     email: string;
     phone: string;
@@ -13,7 +13,7 @@ export interface IUser {
 
 // shape for transaction
 export interface ITransaction {
-    _id: string;
+    id: number;
     amount: number;
     type: 'debit' | 'credit';
     description: string;
