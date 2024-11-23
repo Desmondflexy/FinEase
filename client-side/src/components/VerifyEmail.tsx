@@ -6,7 +6,7 @@ export default function VerifyEmail() {
     const { verifyId } = useParams();
     const navigate = useNavigate();
     useEffect(() => {
-        Api.post(`/auth/email-verify/${verifyId}`)
+        Api.patch(`/auth/email-verify/${verifyId}`)
             .then(res => {
                 navigate('/auth/login');
                 toast.success(res.data.message);

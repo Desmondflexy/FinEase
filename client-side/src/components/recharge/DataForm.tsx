@@ -41,7 +41,7 @@ export default function DataForm() {
     function fetchNetworks() {
         Api.get('transaction/networks')
             .then(res => {
-                setState(s => ({ ...s, networks: res.data, errorFeedback: '' }));
+                setState(s => ({ ...s, networks: res.data.networks, errorFeedback: '' }));
             })
             .catch(() => {
                 setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
@@ -52,7 +52,7 @@ export default function DataForm() {
         if (operatorId)
             Api.get(`transaction/data-plans?operatorId=${operatorId}`)
                 .then(res => {
-                    setState(s => ({ ...s, plans: res.data }));
+                    setState(s => ({ ...s, plans: res.data.dataPlans }));
                 })
                 .catch(err => {
                     console.log(err.response);

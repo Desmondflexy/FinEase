@@ -7,6 +7,6 @@ authRouter.post('/login', userController.login);
 authRouter.post('/logout', userController.logout);
 authRouter.post('/admin-signup', userController.signup);
 authRouter.get('/check/:field/:value', userController.isAvailable);
-authRouter.post('/email-verify/:verifyId', userController.verifyEmail);
+authRouter.patch('/email-verify/:verifyId', userController.verifyEmail);
 authRouter.post('/forgot-password', userController.sendPasswordResetLink);
 authRouter.post('/reset-password/:resetId', userController.resetPassword);

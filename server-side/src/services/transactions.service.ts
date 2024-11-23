@@ -284,6 +284,7 @@ class TransactionsService {
             service: 'bill payment',
             reference: await generateReference('EPT'),
             serviceProvider: operator_name,
+            description: `Payment of ${amount} electricity bill | ${meterNumber} ${operator_name} | ${token} | ${units} units.`,
         });
 
         return {

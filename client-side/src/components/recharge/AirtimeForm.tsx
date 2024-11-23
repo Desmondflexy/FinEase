@@ -31,7 +31,7 @@ function AirtimeForm() {
     function fetchNetworks() {
         Api.get('transaction/networks')
             .then(res => {
-                const networks = res.data
+                const { networks } = res.data
                 setState(s => ({ ...s, networks, errorFeedback: '' }));
             })
             .catch(() => {

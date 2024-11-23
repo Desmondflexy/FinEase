@@ -48,7 +48,7 @@ export default function Account() {
     useEffect(() => {
         Api.get('account')
             .then(res => {
-                setUser(res.data);
+                setUser(res.data.user);
                 setState(s => ({ ...s, status: 'success' }));
             })
             .catch(err => {
