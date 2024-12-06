@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Api from "../../../api.config";
 import { toast } from "react-toastify";
 import { handleError } from "../../../utils/utils";
@@ -25,11 +25,13 @@ export function ResetPassword() {
     });
 
     const { resetId } = useParams();
+    const [searchParams] = useSearchParams();
+    const email = searchParams.get("email");
 
     function onSubmit(data: DataType) {
         const { password, confirm } = data;
         function reset() {
-            Api.post(`/auth/reset-password/${resetId}`, { password, confirm })
+            Api.post(`/auth/reset-password/${resetId}?email=${email}`, { password, confirm })
                 .then((res) => {
                     console.log(res.data);
                     navigate("/auth/login");
@@ -37,11 +39,7 @@ export function ResetPassword() {
                     setState((s) => ({ ...s, loading: false }));
                 })
                 .catch((err) => {
-                    if (err.response) {
-                        handleError(err, toast);
-                    } else {
-                        toast.error(err.message);
-                    }
+                    handleError(err, toast);
                     setState((s) => ({ ...s, loading: false }));
                 });
         }
