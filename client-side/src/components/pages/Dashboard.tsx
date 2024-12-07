@@ -42,7 +42,7 @@ export default function Dashboard() {
     }, [user.balance]);
 
     useEffect(() => {
-        getTotalMonthly('debit')
+        getTotalMonthly('DEBIT')
             .then(res => {
                 setState(s => ({ ...s, totalExpense: res }));
             })

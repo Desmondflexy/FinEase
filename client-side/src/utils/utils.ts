@@ -63,7 +63,7 @@ export function greet() {
 }
 
 // get total expense or income for the current month depending on type
-export async function getTotalMonthly(type: 'debit' | 'credit') {
+export async function getTotalMonthly(type: 'DEBIT' | 'CREDIT') {
     const date = new Date();
     const month = date.getMonth();
     const { data: { transactions } } = await Api.get('/transaction');
