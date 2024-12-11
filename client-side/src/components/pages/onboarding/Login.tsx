@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import Api from "../../../api.config";
 import { toast } from "react-toastify";
 import { handleError } from "../../../utils/utils";
+import { apiService } from "../../../api.service";
 
 interface LoginInputs {
     username_email: string;
@@ -27,7 +27,7 @@ export function Login() {
     function onSubmit(data: LoginInputs) {
         const { username_email, password } = data;
         function login() {
-            Api.post("/auth/login", { emailOrUsername: username_email, password })
+            apiService.login({ emailOrUsername: username_email, password })
                 .then((res) => {
                     localStorage.setItem("token", res.data.token);
                     navigate("/account/dashboard");

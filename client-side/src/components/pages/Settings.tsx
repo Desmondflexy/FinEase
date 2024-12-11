@@ -1,10 +1,10 @@
 import { useOutletContext } from "react-router-dom";
 import { IUser } from "../../types";
 import { useEffect, useState } from "react";
-import Api from "../../api.config";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { handleError } from "../../utils/utils";
+import { apiService } from "../../api.service";
 
 
 function BasicInfoEditForm({ user }: { user: IUser }) {
@@ -35,7 +35,7 @@ function BasicInfoEditForm({ user }: { user: IUser }) {
     }
 
     function editUserApi(first: string, last: string, email: string, phone: string) {
-        Api.put('account', { first, last, email, phone })
+        apiService.editUserDetails<BasicInputs>({ first, last, email, phone })
             .then(res => {
                 toast.success(res.data.message);
                 setState(s => ({ ...s, loading: false }));
@@ -122,7 +122,7 @@ function PasswordEditForm() {
     }
 
     function editPasswordApi(oldPassword: string, newPassword: string, confirmNewPassword: string) {
-        Api.put('account', { newPassword, confirmNewPassword, oldPassword })
+        apiService.editUserDetails<PasswordInputs>({ newPassword, confirmNewPassword, oldPassword })
             .then(res => {
                 toast.success(res.data.message);
                 setValue('oldPassword', '');

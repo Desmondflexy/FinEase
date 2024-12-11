@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { payWithPaystack } from "../../utils/utils";
-import Api from "../../api.config";
 import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
+import { apiService } from "../../api.service";
 
 interface Props {
     closeModal: (id: string) => void;
@@ -37,7 +37,7 @@ export function FundWalletModal({ closeModal }: Props) {
     }
 
     function fundWalletApi(response: { reference: string }) {
-        Api.post('/transaction/fund-wallet', { reference: response.reference })
+        apiService.fundWallet(response)
             .then(res => {
                 setUser(u => ({ ...u, balance: res.data.balance }));
                 closeModal('fundWallet');

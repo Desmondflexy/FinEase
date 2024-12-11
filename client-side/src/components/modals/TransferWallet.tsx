@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Api from "../../api.config";
 import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
 import { handleError } from "../../utils/utils";
+import { apiService } from "../../api.service";
 
 interface Prop {
     closeModal: (id: string) => void;
@@ -33,7 +33,7 @@ function TransferWalletModal({ closeModal }: Prop) {
     }
 
     function transferFunds() {
-        Api.post('transaction/fund-transfer', { acctNoOrUsername, amount: Number(amount), password })
+        apiService.transferWallet(acctNoOrUsername, amount, password)
             .then(res => {
                 setUser(u => ({ ...u, balance: res.data.balance }));
                 toast.success(res.data.message);
@@ -55,7 +55,7 @@ function TransferWalletModal({ closeModal }: Prop) {
     }
 
     function confirmUser(e: React.FocusEvent<HTMLInputElement>) {
-        Api.get(`account/confirm-user?acctNoOrUsername=${e.target.value}`)
+        apiService.confirmWalletRecipient(e.target.value)
             .then(res => {
                 setState(s => ({ ...s, feedback: res.data.fullName }));
             })

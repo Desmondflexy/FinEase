@@ -1,8 +1,8 @@
-import Api from "../../api.config";
 import { useState, useEffect } from "react";
 import { IUser } from "../../types";
 import Error from "./Error";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { apiService } from "../../api.service";
 
 export default function UsersList() {
     const [searchParams] = useSearchParams();
@@ -91,7 +91,7 @@ export default function UsersList() {
     }
 
     function fetchUsers(page: number) {
-        Api.get(`/account/all-users?page=${page}`)
+        apiService.getAllUsers(page)
             .then(res => {
                 const { totalPages, users } = res.data;
                 setState(s => ({ ...s, apiStatus: 'success', users, searchResults: users, totalPages, fetchingTransactions: false }));
@@ -118,12 +118,12 @@ export default function UsersList() {
 
     function handleNext() {
         setState(s => ({ ...s, fetchingTransactions: true }));
-        navigate(`/account/all-users?page=${page + 1}`);
+        navigate(`/admin/all-users?page=${page + 1}`);
     }
 
     function handlePrevious() {
         setState(s => ({ ...s, fetchingTransactions: true }));
-        navigate(`/account/all-users?page=${page - 1}`);
+        navigate(`/admin/all-users?page=${page - 1}`);
     }
 
     interface IState {

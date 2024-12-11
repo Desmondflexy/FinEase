@@ -1,12 +1,12 @@
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Api from "../api.config";
 import Loading from "./pages/Loading";
 import { CgProfile } from "react-icons/cg";
 import Error from "./pages/Error";
 import { IUser } from "../types";
 import { IoMenu } from "react-icons/io5";
 import SideBar from "./SideBar";
+import { apiService } from "../api.service";
 
 interface IState {
     status: 'loading' | 'error' | 'success';
@@ -46,7 +46,7 @@ export default function Account() {
 
 
     useEffect(() => {
-        Api.get('account')
+        apiService.getAccountInfo()
             .then(res => {
                 setUser(res.data.user);
                 setState(s => ({ ...s, status: 'success' }));

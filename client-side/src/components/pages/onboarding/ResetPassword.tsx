@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import Api from "../../../api.config";
 import { toast } from "react-toastify";
 import { handleError } from "../../../utils/utils";
+import { apiService } from "../../../api.service";
 
 interface DataType {
     password: string;
@@ -31,9 +31,8 @@ export function ResetPassword() {
     function onSubmit(data: DataType) {
         const { password, confirm } = data;
         function reset() {
-            Api.post(`/auth/reset-password/${resetId}?email=${email}`, { password, confirm })
-                .then((res) => {
-                    console.log(res.data);
+            apiService.resetPassword({ resetId, email, password, confirm })
+                .then(() => {
                     navigate("/auth/login");
                     toast.success("Password reset successful");
                     setState((s) => ({ ...s, loading: false }));

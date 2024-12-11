@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { formatDateTime, formatNumber, getTotalMonthly, greet } from "../../utils/utils";
+import { formatDateTime, formatNumber, greet } from "../../utils/utils";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { ITransaction, IUser } from "../../types";
-import Api from "../../api.config";
 import { IoWalletOutline } from "react-icons/io5";
 import { GiExpense } from "react-icons/gi";
 import FormModal from "../modals/FormModal";
 import TransferWallet from "../modals/TransferWallet";
 import { FundWalletModal } from "../modals/FundWallet";
+import { apiService } from "../../api.service";
 
 export default function Dashboard() {
     interface IState {
@@ -42,9 +42,9 @@ export default function Dashboard() {
     }, [user.balance]);
 
     useEffect(() => {
-        getTotalMonthly('DEBIT')
+        apiService.getMonthlyExpense()
             .then(res => {
-                setState(s => ({ ...s, totalExpense: res }));
+                setState(s => ({ ...s, totalExpense: res.data.total }));
             })
             .catch(err => {
                 console.error(err.response.data);
@@ -52,7 +52,7 @@ export default function Dashboard() {
     }, [balance]);
 
     function getRecentTransactions() {
-        Api.get(`transaction?limit=${10}`)
+        apiService.getRecentTransactions()
             .then(res => {
                 setState(s => ({ ...s, recent10: res.data.transactions }));
             })
