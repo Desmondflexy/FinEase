@@ -118,12 +118,12 @@ export default function UsersList() {
 
     function handleNext() {
         setState(s => ({ ...s, fetchingTransactions: true }));
-        navigate(`/admin/all-users?page=${page + 1}`);
+        navigate(`/account/all-users?page=${page + 1}`);
     }
 
     function handlePrevious() {
         setState(s => ({ ...s, fetchingTransactions: true }));
-        navigate(`/admin/all-users?page=${page - 1}`);
+        navigate(`/account/all-users?page=${page - 1}`);
     }
 
     interface IState {
