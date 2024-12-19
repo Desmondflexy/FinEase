@@ -4,7 +4,7 @@ class ApiService {
     private Api: AxiosInstance;
     constructor() {
         let baseURL = "http://localhost:8080/api/v2";
-        if (import.meta.env.VITE_NODE_ENV === "production") {
+        if (import.meta.env.VITE_NODE_ENV !== "development") {
             baseURL = import.meta.env.VITE_SERVER_URL;
         }
 
@@ -49,11 +49,11 @@ class ApiService {
     }
 
     confirmWalletRecipient(str: string) {
-        return this.Api.get(`account/confirm-user?acctNoOrUsername=${str}`)
+        return this.Api.get(`account/confirm-user?acctNoOrUsername=${str}`);
     }
 
     verifyEmail(verifyId: string, email: string) {
-        return this.Api.patch<{ message: string }>(`/auth/email-verify/${verifyId}?email=${email}`)
+        return this.Api.patch<{ message: string }>(`/auth/email-verify/${verifyId}?email=${email}`);
     }
 
     editUserDetails<T>(editData: T) {
@@ -61,7 +61,60 @@ class ApiService {
     }
 
     resetPassword({ resetId, email, password, confirm }: { resetId: string | undefined; email: string | null; password: string; confirm: string; }) {
-        return this.Api.post(`/auth/reset-password/${resetId}?email=${email}`, { password, confirm })
+        return this.Api.post(`/auth/reset-password/${resetId}?email=${email}`, { password, confirm });
+    }
+
+    fetchTransactions(page: number) {
+        return this.Api.get(`/transaction?page=${page}`);
+    }
+
+    forgotPassword(email: string) {
+        return this.Api.post("/auth/forgot-password", { email });
+    }
+
+    signup<T>(url: string, data: T) {
+        return this.Api.post(url, data);
+    }
+
+    getNetworks() {
+        return this.Api.get('transaction/networks');
+    }
+
+    buyAirtime(operatorId: string, amount: string, phone: string) {
+        return this.Api.post('transaction/airtime', { operatorId, amount: +amount, phone })
+    }
+
+    buyData(operatorId: string, dataPlanId: string, phone: string) {
+        return this.Api.post('transaction/buy-data', { operatorId, dataPlanId, phone })
+    }
+
+    getMobileNetwork(phone: string) {
+        return this.Api.get(`transaction/phone-network?phone=${phone}`);
+    }
+
+    getOperatorDataPlans(operatorId: string) {
+        return this.Api.get(`transaction/data-plans?operatorId=${operatorId}`)
+    }
+
+    getDiscos() {
+        return this.Api.get('transaction/discos');
+    }
+
+    validateMeter(operatorId: string, meterNumber: string) {
+        return this.Api.get(`transaction/customer-validate?operatorId=${operatorId}&bill=electricity&deviceNumber=${meterNumber}`)
+    }
+
+    buyElectricity(operatorId: string, amount: string, meterNumber: string, meterType: string) {
+        return this.Api.post('transaction/electricity', { amount: +amount, operatorId, meterType, meterNumber })
+    }
+
+    initializePayment(amount: string) {
+        type response = {
+            access_code: string;
+            reference: string;
+            authorization_url: string;
+        }
+        return this.Api.post<response>('transaction/initialize-payment', { amount: +amount })
     }
 }
 

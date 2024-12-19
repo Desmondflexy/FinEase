@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Api from "../../api.config";
 import Error from "./Error";
 import { formatDateTime, formatNumber } from "../../utils/utils";
 import Loading from "./Loading";
@@ -8,6 +7,7 @@ import {
     useNavigate,
     useSearchParams,
 } from "react-router-dom";
+import { apiService } from "../../api.service";
 
 export default function Transactions() {
     const [searchParams] = useSearchParams();
@@ -107,7 +107,7 @@ export default function Transactions() {
     }
 
     function fetchTransactions(page: number) {
-        Api.get(`/transaction?page=${page}`)
+        apiService.fetchTransactions(page)
             .then(res => {
                 const { transactions, totalPages } = res.data;
                 setState(s => ({ ...s, apiStatus: 'success', transactions, searchResults: transactions, totalPages, fetchingTransactions: false }));

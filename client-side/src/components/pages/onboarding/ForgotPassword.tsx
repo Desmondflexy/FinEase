@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import Api from "../../../api.config";
 import { toast } from "react-toastify";
 import { handleError } from "../../../utils/utils";
+import { apiService } from "../../../api.service";
 
 export default function ForgotPassword() {
     const [state, setState] = useState({
@@ -20,7 +20,7 @@ export default function ForgotPassword() {
     function onSubmit(data: { email: string }) {
         const { email } = data;
         function sendOtp() {
-            Api.post("/auth/forgot-password", { email })
+            apiService.forgotPassword(email)
                 .then(() => {
                     toast.info("Check your email for the reset link", { autoClose: false });
                     setState((s) => ({ ...s, loading: false }));

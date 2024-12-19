@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { IDisco, OutletContextType } from "../../types";
-import Api from "../../api.config";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { handleError } from "../../utils/utils";
+import { apiService } from "../../api.service";
 
 interface DataInputs {
     operatorId: string;
@@ -64,7 +64,7 @@ function ElectricityForm() {
 
     function fetchDiscos() {
         setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Fetching discos...', loading: true } }));
-        Api.get('transaction/discos')
+        apiService.getDiscos()
             .then(res => {
                 setState(s => ({ ...s, fetchingMessage: '', discos: res.data.discos, feedback: { ...s.feedback, customer: null, message: '', loading: false } }));
             })
@@ -79,7 +79,7 @@ function ElectricityForm() {
             return;
         }
         setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Validating customer info. Please wait...', error: false, loading: true } }));
-        Api.get(`transaction/customer-validate?operatorId=${operatorId}&bill=electricity&deviceNumber=${meterNumber}`)
+        apiService.validateMeter(operatorId, meterNumber)
             .then(res => {
                 const { address, name } = res.data.customer;
                 setState(s => ({ ...s, feedback: { ...s.feedback, message: '', customer: { address, name }, loading: false } }));
@@ -90,7 +90,7 @@ function ElectricityForm() {
     }
 
     function buyElectricity(amount: string, operatorId: string, meterType: string, meterNumber: string) {
-        Api.post('transaction/electricity', { amount: Number(amount), operatorId, meterType, meterNumber })
+       apiService.buyElectricity(operatorId, amount, meterNumber, meterType)
             .then((res) => {
                 const { message, units, token } = res.data;
                 toast.success(message);

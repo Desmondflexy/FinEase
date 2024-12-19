@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import Api from "../../../api.config";
 import { toast } from "react-toastify";
 import { handleError } from "../../../utils/utils";
+import { apiService } from "../../../api.service";
 
 interface SignupInputs {
     username: string;
@@ -50,7 +50,7 @@ export default function Signup({ admin }: { admin: boolean }) {
         document.querySelector('button')?.focus();
 
         function signup(url: string, inputs: SignupInputs) {
-            Api.post(url, inputs)
+            apiService.signup(url, inputs)
                 .then((res) => {
                     toast.success(res.data.message);
                     navigate('/auth/login');

@@ -2,15 +2,15 @@ import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import Api from "../../api.config";
 import { networkLogo, phoneNumberRegex } from "../../utils/constants";
 import { useForm } from "react-hook-form";
 import { handleError } from "../../utils/utils";
+import { apiService } from "../../api.service";
 
 interface DataInputs {
     operatorId: string;
     phone: string;
-    amount: number;
+    amount: string;
 }
 
 function AirtimeForm() {
@@ -29,7 +29,7 @@ function AirtimeForm() {
     useEffect(fetchNetworks, []);
 
     function fetchNetworks() {
-        Api.get('transaction/networks')
+        apiService.getNetworks()
             .then(res => {
                 const { networks } = res.data
                 setState(s => ({ ...s, networks, errorFeedback: '' }));
@@ -41,8 +41,8 @@ function AirtimeForm() {
 
     const phone = watch('phone');
 
-    function buyAirtime(operatorId: string, amount: number, phone: string) {
-        Api.post('transaction/airtime', { operatorId, amount: Number(amount), phone })
+    function buyAirtime(operatorId: string, amount: string, phone: string) {
+        apiService.buyAirtime(operatorId, amount, phone)
             .then(res => {
                 toast.success(res.data.message);
                 setState(s => ({ ...s, processing: false, logoUrl: '' }));
@@ -60,7 +60,7 @@ function AirtimeForm() {
             setState(s => ({ ...s, logoUrl: '' }));
             return;
         }
-        Api.get(`transaction/phone-network?phone=${phone}`)
+        apiService.getMobileNetwork(phone)
             .then(res => {
                 const network = res.data.network.toLowerCase() as string;
                 setState(s => ({ ...s, logoUrl: networkLogo[network] }));

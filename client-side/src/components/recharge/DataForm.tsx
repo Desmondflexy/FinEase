@@ -1,11 +1,11 @@
 import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
 import { useEffect, useState } from "react";
-import Api from "../../api.config";
 import { networkLogo, phoneNumberRegex } from "../../utils/constants";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { handleError } from "../../utils/utils";
+import { apiService } from "../../api.service";
 
 interface DataInputs {
     operatorId: string;
@@ -39,7 +39,7 @@ export default function DataForm() {
     useEffect(fetchDataPlans, [operatorId]);
 
     function fetchNetworks() {
-        Api.get('transaction/networks')
+        apiService.getNetworks()
             .then(res => {
                 setState(s => ({ ...s, networks: res.data.networks, errorFeedback: '' }));
             })
@@ -50,7 +50,7 @@ export default function DataForm() {
 
     function fetchDataPlans() {
         if (operatorId)
-            Api.get(`transaction/data-plans?operatorId=${operatorId}`)
+            apiService.getOperatorDataPlans(operatorId)
                 .then(res => {
                     setState(s => ({ ...s, plans: res.data.dataPlans }));
                 })
@@ -64,7 +64,7 @@ export default function DataForm() {
             setState(s => ({ ...s, logoUrl: '' }));
             return;
         }
-        Api.get(`transaction/phone-network?phone=${phone}`)
+        apiService.getMobileNetwork(phone)
             .then(res => {
                 const network = res.data.network.toLowerCase();
                 setState(s => ({ ...s, logoUrl: networkLogo[network] }));
@@ -75,7 +75,7 @@ export default function DataForm() {
     }
 
     function buyData(operatorId: string, dataPlanId: string, phone: string) {
-        Api.post('transaction/buy-data', { operatorId, dataPlanId, phone })
+        apiService.buyData(operatorId, dataPlanId, phone)
             .then(res => {
                 const { message, balance } = res.data;
                 toast.success(message);
