@@ -4,45 +4,50 @@ import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../types";
 import { handleError } from "../../utils/utils";
 import { apiService } from "../../api.service";
+import { useForm } from "react-hook-form";
 
-interface Prop {
+type Prop = {
     closeModal: (id: string) => void;
+}
+
+type DataInputs = {
+    acctNoOrUsername: string;
+    amount: string;
+    password: string;
+}
+
+type IState = {
+    processing: boolean;
+    feedback: string;
 }
 
 function TransferWalletModal({ closeModal }: Prop) {
     const [state, setState] = useState<IState>({
-        form: {
-            acctNoOrUsername: '',
-            amount: '',
-            password: '',
-        },
         processing: false,
         feedback: '',
     });
 
-    const { form, processing, feedback } = state;
-    const { acctNoOrUsername, amount, password } = form;
+    const { processing, feedback } = state;
+    const { register, handleSubmit, setValue } = useForm<DataInputs>();
 
     const userContext = useOutletContext() as OutletContextType;
     const setUser = userContext[1];
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    function onSubmit(data: DataInputs) {
         setState(s => ({ ...s, processing: true }));
-        transferFunds();
+        transferFunds(data);
     }
 
-    function transferFunds() {
+    function transferFunds(data: DataInputs) {
+        const { acctNoOrUsername, amount, password } = data;
         apiService.transferWallet(acctNoOrUsername, amount, password)
             .then(res => {
                 setUser(u => ({ ...u, balance: res.data.balance }));
                 toast.success(res.data.message);
-                setState(s => ({
-                    ...s,
-                    form: { acctNoOrUsername: '', amount: '', password: '' },
-                    processing: false,
-                    feedback: '',
-                }));
+                setState(s => ({ ...s, processing: false, feedback: '' }));
+                setValue('acctNoOrUsername', '');
+                setValue('amount', '');
+                setValue('password', '');
                 closeModal('transferWallet');
                 setTimeout(() => {
                     window.location.reload();
@@ -64,48 +69,21 @@ function TransferWalletModal({ closeModal }: Prop) {
             });
     }
 
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const { name, value } = e.target;
-        switch (name) {
-            case 'acctNoOrUsername':
-                setState(s => ({ ...s, form: { ...s.form, acctNoOrUsername: value } }));
-                break;
-            case 'amount':
-                setState(s => ({ ...s, form: { ...s.form, amount: value } }));
-                break;
-            case 'password':
-                setState(s => ({ ...s, form: { ...s.form, password: value } }));
-                break;
-            default:
-                break;
-        }
-    }
-
     return (
-        <form className="m-3" onSubmit={handleSubmit}>
+        <form className="m-3" onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-3">
-                <input id="username" type="text" className="form-control" disabled={processing} onBlur={confirmUser} placeholder="Recipient username or account number" name="acctNoOrUsername" value={acctNoOrUsername} onChange={handleChange} required />
+                <input {...register("acctNoOrUsername")} id="username" className="form-control" disabled={processing} onBlur={confirmUser} placeholder="Recipient username or account number" required />
                 <p className={`text-${feedback.includes('Invalid') ? 'danger' : 'success'} feedback form-text`}>{feedback}</p>
             </div>
             <div className="mb-3">
-                <input type="number" className="form-control" disabled={processing} placeholder="Transfer amount" min={1} name="amount" value={amount} onChange={handleChange} required />
+                <input type="number" className="form-control" disabled={processing} placeholder="Transfer amount" min={1} {...register("amount")} required />
             </div>
             <div className="mb-3">
-                <input type="password" className="form-control" disabled={processing} placeholder="Enter your login password" name="password" value={password} onChange={handleChange} required />
+                <input type="password" className="form-control" disabled={processing} placeholder="Enter your login password" {...register("password")} required />
             </div>
             <button className="btn btn-primary w-100" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
         </form>
     );
-
-    interface IState {
-        form: {
-            acctNoOrUsername: string;
-            amount: string;
-            password: string;
-        }
-        processing: boolean;
-        feedback: string;
-    }
 }
 
 export default TransferWalletModal;

@@ -24,3 +24,5 @@ yarn.lock
 *.sln
 *.sw?
 .env
+
+archive/
