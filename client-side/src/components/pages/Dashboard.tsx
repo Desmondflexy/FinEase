@@ -9,16 +9,6 @@ import TransferWallet from "../modals/TransferWallet";
 import { FundWalletModal } from "../modals/FundWallet";
 import { apiService } from "../../api.service";
 
-type IState = {
-    balance: number;
-    recent10: ITransaction[];
-    modal: {
-        fundWallet: boolean;
-        transferWallet: boolean;
-    },
-    totalExpense: number;
-}
-
 export default function Dashboard() {
     const [user] = useOutletContext() as OutletContextType;
 
@@ -58,7 +48,7 @@ export default function Dashboard() {
             .catch(err => {
                 console.error(err.response.data);
             })
-    }, [balance]);
+    }, []);
 
     function toggleModal(modal: 'fundWallet' | 'transferWallet') {
         setState(s => ({ ...s, modal: { ...s.modal, [modal]: !state.modal[modal] } }));
@@ -135,4 +125,14 @@ export default function Dashboard() {
             </div>
         </div>
     )
+}
+
+type IState = {
+    balance: number;
+    recent10: ITransaction[];
+    modal: {
+        fundWallet: boolean;
+        transferWallet: boolean;
+    },
+    totalExpense: number;
 }
