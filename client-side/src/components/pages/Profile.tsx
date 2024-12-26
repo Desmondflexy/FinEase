@@ -1,8 +1,8 @@
 import { useOutletContext } from "react-router-dom";
-import { IUser } from "../../utils/types";
+import { OutletContextType } from "../../utils/types";
 
 export default function Profile() {
-    const [user] = useOutletContext() as [IUser];
+    const [user] = useOutletContext() as OutletContextType;
 
     return (
         <div id="user-profile">

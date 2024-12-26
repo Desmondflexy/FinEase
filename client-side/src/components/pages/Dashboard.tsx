@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { formatDateTime, formatNumber, greet } from "../../utils/helpers";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { ITransaction, IUser } from "../../utils/types";
+import { ITransaction, OutletContextType } from "../../utils/types";
 import { IoWalletOutline } from "react-icons/io5";
 import { GiExpense } from "react-icons/gi";
 import FormModal from "../modals/FormModal";
@@ -20,7 +20,7 @@ type IState = {
 }
 
 export default function Dashboard() {
-    const [user] = useOutletContext() as [IUser];
+    const [user] = useOutletContext() as OutletContextType;
 
     const [state, setState] = useState<IState>({
         balance: 0,
@@ -36,7 +36,15 @@ export default function Dashboard() {
 
     const { balance, recent10, totalExpense } = state;
 
-    useEffect(getRecentTransactions, []);
+    useEffect(() => {
+        apiService.getRecentTransactions()
+            .then(res => {
+                setState(s => ({ ...s, recent10: res.data.transactions }));
+            })
+            .catch(err => {
+                console.error(err.response.data);
+            })
+    }, []);
 
     useEffect(() => {
         setState(s => ({ ...s, balance: user.balance }));
@@ -51,16 +59,6 @@ export default function Dashboard() {
                 console.error(err.response.data);
             })
     }, [balance]);
-
-    function getRecentTransactions() {
-        apiService.getRecentTransactions()
-            .then(res => {
-                setState(s => ({ ...s, recent10: res.data.transactions }));
-            })
-            .catch(err => {
-                console.error(err.response.data);
-            })
-    }
 
     function toggleModal(modal: 'fundWallet' | 'transferWallet') {
         setState(s => ({ ...s, modal: { ...s.modal, [modal]: !state.modal[modal] } }));

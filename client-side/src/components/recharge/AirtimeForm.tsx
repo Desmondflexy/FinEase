@@ -7,12 +7,6 @@ import { useForm } from "react-hook-form";
 import { handleError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 
-interface DataInputs {
-    operatorId: string;
-    phone: string;
-    amount: string;
-}
-
 function AirtimeForm() {
     const [state, setState] = useState<IState>({
         networks: [],
@@ -110,18 +104,24 @@ function AirtimeForm() {
             {state.errorFeedback && <i className="text-danger">{state.errorFeedback}</i>}
         </div>
     );
-
-    interface IState {
-        networks: {
-            id: string;
-            name: string;
-        }[];
-        processing: boolean;
-        logoUrl: string;
-        errorFeedback: string;
-    }
 }
 
 export default AirtimeForm;
+
+type IState = {
+    networks: {
+        id: string;
+        name: string;
+    }[];
+    processing: boolean;
+    logoUrl: string;
+    errorFeedback: string;
+}
+
+type DataInputs = {
+    operatorId: string;
+    phone: string;
+    amount: string;
+}
 
 // 133 lines of code reduced to 116 lines!

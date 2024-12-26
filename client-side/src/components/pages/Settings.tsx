@@ -1,5 +1,5 @@
 import { useOutletContext } from "react-router-dom";
-import { IUser } from "../../utils/types";
+import { IUser, OutletContextType } from "../../utils/types";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
@@ -175,7 +175,7 @@ function PasswordEditForm() {
 }
 
 function Settings() {
-    const [user] = useOutletContext() as [IUser];
+    const [user] = useOutletContext() as OutletContextType;
 
     return (
         <div id="settings">

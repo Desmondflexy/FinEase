@@ -6,21 +6,6 @@ import { handleError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
 
-type Prop = {
-    closeModal: (id: string) => void;
-}
-
-type DataInputs = {
-    acctNoOrUsername: string;
-    amount: string;
-    password: string;
-}
-
-type IState = {
-    processing: boolean;
-    feedback: string;
-}
-
 function TransferWalletModal({ closeModal }: Prop) {
     const [state, setState] = useState<IState>({
         processing: false,
@@ -84,6 +69,21 @@ function TransferWalletModal({ closeModal }: Prop) {
             <button className="btn btn-primary w-100" disabled={processing}>{processing ? 'Processing...' : 'Proceed'}</button>
         </form>
     );
+}
+
+type Prop = {
+    closeModal: (id: string) => void;
+}
+
+type DataInputs = {
+    acctNoOrUsername: string;
+    amount: string;
+    password: string;
+}
+
+type IState = {
+    processing: boolean;
+    feedback: string;
 }
 
 export default TransferWalletModal;
