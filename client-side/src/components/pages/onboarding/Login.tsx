@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { handleError } from "../../../utils/utils";
+import { handleError } from "../../../utils/helpers";
 import { apiService } from "../../../api.service";
 
-interface LoginInputs {
+type LoginInputs = {
     username_email: string;
     password: string;
 }

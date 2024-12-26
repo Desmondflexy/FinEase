@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { IDisco, OutletContextType } from "../../types";
+import { IDisco, OutletContextType } from "../../utils/types";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { handleError } from "../../utils/utils";
+import { handleError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 
-interface DataInputs {
+type DataInputs = {
     operatorId: string;
     meterType: string;
     meterNumber: string;
     amount: string;
 }
 
-interface State {
+type State = {
     processing: boolean;
     token: string;
     units: number;
@@ -90,7 +90,7 @@ function ElectricityForm() {
     }
 
     function buyElectricity(amount: string, operatorId: string, meterType: string, meterNumber: string) {
-       apiService.buyElectricity(operatorId, amount, meterNumber, meterType)
+        apiService.buyElectricity(operatorId, amount, meterNumber, meterType)
             .then((res) => {
                 const { message, units, token } = res.data;
                 toast.success(message);

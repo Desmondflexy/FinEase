@@ -1,9 +1,9 @@
 import { useOutletContext } from "react-router-dom";
-import { IUser } from "../../types";
+import { IUser } from "../../utils/types";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { handleError } from "../../utils/utils";
+import { handleError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 
 

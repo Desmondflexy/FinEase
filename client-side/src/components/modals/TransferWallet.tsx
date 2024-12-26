@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
-import { OutletContextType } from "../../types";
-import { handleError } from "../../utils/utils";
+import { OutletContextType } from "../../utils/types";
+import { handleError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
 

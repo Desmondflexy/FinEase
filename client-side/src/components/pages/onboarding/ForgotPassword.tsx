@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { handleError } from "../../../utils/utils";
+import { handleError } from "../../../utils/helpers";
 import { apiService } from "../../../api.service";
 
 export default function ForgotPassword() {

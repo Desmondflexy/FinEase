@@ -2,15 +2,23 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Header } from "./onboarding/GetStarted";
 
-export default function Error({ code, message, goto }: IError) {
+type IError = {
+    code: number;
+    message: string;
+    goto: string
+}
+
+export default function Error(err: IError) {
     const navigate = useNavigate();
 
+    const { code, message, goto } = err;
+
     useEffect(() => {
-        if (code === 401) {
+        if (code === 401 || code === 403) {
             localStorage.removeItem('token');
             navigate('/auth/login');
         }
-    })
+    }, [code, navigate]);
 
 
     return (
@@ -21,10 +29,4 @@ export default function Error({ code, message, goto }: IError) {
             <Link to={goto}>{goto === '/auth/login' ? 'Login' : 'Home'}</Link>
         </div>
     )
-}
-
-interface IError {
-    code: number;
-    message: string;
-    goto: string
 }

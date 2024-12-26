@@ -116,6 +116,10 @@ class ApiService {
         }
         return this.Api.post<response>('transaction/initialize-payment', { amount: +amount })
     }
+
+    logout() {
+        return this.Api.post('auth/logout');
+    }
 }
 
 export const apiService = new ApiService();

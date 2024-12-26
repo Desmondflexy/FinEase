@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { IUser } from "../types";
+import { IUser } from "../utils/types";
 
 function SideBar({ user }: { user: IUser }) {
     const location = useLocation().pathname.split('/')[2];

@@ -1,5 +1,5 @@
 import { useOutletContext } from "react-router-dom";
-import { IUser } from "../../types";
+import { IUser } from "../../utils/types";
 
 export default function Profile() {
     const [user] = useOutletContext() as [IUser];

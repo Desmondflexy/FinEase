@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Home from './components/pages/Home'
@@ -24,15 +24,17 @@ export default function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path='/auth' element={<Auth />}>
+                    <Route index element={<Navigate to='login' />} />
                     <Route path='signup' element={<Signup admin={false} />} />
                     <Route path='admin-signup' element={<Signup admin={true} />} />
                     <Route path='login' element={<Login />} />
                     <Route path='logout' element={<Logout />} />
                     <Route path='forgot-password' element={<ForgotPassword />} />
                     <Route path='reset-password/:resetId' element={<ResetPassword />} />
-                    <Route path='verify-email/:verifyId' element={<VerifyEmail/>}/>
+                    <Route path='verify-email/:verifyId' element={<VerifyEmail />} />
                 </Route>
                 <Route path='/account' element={<Account />}>
+                    <Route index element={<Navigate to='dashboard' />} />
                     <Route path='dashboard' element={<Dashboard />} />
                     <Route path='profile' element={<Profile />} />
                     <Route path='all-users' element={<AllUsers />} />

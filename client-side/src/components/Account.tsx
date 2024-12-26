@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import Loading from "./pages/Loading";
 import { CgProfile } from "react-icons/cg";
 import Error from "./pages/Error";
-import { IUser } from "../types";
+import { ApiStatus, IUser } from "../utils/types";
 import { IoMenu } from "react-icons/io5";
 import SideBar from "./SideBar";
 import { apiService } from "../api.service";
 
-interface IState {
-    status: 'loading' | 'error' | 'success';
+type IState = {
+    apiStatus: ApiStatus;
     error: {
         status: number;
         statusText: string;
@@ -25,12 +25,12 @@ export default function Account() {
     const location = useLocation().pathname.split('/')[2];
     const token = localStorage.getItem('token');
     const [state, setState] = useState<IState>({
-        status: 'loading',
+        apiStatus: ApiStatus.LOADING,
         error: { status: 0, statusText: '', goto: '/' },
         isVisible: { sideBar: false },
     });
 
-    const { status, error } = state;
+    const { apiStatus, error } = state;
 
     useEffect(() => {
         document.title = 'FinEase | Account';
@@ -49,10 +49,10 @@ export default function Account() {
         apiService.getAccountInfo()
             .then(res => {
                 setUser(res.data.user);
-                setState(s => ({ ...s, status: 'success' }));
+                setState(s => ({ ...s, apiStatus: ApiStatus.SUCCESS }));
             })
             .catch(err => {
-                setState(s => ({ ...s, status: 'error' }));
+                setState(s => ({ ...s, apiStatus: ApiStatus.ERROR }));
                 if (err.response) {
                     const { status, statusText } = err.response;
                     setState(s => ({
@@ -66,11 +66,11 @@ export default function Account() {
     }, [token, location]);
 
 
-    if (status === 'loading') {
+    if (apiStatus === ApiStatus.LOADING) {
         return <Loading />
     }
 
-    if (status === 'success' && user) {
+    if (apiStatus === ApiStatus.SUCCESS && user) {
         return (
             <div id="app-layout">
 
@@ -110,7 +110,7 @@ export default function Account() {
         );
     }
 
-    if (status === 'error') {
+    if (apiStatus === ApiStatus.ERROR) {
         return (
             <Error code={error.status} message={error.statusText} goto={error.goto} />
         );

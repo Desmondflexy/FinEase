@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { payWithPaystack } from "../../utils/utils";
+import { payWithPaystack } from "../../utils/helpers";
 import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
-import { OutletContextType } from "../../types";
+import { OutletContextType } from "../../utils/types";
 import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
 

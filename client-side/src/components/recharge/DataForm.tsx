@@ -1,10 +1,10 @@
 import { useOutletContext } from "react-router-dom";
-import { OutletContextType } from "../../types";
+import { OutletContextType } from "../../utils/types";
 import { useEffect, useState } from "react";
 import { networkLogo, phoneNumberRegex } from "../../utils/constants";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { handleError } from "../../utils/utils";
+import { handleError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 
 interface DataInputs {

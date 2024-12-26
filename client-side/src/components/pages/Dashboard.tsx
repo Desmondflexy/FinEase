@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { formatDateTime, formatNumber, greet } from "../../utils/utils";
+import { formatDateTime, formatNumber, greet } from "../../utils/helpers";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { ITransaction, IUser } from "../../types";
+import { ITransaction, IUser } from "../../utils/types";
 import { IoWalletOutline } from "react-icons/io5";
 import { GiExpense } from "react-icons/gi";
 import FormModal from "../modals/FormModal";
@@ -9,16 +9,17 @@ import TransferWallet from "../modals/TransferWallet";
 import { FundWalletModal } from "../modals/FundWallet";
 import { apiService } from "../../api.service";
 
+type IState = {
+    balance: number;
+    recent10: ITransaction[];
+    modal: {
+        fundWallet: boolean;
+        transferWallet: boolean;
+    },
+    totalExpense: number;
+}
+
 export default function Dashboard() {
-    interface IState {
-        balance: number;
-        recent10: ITransaction[];
-        modal: {
-            fundWallet: boolean;
-            transferWallet: boolean;
-        },
-        totalExpense: number;
-    }
     const [user] = useOutletContext() as [IUser];
 
     const [state, setState] = useState<IState>({

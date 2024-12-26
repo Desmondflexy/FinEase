@@ -1,5 +1,5 @@
 // shape for user
-export interface IUser {
+export type IUser = {
     id: number;
     fullName: string;
     email: string;
@@ -12,7 +12,7 @@ export interface IUser {
 }
 
 // shape for transaction
-export interface ITransaction {
+export type ITransaction = {
     id: number;
     amount: number;
     type: 'DEBIT' | 'CREDIT';
@@ -24,8 +24,14 @@ export interface ITransaction {
 // shape for [user, setUser] context
 export type OutletContextType = [IUser, React.Dispatch<React.SetStateAction<IUser>>];
 
-export interface IDisco {
+export type IDisco = {
     desc: string;
     id: string;
     name: string;
+}
+
+export enum ApiStatus {
+    LOADING = 'LOADING',
+    SUCCESS = 'SUCCESS',
+    ERROR = 'ERROR',
 }
