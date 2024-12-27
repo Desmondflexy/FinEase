@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Error from "./Error";
 import { formatDateTime, formatNumber, handleError } from "../../utils/helpers";
 import Loading from "./Loading";
@@ -6,6 +6,7 @@ import { ApiStatus, ITransaction } from "../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiService } from "../../api.service";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
 
 export default function Transactions() {
     const [searchParams] = useSearchParams();
@@ -13,8 +14,6 @@ export default function Transactions() {
         transactions: [],
         apiStatus: ApiStatus.LOADING,
         error: { status: 0, statusText: '', goto: '/' },
-        searchTerm: '',
-        searchResults: [],
         fetchingData: true,
         apiMeta: {
             itemCount: 0,
@@ -23,60 +22,44 @@ export default function Transactions() {
         },
     });
 
+    const { register, watch } = useForm<{ search: string }>();
+    const searchTerm = watch("search");
+
     const page = Number(searchParams.get('page'));
     const navigate = useNavigate();
-    const { apiStatus, error, searchTerm, searchResults, apiMeta } = state;
+    const { apiStatus, error, apiMeta, transactions } = state;
 
     useEffect(() => {
-        apiService.fetchTransactions(page)
-            .then(res => {
-                const { transactions, links, meta } = res.data;
+        apiService.fetchTransactions(page, searchTerm).then(res => {
+            const { transactions, links, meta } = res.data;
 
-                if (page > meta.totalPages) {
-                    navigate(`/account/transactions?page=${meta.totalPages}`);
-                    return;
-                }
-                setState(s => ({
-                    ...s,
-                    transactions,
-                    apiStatus: ApiStatus.SUCCESS,
-                    searchResults: transactions,
-                    fetchingData: false,
-                    apiMeta: meta,
-                    apiLinks: links,
-                }));
-            }).catch(err => {
-                if (page < 1) {
-                    navigate(`/account/transactions?page=1`);
-                    return;
-                }
-                const { status, statusText } = err.response;
-                handleError(err, toast);
-                setState(s => ({
-                    ...s,
-                    apiStatus: ApiStatus.ERROR,
-                    error: { ...s.error, status, statusText }
-                }));
-            });
+            if (page > meta.totalPages) {
+                navigate(`/account/transactions?page=${meta.totalPages}`);
+                return;
+            }
+            setState(s => ({
+                ...s,
+                transactions,
+                apiStatus: ApiStatus.SUCCESS,
+                fetchingData: false,
+                apiMeta: meta,
+                apiLinks: links,
+            }));
+        }).catch(err => {
+            if (page < 1) {
+                navigate(`/account/transactions?page=1`);
+                return;
+            }
+            const { status, statusText } = err.response;
+            handleError(err, toast);
+            setState(s => ({
+                ...s,
+                apiStatus: ApiStatus.ERROR,
+                error: { ...s.error, status, statusText }
+            }));
+        });
         setState(s => ({ ...s, searchResults: s.transactions }));
-    }, [page, navigate]);
-
-    function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
-        const text = e.target.value;
-        setState(s => ({
-            ...s,
-            searchTerm: text,
-            searchResults: s.transactions.filter(trx => {
-                const searchPool = [
-                    trx.amount,
-                    trx.type,
-                    trx.description.toLowerCase(),
-                    trx.reference.toLowerCase(),
-                ];
-                return searchPool.some(item => item.toString().includes(text.toLowerCase().trim()));
-            })
-        }));
-    }
+    }, [page, navigate, searchTerm]);
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
@@ -91,7 +74,7 @@ export default function Transactions() {
     if (apiStatus === ApiStatus.SUCCESS) {
         return <section id="all-transactions">
             <h1>Transactions</h1>
-            <input value={searchTerm} onChange={handleSearch} type="search" placeholder="Search transaction..." />
+            <input {...register("search")} type="search" placeholder="Search transaction..." />
             <hr />
             <div className="table">
 
@@ -109,8 +92,8 @@ export default function Transactions() {
                         </tr>
                     </thead>
                     <tbody>
-                        {searchResults.length
-                            ? searchResults.map((trx: ITransaction, index: number) => (
+                        {transactions.length
+                            ? transactions.map((trx: ITransaction, index: number) => (
                                 <tr key={trx.id}>
                                     <td>{index + 1}</td>
                                     <td>{formatNumber(+trx.amount).slice(3)}</td>
@@ -149,8 +132,6 @@ type IState = {
         statusText: string;
         goto: string;
     };
-    searchTerm: string;
-    searchResults: ITransaction[];
     fetchingData: boolean;
     apiMeta: {
         itemCount: number;

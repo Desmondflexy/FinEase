@@ -6,6 +6,7 @@ import { apiService } from "../../api.service";
 import Loading from "./Loading";
 import { handleError } from "../../utils/helpers";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
 
 export default function UsersList() {
     const [searchParams] = useSearchParams();
@@ -14,8 +15,6 @@ export default function UsersList() {
     const [state, setState] = useState<IState>({
         users: [],
         apiStatus: ApiStatus.LOADING,
-        searchTerm: '',
-        searchResults: [],
         error: { status: 0, statusText: '', goto: '/' },
         totalPages: 1,
         fetchingData: false,
@@ -26,12 +25,15 @@ export default function UsersList() {
         },
     });
 
-    const { apiStatus, searchTerm, searchResults, error, apiMeta } = state;
+    const { register, watch, } = useForm<{ search: string }>();
+    const searchTerm = watch("search");
+
+    const { apiStatus, error, apiMeta, users } = state;
 
     const page = Number(searchParams.get('page'));
 
     useEffect(() => {
-        apiService.getAllUsers(page)
+        apiService.getAllUsers(page, searchTerm)
             .then(res => {
                 const { users, links, meta } = res.data;
 
@@ -43,7 +45,6 @@ export default function UsersList() {
                     ...s,
                     users,
                     apiStatus: ApiStatus.SUCCESS,
-                    searchResults: users,
                     fetchingData: false,
                     apiMeta: meta,
                     apiLinks: links,
@@ -70,29 +71,7 @@ export default function UsersList() {
                     setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
                 }
             });
-    }, [page, navigate]);
-    
-    useEffect(() => {
-        setState(s => ({ ...s, searchResults: s.users }));
-    }, []);
-
-    function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
-        const text = e.target.value;
-        setState(s => ({
-            ...s,
-            searchTerm: text,
-            searchResults: s.users.filter(user => {
-                const { fullName, email, phone, acctNo } = user;
-                const searchPool = [
-                    fullName.toLowerCase(),
-                    email.toLowerCase(),
-                    phone.toLowerCase(),
-                    acctNo.toLowerCase()
-                ];
-                return searchPool.some(item => item.includes(text.toLowerCase().trim()));
-            })
-        }));
-    }
+    }, [page, navigate, searchTerm]);
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
@@ -107,7 +86,7 @@ export default function UsersList() {
     if (apiStatus === ApiStatus.SUCCESS) {
         return <section id="admin">
             <h1>Active Users</h1>
-            <input type="search" placeholder="Search for user" onChange={handleSearch} value={searchTerm} />
+            <input type="search" placeholder="Search for user" {...register("search")} />
             <hr />
             <div className="table-container">
                 <table>
@@ -122,7 +101,7 @@ export default function UsersList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {searchResults.map((user: IUser, index: number) => (
+                        {users.map((user: IUser, index: number) => (
                             <tr key={user.id}>
                                 <td>{index + 1}</td>
                                 <td>{user.fullName}</td>
@@ -155,8 +134,6 @@ export default function UsersList() {
 type IState = {
     users: IUser[];
     apiStatus: ApiStatus;
-    searchTerm: string;
-    searchResults: IUser[];
     error: {
         status: number;
         statusText: string;

@@ -8,18 +8,6 @@ import { IoMenu } from "react-icons/io5";
 import SideBar from "./SideBar";
 import { apiService } from "../api.service";
 
-type IState = {
-    apiStatus: ApiStatus;
-    error: {
-        status: number;
-        statusText: string;
-        goto: string;
-    };
-    isVisible: {
-        sideBar: boolean;
-    }
-}
-
 export default function Account() {
     const [user, setUser] = useState<IUser | null>(null);
     const location = useLocation().pathname.split('/')[2];
@@ -46,23 +34,21 @@ export default function Account() {
 
 
     useEffect(() => {
-        apiService.getAccountInfo()
-            .then(res => {
-                setUser(res.data.user);
-                setState(s => ({ ...s, apiStatus: ApiStatus.SUCCESS }));
-            })
-            .catch(err => {
-                setState(s => ({ ...s, apiStatus: ApiStatus.ERROR }));
-                if (err.response) {
-                    const { status, statusText } = err.response;
-                    setState(s => ({
-                        ...s,
-                        error: { status, statusText, goto: status >= 400 && status <= 499 ? '/auth/login' : s.error.goto }
-                    }));
-                } else {
-                    setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
-                }
-            });
+        apiService.getAccountInfo().then(res => {
+            setUser(res.data.user);
+            setState(s => ({ ...s, apiStatus: ApiStatus.SUCCESS }));
+        }).catch(err => {
+            setState(s => ({ ...s, apiStatus: ApiStatus.ERROR }));
+            if (err.response) {
+                const { status, statusText } = err.response;
+                setState(s => ({
+                    ...s,
+                    error: { status, statusText, goto: status >= 400 && status <= 499 ? '/auth/login' : s.error.goto }
+                }));
+            } else {
+                setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
+            }
+        });
     }, [token, location]);
 
 
@@ -114,5 +100,17 @@ export default function Account() {
         return (
             <Error code={error.status} message={error.statusText} goto={error.goto} />
         );
+    }
+}
+
+type IState = {
+    apiStatus: ApiStatus;
+    error: {
+        status: number;
+        statusText: string;
+        goto: string;
+    };
+    isVisible: {
+        sideBar: boolean;
     }
 }
