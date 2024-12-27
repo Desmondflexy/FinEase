@@ -7,6 +7,7 @@ import Loading from "./Loading";
 import { handleError } from "../../utils/helpers";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { APP_ROUTES } from "../../utils/constants";
 
 export default function UsersList() {
     const [searchParams] = useSearchParams();
@@ -38,7 +39,7 @@ export default function UsersList() {
                 const { users, links, meta } = res.data;
 
                 if (page > meta.totalPages) {
-                    navigate(`/account/all-users?page=${meta.totalPages}`);
+                    navigate(`${APP_ROUTES.ALL_USERS}?page=${meta.totalPages}`);
                     return;
                 }
                 setState(s => ({
@@ -51,7 +52,7 @@ export default function UsersList() {
                 }));
             }).catch(err => {
                 if (page < 1) {
-                    navigate(`/account/all-users?page=1`);
+                    navigate(`${APP_ROUTES.ALL_USERS}?page=1`);
                     return;
                 }
                 setState(s => ({ ...s, apiStatus: ApiStatus.ERROR }));
@@ -75,17 +76,17 @@ export default function UsersList() {
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`/account/all-users?page=${page + 1}`);
+        navigate(`${APP_ROUTES.ALL_USERS}?page=${page + 1}`);
     }
 
     function handlePrevious() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`/account/all-users?page=${page - 1}`);
+        navigate(`${APP_ROUTES.ALL_USERS}?page=${page - 1}`);
     }
 
     if (apiStatus === ApiStatus.SUCCESS) {
         return <section id="admin">
-            <h1>Active Users</h1>
+            <h3>Active Users</h3>
             <input type="search" placeholder="Search for user" {...register("search")} />
             <hr />
             <div className="table-container">

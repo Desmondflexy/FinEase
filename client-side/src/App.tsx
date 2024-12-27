@@ -17,6 +17,8 @@ import { Logout } from './components/Logout';
 import ForgotPassword from './components/pages/onboarding/ForgotPassword';
 import { ResetPassword } from './components/pages/onboarding/ResetPassword';
 import VerifyEmail from './components/VerifyEmail';
+import AdminApp from './components/AdminApp';
+import AllTransactions from './components/pages/AllTransactions';
 
 export default function App() {
     return (
@@ -37,10 +39,14 @@ export default function App() {
                     <Route index element={<Navigate to='dashboard' />} />
                     <Route path='dashboard' element={<Dashboard />} />
                     <Route path='profile' element={<Profile />} />
-                    <Route path='all-users' element={<AllUsers />} />
                     <Route path='transactions' element={<Transactions />} />
                     <Route path='recharge' element={<Recharge />} />
                     <Route path='settings' element={<Settings />} />
+                    <Route path='admin' element={<AdminApp />}>
+                        <Route index element={<Navigate to='users?page=1' />} />
+                        <Route path='users' element={<AllUsers />} />
+                        <Route path='transactions' element={<AllTransactions />} />
+                    </Route>
                 </Route>
                 <Route path='*' element={<Error message={'Page Not Found'} code={404} goto={'/'} />} />
             </Routes>

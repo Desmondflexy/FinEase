@@ -33,7 +33,7 @@ class ApiService {
         return this.Api.get(`transaction/recent`);
     }
     getAllUsers(page: number, search: string) {
-        return this.Api.get(`/admin/all-users?page=${page}&search=${search}`);
+        return this.Api.get(`/admin/users?page=${page}&search=${search}`);
     }
 
     getAccountInfo() {
@@ -66,6 +66,10 @@ class ApiService {
 
     fetchTransactions(page: number, search: string) {
         return this.Api.get(`/transaction?page=${page}&search=${search}`);
+    }
+
+    fetchAllTransactions(page: number, search: string) {
+        return this.Api.get(`/admin/transactions?page=${page}&search=${search}`);
     }
 
     forgotPassword(email: string) {

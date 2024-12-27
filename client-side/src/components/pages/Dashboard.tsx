@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { formatDateTime, formatNumber, greet } from "../../utils/helpers";
-import { useOutletContext, useNavigate } from "react-router-dom";
+import { useOutletContext, Link } from "react-router-dom";
 import { ITransaction, OutletContextType } from "../../utils/types";
 import { IoWalletOutline } from "react-icons/io5";
 import { GiExpense } from "react-icons/gi";
@@ -21,8 +21,6 @@ export default function Dashboard() {
         },
         totalExpense: 0,
     });
-
-    const navigate = useNavigate();
 
     const { balance, recent10, totalExpense } = state;
 
@@ -110,7 +108,7 @@ export default function Dashboard() {
 
                     </table>
                 </div>
-                <button onClick={() => navigate('/account/transactions')}>See more</button>
+                <Link to='/account/transactions?page=1' className="btn btn-primary my-2 btn-sm">See more</Link>
             </section>
 
             <FormModal closeModal={() => toggleModal('transferWallet')} id='transferWallet' title="Wallet to Wallet Transfer">

@@ -19,6 +19,7 @@ export type ITransaction = {
     description: string;
     reference: string;
     createdAt: string;
+    user?: IUser;
 }
 
 // shape for [user, setUser] context
