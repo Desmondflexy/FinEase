@@ -21,17 +21,18 @@ export default function AllTransactions() {
             totalItems: 0,
             totalPages: 1,
         },
+        pgSize: 10,
     });
 
-    const { register, watch } = useForm<{ search: string }>();
+    const { register, watch,  } = useForm<{ search: string, pgSize: string }>();
     const searchTerm = watch("search");
 
     const page = Number(searchParams.get('page'));
     const navigate = useNavigate();
-    const { apiStatus, error, apiMeta, transactions } = state;
+    const { apiStatus, error, apiMeta, transactions, pgSize } = state;
 
     useEffect(() => {
-        apiService.fetchAllTransactions(page, searchTerm).then(res => {
+        apiService.fetchAllTransactions(page, pgSize, searchTerm).then(res => {
             const { transactions, links, meta } = res.data;
 
             if (page > meta.totalPages) {
@@ -60,7 +61,7 @@ export default function AllTransactions() {
             }));
         });
         setState(s => ({ ...s, searchResults: s.transactions }));
-    }, [page, navigate, searchTerm]);
+    }, [page, navigate, searchTerm, pgSize]);
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
@@ -72,13 +73,24 @@ export default function AllTransactions() {
         navigate(`${APP_ROUTES.ALL_TRANSACTIONS}?page=${page - 1}`);
     }
 
+    function handlePgSizeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        setState(s => ({ ...s, pgSize: +e.target.value }));
+    }
+
     if (apiStatus === ApiStatus.SUCCESS) {
         return <section id="all-transactions">
             <h3>All Transactions</h3>
             <input {...register("search")} type="search" placeholder="Search transaction..." />
             <hr />
-            <div className="table">
 
+            <div className="pg-size">
+                <label htmlFor="pg-size">Size: </label>
+                <select name="pg-size" id="pg-size" onChange={handlePgSizeChange} value={pgSize}>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
             </div>
             <div className="table-container">
                 <table>
@@ -147,4 +159,5 @@ type IState = {
         previous: string;
         next: string;
     };
+    pgSize: number;
 }

@@ -24,17 +24,18 @@ export default function UsersList() {
             totalItems: 0,
             totalPages: 1,
         },
+        pgSize: 10,
     });
 
     const { register, watch, } = useForm<{ search: string }>();
     const searchTerm = watch("search");
 
-    const { apiStatus, error, apiMeta, users } = state;
+    const { apiStatus, error, apiMeta, users, pgSize } = state;
 
     const page = Number(searchParams.get('page'));
 
     useEffect(() => {
-        apiService.getAllUsers(page, searchTerm)
+        apiService.getAllUsers(page, pgSize, searchTerm)
             .then(res => {
                 const { users, links, meta } = res.data;
 
@@ -72,7 +73,7 @@ export default function UsersList() {
                     setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
                 }
             });
-    }, [page, navigate, searchTerm]);
+    }, [page, navigate, searchTerm, pgSize]);
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
@@ -84,11 +85,24 @@ export default function UsersList() {
         navigate(`${APP_ROUTES.ALL_USERS}?page=${page - 1}`);
     }
 
+    function handlePgSizeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        setState(s => ({ ...s, pgSize: +e.target.value }));
+    }
+
     if (apiStatus === ApiStatus.SUCCESS) {
         return <section id="admin">
             <h3>Active Users</h3>
             <input type="search" placeholder="Search for user" {...register("search")} />
             <hr />
+            <div className="pg-size">
+                <label htmlFor="pg-size">Size: </label>
+                <select name="pg-size" id="pg-size" onChange={handlePgSizeChange} value={pgSize}>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
             <div className="table-container">
                 <table>
                     <thead>
@@ -153,4 +167,5 @@ type IState = {
         previous: string;
         next: string;
     };
+    pgSize: number;
 }

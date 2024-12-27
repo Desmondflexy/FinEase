@@ -32,8 +32,8 @@ class ApiService {
     getRecentTransactions() {
         return this.Api.get(`transaction/recent`);
     }
-    getAllUsers(page: number, search: string) {
-        return this.Api.get(`/admin/users?page=${page}&search=${search}`);
+    getAllUsers(page: number, limit: number, search: string) {
+        return this.Api.get(`/admin/users?page=${page}&search=${search}&limit=${limit}`);
     }
 
     getAccountInfo() {
@@ -64,12 +64,12 @@ class ApiService {
         return this.Api.post(`/auth/reset-password/${resetId}?email=${email}`, { password, confirm });
     }
 
-    fetchTransactions(page: number, search: string) {
-        return this.Api.get(`/transaction?page=${page}&search=${search}`);
+    fetchTransactions(page: number, limit: number, search: string) {
+        return this.Api.get(`/transaction?page=${page}&search=${search}&limit=${limit}`);
     }
 
-    fetchAllTransactions(page: number, search: string) {
-        return this.Api.get(`/admin/transactions?page=${page}&search=${search}`);
+    fetchAllTransactions(page: number, limit: number, search: string) {
+        return this.Api.get(`/admin/transactions?page=${page}&search=${search}&limit=${limit}`);
     }
 
     forgotPassword(email: string) {
