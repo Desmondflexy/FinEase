@@ -5,7 +5,7 @@ export const networkLogo: { [key: string]: string } = {
     '9mobile': '/images/9mobile-logo.png'
 };
 
-export const phoneNumberRegex = /^(070[1234568]|080[2356789]|081[0-8]|090[1-9]|091[12356])\d{7}$/;
+export const phoneNumberRegex = /^(070[1-8]|080[2356789]|081[0-8]|090[1-9]|091[12356])\d{7}$/;
 
 export const APP_ROUTES = {
     ALL_USERS: '/account/admin/users',
