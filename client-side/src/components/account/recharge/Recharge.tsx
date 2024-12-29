@@ -2,17 +2,19 @@ import DataForm from "./DataForm";
 import ElectricityForm from "./ElectricityForm";
 import Tv from "./TvForm";
 import AirtimeForm from "./AirtimeForm";
-import { useNavigate, Route, Routes } from "react-router-dom";
+import { useNavigate, Route, Routes, useLocation } from "react-router-dom";
 
 export default function Recharge() {
     const navigate = useNavigate();
+    const paths = useLocation().pathname.split('/');
+    const location = paths[paths.length - 1];
 
     return (
         <section id="recharge">
             <h1>Recharge</h1>
             <form className="mb-4">
                 <label htmlFor="service">What do you want to do?</label>
-                <select id="service" onChange={e => navigate(e.target.value)}>
+                <select id="service" value={location} onChange={e => navigate(e.target.value)}>
                     <option value='' >--select--</option>
                     <option value="airtime">Buy Airtime</option>
                     <option value="data">Buy Data</option>

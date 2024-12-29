@@ -16,8 +16,8 @@ import Transactions from "./Transactions";
 
 export default function Account() {
     const [user, setUser] = useState<IUser | null>(null);
-    const pathname = useLocation().pathname;
-    const location = pathname.split('/').pop();
+    const paths = useLocation().pathname.split('/');
+    const location = paths[paths.length - 1];
     const token = localStorage.getItem('token');
     const [state, setState] = useState<IState>({
         apiStatus: ApiStatus.LOADING,
