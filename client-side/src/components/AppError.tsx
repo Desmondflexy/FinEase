@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 // import { Header } from "./auth/Auth";
 
-export default function Error(err: IError) {
+export default function AppError(err: IError) {
     const navigate = useNavigate();
 
     const { code, message, goto } = err;

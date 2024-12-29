@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { payWithPaystack } from "../../utils/helpers";
 import { toast } from "react-toastify";
-import { useOutletContext } from "react-router-dom";
-import { OutletContextType } from "../../utils/types";
 import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
+import { useUserHook } from "../../utils/hooks";
 
 type Props = {
     closeModal: (id: string) => void;
@@ -19,10 +18,10 @@ type IState = {
 }
 
 export function FundWalletModal({ closeModal }: Props) {
-    const [user, setUser] = useOutletContext() as OutletContextType;
     const [state, setState] = useState<IState>({
         processing: false,
     });
+    const { setUser, user } = useUserHook();
 
     const { processing } = state;
 
@@ -40,7 +39,7 @@ export function FundWalletModal({ closeModal }: Props) {
     function fundWalletApi(response: { reference: string }) {
         apiService.fundWallet(response)
             .then(res => {
-                setUser(u => ({ ...u, balance: res.data.balance }));
+                setUser({ ...user, balance: res.data.balance });
                 closeModal('fundWallet');
                 toast.success('Wallet funded successfully!');
                 setState(s => ({ ...s, processing: false }));

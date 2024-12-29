@@ -1,14 +1,13 @@
-import { useOutletContext } from "react-router-dom";
-import { OutletContextType } from "../../../utils/types";
 import { useEffect, useState } from "react";
 import { networkLogo, phoneNumberRegex } from "../../../utils/constants";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { toastError } from "../../../utils/helpers";
 import { apiService } from "../../../api.service";
+import { useUserHook } from "../../../utils/hooks";
 
 export default function DataForm() {
-    const [user, setUser] = useOutletContext() as OutletContextType;
+    const { user, setUser } = useUserHook();
     const [state, setState] = useState<IState>({
         networks: [],
         plans: [],

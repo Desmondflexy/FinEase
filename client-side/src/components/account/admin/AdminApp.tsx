@@ -1,7 +1,7 @@
 import { Link, Navigate, Route, Routes } from "react-router-dom"
 import AllTransactions from "./AllTransactions"
 import AllUsers from "./AllUsers"
-import Error from "../../Error"
+import AppError from "../../AppError"
 
 export default function AdminApp() {
     return (
@@ -15,7 +15,7 @@ export default function AdminApp() {
                 <Route index element={<Navigate to='users?page=1' />} />
                 <Route path='users' element={<AllUsers />} />
                 <Route path='transactions' element={<AllTransactions />} />
-                <Route path='*' element={<Error message={'Page Not Found'} code={404} goto={''} />} />
+                <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
             </Routes>
         </section>
     )

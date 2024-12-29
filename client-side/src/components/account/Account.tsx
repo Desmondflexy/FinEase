@@ -1,12 +1,18 @@
-import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useLocation, Link, useNavigate, Routes, Navigate, Route } from "react-router-dom";
+import { createContext, useEffect, useState } from "react";
 import Loading from "../Loading";
 import { CgProfile } from "react-icons/cg";
-import Error from "../Error";
+import AppError from "../AppError";
 import { ApiStatus, IUser } from "../../utils/types";
 import { IoMenu } from "react-icons/io5";
 import SideBar from "../SideBar";
 import { apiService } from "../../api.service";
+import AdminApp from "./admin/AdminApp";
+import Dashboard from "./Dashboard";
+import Profile from "./Profile";
+import Recharge from "./recharge/Recharge";
+import Settings from "./Settings";
+import Transactions from "./Transactions";
 
 export default function Account() {
     const [user, setUser] = useState<IUser | null>(null);
@@ -58,49 +64,69 @@ export default function Account() {
 
     if (apiStatus === ApiStatus.SUCCESS && user) {
         return (
-            <div id="app-layout">
+            <UserProvider value={{ user, setUser }}>
+                <div id="app-layout">
 
-                {/* header */}
-                <div className="app-header text-secondary bg-white">
-                    <ul>
-                        <li><IoMenu size={30} data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions" /></li>
-                        <li><Link className="navbar-brand" to='/'>FinEase</Link></li>
-                        <li>
-                            <div className="dropdown">
-                                <button className="btn dropdown-toggle d-flex gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ alignItems: 'center' }}>
-                                    <CgProfile /><span>{user.username}</span>
-                                </button>
-                                <ul className="dropdown-menu" style={{ fontSize: '12px' }}>
-                                    <li><Link className="dropdown-item" to="/account/profile">Profile</Link></li>
-                                    <li><Link className="dropdown-item" to="/auth/logout">Logout</Link></li>
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
+                    {/* header */}
+                    <div className="app-header text-secondary bg-white">
+                        <ul>
+                            <li><IoMenu size={30} data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions" /></li>
+                            <li><Link className="navbar-brand" to='/'>FinEase</Link></li>
+                            <li>
+                                <div className="dropdown">
+                                    <button className="btn dropdown-toggle d-flex gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ alignItems: 'center' }}>
+                                        <CgProfile /><span>{user.username}</span>
+                                    </button>
+                                    <ul className="dropdown-menu" style={{ fontSize: '12px' }}>
+                                        <li><Link className="dropdown-item" to="/account/profile">Profile</Link></li>
+                                        <li><Link className="dropdown-item" to="/auth/logout">Logout</Link></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* main */}
+                    <div className="app-body">
+                        <SideBar user={user} />
+
+                        <main className="main p-3">
+                            <Routes>
+                                <Route index element={<Navigate to='dashboard' />} />
+                                <Route path='dashboard' element={<Dashboard />} />
+                                <Route path='profile' element={<Profile />} />
+                                <Route path='transactions' element={<Transactions />} />
+                                <Route path='recharge/*' element={<Recharge />} />
+                                <Route path='settings' element={<Settings />} />
+                                <Route path='admin/*' element={<AdminApp />} />
+                            </Routes>
+                        </main>
+
+                        {/* footer */}
+                        <footer className="app-footer p-3">
+                            <p>© 2024 FinEase. All Rights Reserved.</p>
+                        </footer>
+                    </div>
                 </div>
-
-                {/* main */}
-                <div className="app-body">
-                    <SideBar user={user} />
-
-                    <main className="main p-3">
-                        <Outlet context={[user, setUser]} />
-                    </main>
-
-                    {/* footer */}
-                    <footer className="app-footer p-3">
-                        <p>© 2024 FinEase. All Rights Reserved.</p>
-                    </footer>
-                </div>
-            </div>
+            </UserProvider>
         );
     }
 
     if (apiStatus === ApiStatus.ERROR) {
         return (
-            <Error code={error.status} message={error.statusText} goto={error.goto} />
+            <AppError code={error.status} message={error.statusText} goto={error.goto} />
         );
     }
+}
+
+// UserContext variable is required by useUser hook function
+export const UserContext = createContext<UserContextType | null>(null);
+function UserProvider({ children, value }: { children: React.ReactNode, value: UserContextType }) {
+    return (
+        <UserContext.Provider value={value}>
+            {children}
+        </UserContext.Provider>
+    );
 }
 
 type IState = {
@@ -114,3 +140,8 @@ type IState = {
         sideBar: boolean;
     }
 }
+
+type UserContextType = {
+    user: IUser;
+    setUser: (user: IUser) => void
+};

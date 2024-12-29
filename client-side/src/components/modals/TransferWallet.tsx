@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { useOutletContext } from "react-router-dom";
-import { OutletContextType } from "../../utils/types";
 import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
+import { useUserHook } from "../../utils/hooks";
 
 function TransferWalletModal({ closeModal }: Prop) {
     const [state, setState] = useState<IState>({
@@ -14,9 +13,7 @@ function TransferWalletModal({ closeModal }: Prop) {
 
     const { processing, feedback } = state;
     const { register, handleSubmit, setValue } = useForm<DataInputs>();
-
-    const userContext = useOutletContext() as OutletContextType;
-    const setUser = userContext[1];
+    const { user, setUser } = useUserHook();
 
     function onSubmit(data: DataInputs) {
         setState(s => ({ ...s, processing: true }));
@@ -27,7 +24,7 @@ function TransferWalletModal({ closeModal }: Prop) {
         const { acctNoOrUsername, amount, password } = data;
         apiService.transferWallet(acctNoOrUsername, amount, password)
             .then(res => {
-                setUser(u => ({ ...u, balance: res.data.balance }));
+                setUser({ ...user, balance: res.data.balance });
                 toast.success(res.data.message);
                 setState(s => ({ ...s, processing: false, feedback: '' }));
                 setValue('acctNoOrUsername', '');

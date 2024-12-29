@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Error from "../../Error";
+import AppError from "../../AppError";
 import { formatDateTime, formatNumber, toastError } from "../../../utils/helpers";
 import Loading from "../../Loading";
 import { ApiStatus, ITransaction } from "../../../utils/types";
@@ -133,7 +133,7 @@ export default function AllTransactions() {
     }
 
     if (apiStatus === ApiStatus.ERROR) {
-        return <Error code={error.status} message={error.statusText} goto={error.goto} />
+        return <AppError code={error.status} message={error.statusText} goto={error.goto} />
     }
 
     return <Loading />

@@ -1,17 +1,17 @@
-import { useOutletContext } from "react-router-dom";
-import { IUser, OutletContextType } from "../../utils/types";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
+import { useUserHook } from "../../utils/hooks";
 
 
-function BasicInfoEditForm({ user }: { user: IUser }) {
-    const [state, setState] = useState<State>({
+function BasicInfoEditForm() {
+    const [state, setState] = useState<IState>({
         loading: false
     });
     const { loading } = state;
+    const { user, setUser } = useUserHook();
 
     const { register, handleSubmit, setValue } = useForm<BasicInputs>();
     useEffect(() => {
@@ -39,6 +39,7 @@ function BasicInfoEditForm({ user }: { user: IUser }) {
             .then(res => {
                 toast.success(res.data.message);
                 setState(s => ({ ...s, loading: false }));
+                setUser(res.data.user);
             })
             .catch(err => {
                 toastError(err, toast);
@@ -94,21 +95,10 @@ function BasicInfoEditForm({ user }: { user: IUser }) {
             </form>
         </div>
     );
-
-    interface BasicInputs {
-        first: string;
-        last: string;
-        email: string;
-        phone: string;
-    }
-
-    interface State {
-        loading: boolean;
-    }
 }
 
 function PasswordEditForm() {
-    const [state, setState] = useState<State>({
+    const [state, setState] = useState<IState>({
         loading: false,
     });
 
@@ -162,30 +152,35 @@ function PasswordEditForm() {
             </form>
         </div>
     );
-
-    interface PasswordInputs {
-        oldPassword: string;
-        newPassword: string;
-        confirmNewPassword: string;
-    }
-
-    interface State {
-        loading: boolean;
-    }
 }
 
 function Settings() {
-    const [user] = useOutletContext() as OutletContextType;
-
     return (
         <div id="settings">
             <div className="mb-3">
                 <h1>Settings</h1>
             </div>
-            <BasicInfoEditForm user={user} />
+            <BasicInfoEditForm />
             <PasswordEditForm />
         </div>
     )
 }
 
 export default Settings;
+
+type IState = {
+    loading: boolean;
+}
+
+type BasicInputs = {
+    first: string;
+    last: string;
+    email: string;
+    phone: string;
+}
+
+type PasswordInputs = {
+    oldPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+}

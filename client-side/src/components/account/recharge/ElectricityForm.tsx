@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import { IDisco, OutletContextType } from "../../../utils/types";
+import { IDisco } from "../../../utils/types";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { toastError } from "../../../utils/helpers";
 import { apiService } from "../../../api.service";
+import { useUserHook } from "../../../utils/hooks";
 
 type DataInputs = {
     operatorId: string;
@@ -45,7 +45,7 @@ function ElectricityForm() {
         fetchingMessage: 'Fetching discos...'
     });
     const { processing, token, units, discos, feedback: { error, message, customer, loading } } = state;
-    const [user, setUser] = useOutletContext() as OutletContextType;
+    const { user, setUser } = useUserHook();
     const { register, handleSubmit, watch, reset, setValue } = useForm<DataInputs>();
     const operatorId = watch('operatorId');
     const meterNumber = watch('meterNumber');

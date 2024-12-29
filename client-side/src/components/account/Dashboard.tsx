@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { formatDateTime, formatNumber, greet } from "../../utils/helpers";
-import { useOutletContext, Link } from "react-router-dom";
-import { ITransaction, OutletContextType } from "../../utils/types";
+import { Link } from "react-router-dom";
+import { ITransaction } from "../../utils/types";
 import { IoWalletOutline } from "react-icons/io5";
 import { GiExpense } from "react-icons/gi";
 import FormModal from "../modals/FormModal";
 import TransferWallet from "../modals/TransferWallet";
 import { FundWalletModal } from "../modals/FundWallet";
 import { apiService } from "../../api.service";
+import { useUserHook } from "../../utils/hooks";
 
 export default function Dashboard() {
-    const [user] = useOutletContext() as OutletContextType;
+    const vv = useUserHook();
+    const user = vv.user;
 
     const [state, setState] = useState<IState>({
         balance: 0,

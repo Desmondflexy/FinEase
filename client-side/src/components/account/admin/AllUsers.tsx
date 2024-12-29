@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ApiStatus, IUser } from "../../../utils/types";
-import Error from "../../Error";
+import AppError from "../../AppError";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { apiService } from "../../../api.service";
 import Loading from "../../Loading";
@@ -140,7 +140,7 @@ export default function UsersList() {
     }
 
     if (apiStatus === ApiStatus.ERROR) {
-        return <Error code={error.status} message={error.statusText} goto={error.goto} />
+        return <AppError code={error.status} message={error.statusText} goto={error.goto} />
     }
 
     return <Loading />;
