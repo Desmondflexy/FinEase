@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { toastError } from "../../../utils/helpers";
-import { apiService } from "../../../api.service";
+import { toastError } from "../../utils/helpers";
+import { apiService } from "../../api.service";
 
 export default function ForgotPassword() {
     const [state, setState] = useState({

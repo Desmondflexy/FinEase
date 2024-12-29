@@ -1,5 +1,5 @@
 
-interface Props {
+type Props = {
     children: React.ReactNode;
     id: string;
     title: string;

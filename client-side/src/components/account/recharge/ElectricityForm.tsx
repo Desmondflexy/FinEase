@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { IDisco, OutletContextType } from "../../utils/types";
+import { IDisco, OutletContextType } from "../../../utils/types";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { toastError } from "../../utils/helpers";
-import { apiService } from "../../api.service";
+import { toastError } from "../../../utils/helpers";
+import { apiService } from "../../../api.service";
 
 type DataInputs = {
     operatorId: string;

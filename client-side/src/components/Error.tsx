@@ -1,12 +1,6 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Header } from "./onboarding/GetStarted";
-
-type IError = {
-    code: number;
-    message: string;
-    goto: string
-}
+import { Header } from "./auth/Auth";
 
 export default function Error(err: IError) {
     const navigate = useNavigate();
@@ -29,4 +23,10 @@ export default function Error(err: IError) {
             <Link to={goto}>{goto === '/auth/login' ? 'Login' : 'Home'}</Link>
         </div>
     )
+}
+
+type IError = {
+    code: number;
+    message: string;
+    goto: string
 }

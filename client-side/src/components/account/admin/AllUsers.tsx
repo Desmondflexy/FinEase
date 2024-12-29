@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { ApiStatus, IUser } from "../../utils/types";
-import Error from "./Error";
+import { ApiStatus, IUser } from "../../../utils/types";
+import Error from "../../Error";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { apiService } from "../../api.service";
-import Loading from "./Loading";
-import { toastError } from "../../utils/helpers";
+import { apiService } from "../../../api.service";
+import Loading from "../../Loading";
+import { toastError } from "../../../utils/helpers";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { APP_ROUTES } from "../../utils/constants";
+import { APP_ROUTES } from "../../../utils/constants";
 
 export default function UsersList() {
     const [searchParams] = useSearchParams();

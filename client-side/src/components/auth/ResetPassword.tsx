@@ -2,13 +2,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { toastError } from "../../../utils/helpers";
-import { apiService } from "../../../api.service";
-
-interface DataType {
-    password: string;
-    confirm: string;
-}
+import { toastError } from "../../utils/helpers";
+import { apiService } from "../../api.service";
 
 export function ResetPassword() {
     const [state, setState] = useState({
@@ -67,4 +62,9 @@ export function ResetPassword() {
             </div>
         </form>
     );
+}
+
+type DataType = {
+    password: string;
+    confirm: string;
 }

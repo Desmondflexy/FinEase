@@ -1,4 +1,4 @@
-import loadingImg from '../../assets/loading.gif';
+import loadingImg from '../assets/loading.gif';
 
 export default function Loading() {
     return (

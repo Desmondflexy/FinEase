@@ -1,12 +1,12 @@
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Loading from "./pages/Loading";
+import Loading from "../Loading";
 import { CgProfile } from "react-icons/cg";
-import Error from "./pages/Error";
-import { ApiStatus, IUser } from "../utils/types";
+import Error from "../Error";
+import { ApiStatus, IUser } from "../../utils/types";
 import { IoMenu } from "react-icons/io5";
-import SideBar from "./SideBar";
-import { apiService } from "../api.service";
+import SideBar from "../SideBar";
+import { apiService } from "../../api.service";
 
 export default function Account() {
     const [user, setUser] = useState<IUser | null>(null);

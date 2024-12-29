@@ -1,8 +1,8 @@
 import { useState } from "react";
-import AirtimeForm from "../recharge/AirtimeForm";
-import DataForm from "../recharge/DataForm";
-import ElectricityForm from "../recharge/ElectricityForm";
-import Tv from "../recharge/TvForm";
+import DataForm from "./DataForm";
+import ElectricityForm from "./ElectricityForm";
+import Tv from "./TvForm";
+import AirtimeForm from "./AirtimeForm";
 
 export default function Recharge() {
     const [state, setState] = useState({

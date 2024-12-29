@@ -1,24 +1,24 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Home from './components/pages/Home'
-import Profile from './components/pages/Profile'
-import Dashboard from './components/pages/Dashboard';
-import Error from './components/pages/Error';
-import AllUsers from './components/pages/AllUsers';
-import Auth from './components/pages/onboarding/GetStarted';
-import Signup from './components/pages/onboarding/Signup';
-import Transactions from './components/pages/Transactions';
-import Recharge from './components/pages/Recharge';
-import Settings from './components/pages/Settings';
-import Account from './components/Account';
-import { Login } from './components/pages/onboarding/Login';
-import { Logout } from './components/Logout';
-import ForgotPassword from './components/pages/onboarding/ForgotPassword';
-import { ResetPassword } from './components/pages/onboarding/ResetPassword';
-import VerifyEmail from './components/VerifyEmail';
-import AdminApp from './components/AdminApp';
-import AllTransactions from './components/pages/AllTransactions';
+import Home from './Home'
+import Profile from './account/Profile'
+import Dashboard from './account/Dashboard';
+import Error from './Error';
+import AllUsers from './account/admin/AllUsers';
+import Auth from './auth/Auth';
+import Signup from './auth/Signup';
+import Transactions from './account/Transactions';
+import Recharge from './account/recharge/Recharge';
+import Settings from './account/Settings';
+import Account from './account/Account';
+import { Login } from './auth/Login';
+import { Logout } from './auth/Logout';
+import ForgotPassword from './auth/ForgotPassword';
+import { ResetPassword } from './auth/ResetPassword';
+import VerifyEmail from './auth/VerifyEmail';
+import AdminApp from './account/admin/AdminApp';
+import AllTransactions from './account/admin/AllTransactions';
 
 export default function App() {
     return (

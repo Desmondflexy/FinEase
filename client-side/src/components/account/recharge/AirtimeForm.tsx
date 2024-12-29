@@ -1,11 +1,11 @@
 import { useOutletContext } from "react-router-dom";
-import { OutletContextType } from "../../utils/types";
+import { OutletContextType } from "../../../utils/types";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { networkLogo, phoneNumberRegex } from "../../utils/constants";
+import { networkLogo, phoneNumberRegex } from "../../../utils/constants";
 import { useForm } from "react-hook-form";
-import { toastError } from "../../utils/helpers";
-import { apiService } from "../../api.service";
+import { toastError } from "../../../utils/helpers";
+import { apiService } from "../../../api.service";
 
 function AirtimeForm() {
     const [state, setState] = useState<IState>({

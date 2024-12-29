@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import Error from "./Error";
-import { formatDateTime, formatNumber, toastError } from "../../utils/helpers";
-import Loading from "./Loading";
-import { ApiStatus, ITransaction } from "../../utils/types";
+import Error from "../../Error";
+import { formatDateTime, formatNumber, toastError } from "../../../utils/helpers";
+import Loading from "../../Loading";
+import { ApiStatus, ITransaction } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { apiService } from "../../api.service";
+import { apiService } from "../../../api.service";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { APP_ROUTES } from "../../../utils/constants";
 
-export default function Transactions() {
+export default function AllTransactions() {
     const [searchParams] = useSearchParams();
     const [state, setState] = useState<IState>({
         transactions: [],
@@ -23,7 +24,7 @@ export default function Transactions() {
         pgSize: 10,
     });
 
-    const { register, watch } = useForm<{ search: string }>();
+    const { register, watch, } = useForm<{ search: string, pgSize: string }>();
     const searchTerm = watch("search");
 
     const page = Number(searchParams.get('page'));
@@ -31,11 +32,11 @@ export default function Transactions() {
     const { apiStatus, error, apiMeta, transactions, pgSize } = state;
 
     useEffect(() => {
-        apiService.fetchTransactions(page, pgSize, searchTerm).then(res => {
+        apiService.fetchAllTransactions(page, pgSize, searchTerm).then(res => {
             const { transactions, links, meta } = res.data;
 
             if (page > meta.totalPages) {
-                navigate(`/account/transactions?page=${meta.totalPages}`);
+                navigate(`${APP_ROUTES.ALL_TRANSACTIONS}?page=${meta.totalPages}`);
                 return;
             }
             setState(s => ({
@@ -48,7 +49,7 @@ export default function Transactions() {
             }));
         }).catch(err => {
             if (page < 1) {
-                navigate(`/account/transactions?page=1`);
+                navigate(`${APP_ROUTES.ALL_TRANSACTIONS}page=1`);
                 return;
             }
             const { status, statusText } = err.response;
@@ -64,12 +65,12 @@ export default function Transactions() {
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`/account/transactions?page=${page + 1}`);
+        navigate(`${APP_ROUTES.ALL_TRANSACTIONS}?page=${page + 1}`);
     }
 
     function handlePrevious() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`/account/transactions?page=${page - 1}`);
+        navigate(`${APP_ROUTES.ALL_TRANSACTIONS}?page=${page - 1}`);
     }
 
     function handlePgSizeChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -78,9 +79,10 @@ export default function Transactions() {
 
     if (apiStatus === ApiStatus.SUCCESS) {
         return <section id="all-transactions">
-            <h1>Transactions</h1>
+            <h3>All Transactions</h3>
             <input {...register("search")} type="search" placeholder="Search transaction..." />
             <hr />
+
             <div className="pg-size">
                 <label htmlFor="pg-size">Size: </label>
                 <select name="pg-size" id="pg-size" onChange={handlePgSizeChange} value={pgSize}>
@@ -98,6 +100,7 @@ export default function Transactions() {
                             <th>Amount</th>
                             <th>Type</th>
                             <th className="table-desc">Description</th>
+                            <th>User</th>
                             <th>Reference</th>
                             <th style={{ width: '130px' }}>Date</th>
                         </tr>
@@ -110,6 +113,7 @@ export default function Transactions() {
                                     <td>{formatNumber(+trx.amount).slice(3)}</td>
                                     <td>{trx.type}</td>
                                     <td>{trx.description}</td>
+                                    <td>{trx.user?.username}</td>
                                     <td>{trx.reference}</td>
                                     <td>{formatDateTime(trx.createdAt)}</td>
                                 </tr>

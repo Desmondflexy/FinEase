@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { apiService } from "../api.service";
+import { apiService } from "../../api.service";
 
 export function Logout() {
     const navigate = useNavigate();
