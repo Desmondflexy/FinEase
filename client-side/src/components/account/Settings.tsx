@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { toastError } from "../../utils/helpers";
@@ -14,12 +14,7 @@ function BasicInfoEditForm() {
     const { user, setUser } = useUserHook();
 
     const { register, handleSubmit, setValue } = useForm<BasicInputs>();
-    useEffect(() => {
-        setValue('first', user.fullName.split(' ')[0]);
-        setValue('last', user.fullName.split(' ')[1]);
-        setValue('email', user.email);
-        setValue('phone', user.phone);
-    }, [user, setValue])
+    resetValues();
 
     function onSubmit(data: BasicInputs) {
         setState(s => ({ ...s, loading: true }));
@@ -27,7 +22,7 @@ function BasicInfoEditForm() {
         editUserApi(first, last, email, phone);
     }
 
-    function handleReset() {
+    function resetValues() {
         setValue('first', user.fullName.split(' ')[0]);
         setValue('last', user.fullName.split(' ')[1]);
         setValue('email', user.email);
@@ -90,7 +85,7 @@ function BasicInfoEditForm() {
 
                 <div className='d-flex justify-content-center gap-3'>
                     <button disabled={loading} className="btn btn-primary w-100" >{loading ? 'Processing' : 'Confirm Changes'}</button>
-                    <button className="btn btn-danger w-100" onClick={handleReset} type="button">Cancel</button>
+                    <button className="btn btn-danger w-100" onClick={resetValues} type="button">Cancel</button>
                 </div>
             </form>
         </div>
@@ -103,7 +98,7 @@ function PasswordEditForm() {
     });
 
     const { loading } = state;
-    const { register, handleSubmit, setValue } = useForm<PasswordInputs>();
+    const { register, handleSubmit, reset } = useForm<PasswordInputs>();
 
     function onSubmit(data: PasswordInputs) {
         setState(s => ({ ...s, loading: true }));
@@ -115,9 +110,7 @@ function PasswordEditForm() {
         apiService.editUserDetails<PasswordInputs>({ newPassword, confirmNewPassword, oldPassword })
             .then(res => {
                 toast.success(res.data.message);
-                setValue('oldPassword', '');
-                setValue('newPassword', '');
-                setValue('confirmNewPassword', '');
+                reset();
                 setState(s => ({ ...s, loading: false }));
             })
             .catch(err => {

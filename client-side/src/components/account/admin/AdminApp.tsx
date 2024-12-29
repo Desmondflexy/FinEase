@@ -11,12 +11,18 @@ export default function AdminApp() {
                 <li><Link to="transactions?page=1">Transactions</Link></li>
             </ul>
 
-            <Routes>
-                <Route index element={<Navigate to='users?page=1' />} />
-                <Route path='users' element={<AllUsers />} />
-                <Route path='transactions' element={<AllTransactions />} />
-                <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
-            </Routes>
+            <Outlet />
         </section>
-    )
+    );
+}
+
+function Outlet() {
+    return (
+        <Routes>
+            <Route index element={<Navigate to='users?page=1' />} />
+            <Route path='users' element={<AllUsers />} />
+            <Route path='transactions' element={<AllTransactions />} />
+            <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
+        </Routes>
+    );
 }

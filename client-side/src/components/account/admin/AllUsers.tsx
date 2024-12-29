@@ -34,6 +34,11 @@ export default function UsersList() {
 
     const page = Number(searchParams.get('page'));
 
+    let nextBtnDisabled = !state.apiLinks?.next;
+    if (state.fetchingData) nextBtnDisabled = true;
+    let prevBtnDisabled = !state.apiLinks?.previous;
+    if (state.fetchingData) prevBtnDisabled = true;
+
     useEffect(() => {
         apiService.getAllUsers(page, pgSize, searchTerm)
             .then(res => {
@@ -131,9 +136,9 @@ export default function UsersList() {
             </div>
             {apiMeta.totalPages === 1 ? null :
                 <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
-                    <button disabled={!state.apiLinks?.previous} onClick={handlePrevious}>Prev Page</button>
+                    <button disabled={prevBtnDisabled} onClick={handlePrevious}>Prev Page</button>
                     <span>{state.fetchingData ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
-                    <button disabled={!state.apiLinks?.next} onClick={handleNext}>Next Page</button>
+                    <button disabled={nextBtnDisabled} onClick={handleNext}>Next Page</button>
                 </div>}
             <p>Showing {apiMeta.itemCount} of {apiMeta.totalItems} users</p>
         </section>;

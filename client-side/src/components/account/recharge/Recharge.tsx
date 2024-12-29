@@ -20,13 +20,18 @@ export default function Recharge() {
                     <option value="tv">Tv Subscription</option>
                 </select>
             </form>
-
-            <Routes>
-                <Route path='airtime' element={<AirtimeForm />} />
-                <Route path='data' element={<DataForm />} />
-                <Route path='electricity' element={<ElectricityForm />} />
-                <Route path='tv' element={<Tv />} />
-            </Routes>
+            <Outlet />
         </section>
-    )
+    );
+}
+
+function Outlet() {
+    return (
+        <Routes>
+            <Route path='airtime' element={<AirtimeForm />} />
+            <Route path='data' element={<DataForm />} />
+            <Route path='electricity' element={<ElectricityForm />} />
+            <Route path='tv' element={<Tv />} />
+        </Routes>
+    );
 }

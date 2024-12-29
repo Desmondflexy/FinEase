@@ -16,7 +16,8 @@ import Transactions from "./Transactions";
 
 export default function Account() {
     const [user, setUser] = useState<IUser | null>(null);
-    const location = useLocation().pathname.split('/')[2];
+    const pathname = useLocation().pathname;
+    const location = pathname.split('/').pop();
     const token = localStorage.getItem('token');
     const [state, setState] = useState<IState>({
         apiStatus: ApiStatus.LOADING,
@@ -32,12 +33,9 @@ export default function Account() {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!token) {
-            navigate("/auth/login");
-        }
-    });
-
+    if (!token) {
+        navigate("/auth/login");
+    }
 
     useEffect(() => {
         apiService.getAccountInfo().then(res => {
@@ -91,15 +89,7 @@ export default function Account() {
                         <SideBar user={user} />
 
                         <main className="main p-3">
-                            <Routes>
-                                <Route index element={<Navigate to='dashboard' />} />
-                                <Route path='dashboard' element={<Dashboard />} />
-                                <Route path='profile' element={<Profile />} />
-                                <Route path='transactions' element={<Transactions />} />
-                                <Route path='recharge/*' element={<Recharge />} />
-                                <Route path='settings' element={<Settings />} />
-                                <Route path='admin/*' element={<AdminApp />} />
-                            </Routes>
+                            <Outlet />
                         </main>
 
                         {/* footer */}
@@ -112,11 +102,7 @@ export default function Account() {
         );
     }
 
-    if (apiStatus === ApiStatus.ERROR) {
-        return (
-            <AppError code={error.status} message={error.statusText} goto={error.goto} />
-        );
-    }
+    return <AppError code={error.status} message={error.statusText} goto={error.goto} />;
 }
 
 // UserContext variable is required by useUser hook function
@@ -145,3 +131,18 @@ type UserContextType = {
     user: IUser;
     setUser: (user: IUser) => void
 };
+
+function Outlet() {
+    return (
+        <Routes>
+            <Route index element={<Navigate to='dashboard' />} />
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='profile' element={<Profile />} />
+            <Route path='transactions' element={<Transactions />} />
+            <Route path='recharge/*' element={<Recharge />} />
+            <Route path='settings' element={<Settings />} />
+            <Route path='admin/*' element={<AdminApp />} />
+            <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
+        </Routes>
+    );
+}
