@@ -57,6 +57,7 @@ export default function Account() {
     }
 
     if (apiStatus === ApiStatus.SUCCESS && user) {
+        console.log(user);
         return (
             <div id="app-layout">
 

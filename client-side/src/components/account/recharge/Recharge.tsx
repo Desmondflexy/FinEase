@@ -1,25 +1,18 @@
-import { useState } from "react";
 import DataForm from "./DataForm";
 import ElectricityForm from "./ElectricityForm";
 import Tv from "./TvForm";
 import AirtimeForm from "./AirtimeForm";
+import { useNavigate, Route, Routes } from "react-router-dom";
 
 export default function Recharge() {
-    const [state, setState] = useState({
-        service: '',
-    });
-    const { service } = state;
-
-    function handleServiceChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        setState(s => ({ ...s, service: e.target.value }));
-    }
+    const navigate = useNavigate();
 
     return (
         <section id="recharge">
             <h1>Recharge</h1>
             <form className="mb-4">
                 <label htmlFor="service">What do you want to do?</label>
-                <select id="service" value={service} onChange={handleServiceChange}>
+                <select id="service" onChange={e => navigate(e.target.value)}>
                     <option value='' >--select--</option>
                     <option value="airtime">Buy Airtime</option>
                     <option value="data">Buy Data</option>
@@ -28,10 +21,12 @@ export default function Recharge() {
                 </select>
             </form>
 
-            {service === 'airtime' && <AirtimeForm />}
-            {service === 'data' && <DataForm />}
-            {service === 'electricity' && <ElectricityForm />}
-            {service === 'tv' && <Tv />}
+            <Routes>
+                <Route path='airtime' element={<AirtimeForm />} />
+                <Route path='data' element={<DataForm />} />
+                <Route path='electricity' element={<ElectricityForm />} />
+                <Route path='tv' element={<Tv />} />
+            </Routes>
         </section>
     )
 }

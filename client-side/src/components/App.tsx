@@ -5,7 +5,6 @@ import Home from './Home'
 import Profile from './account/Profile'
 import Dashboard from './account/Dashboard';
 import Error from './Error';
-import AllUsers from './account/admin/AllUsers';
 import Auth from './auth/Auth';
 import Signup from './auth/Signup';
 import Transactions from './account/Transactions';
@@ -18,7 +17,6 @@ import ForgotPassword from './auth/ForgotPassword';
 import { ResetPassword } from './auth/ResetPassword';
 import VerifyEmail from './auth/VerifyEmail';
 import AdminApp from './account/admin/AdminApp';
-import AllTransactions from './account/admin/AllTransactions';
 
 export default function App() {
     return (
@@ -40,13 +38,9 @@ export default function App() {
                     <Route path='dashboard' element={<Dashboard />} />
                     <Route path='profile' element={<Profile />} />
                     <Route path='transactions' element={<Transactions />} />
-                    <Route path='recharge' element={<Recharge />} />
+                    <Route path='recharge/*' element={<Recharge />} />
                     <Route path='settings' element={<Settings />} />
-                    <Route path='admin' element={<AdminApp />}>
-                        <Route index element={<Navigate to='users?page=1' />} />
-                        <Route path='users' element={<AllUsers />} />
-                        <Route path='transactions' element={<AllTransactions />} />
-                    </Route>
+                    <Route path='admin/*' element={<AdminApp />} />
                 </Route>
                 <Route path='*' element={<Error message={'Page Not Found'} code={404} goto={'/'} />} />
             </Routes>
