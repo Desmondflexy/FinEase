@@ -4,7 +4,7 @@ import Error from "./Error";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { apiService } from "../../api.service";
 import Loading from "./Loading";
-import { handleError } from "../../utils/helpers";
+import { toastError } from "../../utils/helpers";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { APP_ROUTES } from "../../utils/constants";
@@ -57,7 +57,7 @@ export default function UsersList() {
                     return;
                 }
                 setState(s => ({ ...s, apiStatus: ApiStatus.ERROR }));
-                handleError(err, toast);
+                toastError(err, toast);
                 if (err.response) {
                     const { status, statusText } = err.response;
                     setState(s => ({

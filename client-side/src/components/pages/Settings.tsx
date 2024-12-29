@@ -3,7 +3,7 @@ import { IUser, OutletContextType } from "../../utils/types";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { handleError } from "../../utils/helpers";
+import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 
 
@@ -41,7 +41,7 @@ function BasicInfoEditForm({ user }: { user: IUser }) {
                 setState(s => ({ ...s, loading: false }));
             })
             .catch(err => {
-                handleError(err, toast);
+                toastError(err, toast);
                 setState(s => ({ ...s, loading: false }));
             });
     }
@@ -131,7 +131,7 @@ function PasswordEditForm() {
                 setState(s => ({ ...s, loading: false }));
             })
             .catch(err => {
-                handleError(err, toast);
+                toastError(err, toast);
                 setState(s => ({ ...s, loading: false }));
             });
     }

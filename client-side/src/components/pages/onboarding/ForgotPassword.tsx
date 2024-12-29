@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { handleError } from "../../../utils/helpers";
+import { toastError } from "../../../utils/helpers";
 import { apiService } from "../../../api.service";
 
 export default function ForgotPassword() {
@@ -27,7 +27,7 @@ export default function ForgotPassword() {
                 })
                 .catch((err) => {
                     if (err.response) {
-                        handleError(err, toast);
+                        toastError(err, toast);
                     } else {
                         toast.error(err.message);
                     }

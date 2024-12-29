@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
 import { OutletContextType } from "../../utils/types";
-import { handleError } from "../../utils/helpers";
+import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
 
@@ -39,7 +39,7 @@ function TransferWalletModal({ closeModal }: Prop) {
                 }, 3000);
             })
             .catch(err => {
-                handleError(err, toast);
+                toastError(err, toast);
                 setState(s => ({ ...s, processing: false }));
             });
     }

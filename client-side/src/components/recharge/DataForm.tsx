@@ -4,14 +4,8 @@ import { useEffect, useState } from "react";
 import { networkLogo, phoneNumberRegex } from "../../utils/constants";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { handleError } from "../../utils/helpers";
+import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
-
-interface DataInputs {
-    operatorId: string;
-    dataPlanId: string;
-    phone: string;
-}
 
 export default function DataForm() {
     const [user, setUser] = useOutletContext() as OutletContextType;
@@ -27,7 +21,7 @@ export default function DataForm() {
     const phone = watch('phone');
     const operatorId = watch('operatorId');
 
-    const options = state.networks.map(network => {
+    const networkOptions = state.networks.map(network => {
         return <option key={network.id} value={network.id}>{network.name}</option>
     });
 
@@ -39,54 +33,52 @@ export default function DataForm() {
     useEffect(fetchDataPlans, [operatorId]);
 
     function fetchNetworks() {
-        apiService.getNetworks()
-            .then(res => {
-                setState(s => ({ ...s, networks: res.data.networks, errorFeedback: '' }));
-            })
-            .catch(() => {
-                setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
-            });
+        apiService.getNetworks().then(res => {
+            const { networks } = res.data
+            setState(s => ({ ...s, networks, errorFeedback: '' }));
+        }).catch(err => {
+            toastError(err, toast);
+            setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
+        });
     }
 
     function fetchDataPlans() {
         if (operatorId)
-            apiService.getOperatorDataPlans(operatorId)
-                .then(res => {
-                    setState(s => ({ ...s, plans: res.data.dataPlans }));
-                })
-                .catch(err => {
-                    console.log(err.response);
-                })
+            apiService.getOperatorDataPlans(operatorId).then(res => {
+                setState(s => ({ ...s, plans: res.data.dataPlans }));
+            }).catch(err => {
+                toastError(err, toast);
+                setState(s => ({ ...s, plans: [] }));
+            })
     }
 
     function determineNetwork() {
+        if (!phone) return;
         if (!phoneNumberRegex.test(phone)) {
             setState(s => ({ ...s, logoUrl: '' }));
+            toastError(new Error("Invalid phone number"), toast, true);
             return;
         }
-        apiService.getMobileNetwork(phone)
-            .then(res => {
-                const network = res.data.network.toLowerCase();
-                setState(s => ({ ...s, logoUrl: networkLogo[network] }));
-            })
-            .catch(() => {
-                setState(s => ({ ...s, logoUrl: '' }));
-            })
+        apiService.getMobileNetwork(phone).then(res => {
+            const network = res.data.network.toLowerCase() as string;
+            setState(s => ({ ...s, logoUrl: networkLogo[network] }));
+        }).catch(err => {
+            toastError(err, toast);
+            setState(s => ({ ...s, logoUrl: '' }));
+        });
     }
 
     function buyData(operatorId: string, dataPlanId: string, phone: string) {
-        apiService.buyData(operatorId, dataPlanId, phone)
-            .then(res => {
-                const { message, balance } = res.data;
-                toast.success(message);
-                setState(s => ({ ...s, processing: false, formInput: { operatorId: '', phone: '', dataPlanId: '' } }));
-                setUser({ ...user, balance });
-                reset();
-            })
-            .catch(err => {
-                handleError(err, toast);
-                setState(s => ({ ...s, processing: false }));
-            });
+        apiService.buyData(operatorId, dataPlanId, phone).then(res => {
+            const { message, balance } = res.data;
+            toast.success(message);
+            setState(s => ({ ...s, processing: false, logoUrl: '' }));
+            setUser({ ...user, balance });
+            reset();
+        }).catch(err => {
+            toastError(err, toast);
+            setState(s => ({ ...s, processing: false }));
+        });
     }
 
     function onSubmit(data: DataInputs) {
@@ -104,7 +96,7 @@ export default function DataForm() {
                     <div className="form-floating">
                         <select {...register('operatorId')} className="form-control" required id="network">
                             <option value="">-- SELECT NETWORK --</option>
-                            {options}
+                            {networkOptions}
                         </select>
                         <label htmlFor="network">Network</label>
                     </div>
@@ -131,21 +123,27 @@ export default function DataForm() {
             {state.errorFeedback && <i className="text-danger">{state.errorFeedback}</i>}
         </div>
     );
+}
 
-    interface IState {
-        networks: {
-            id: string;
-            name: string;
-        }[];
-        plans: {
-            amount: number;
-            id: string;
-            name: string;
-        }[];
-        processing: boolean;
-        logoUrl: string;
-        errorFeedback: string;
-    }
+type IState = {
+    networks: {
+        id: string;
+        name: string;
+    }[];
+    plans: {
+        amount: number;
+        id: string;
+        name: string;
+    }[];
+    processing: boolean;
+    logoUrl: string;
+    errorFeedback: string;
+}
+
+type DataInputs = {
+    operatorId: string;
+    dataPlanId: string;
+    phone: string;
 }
 
 // 164 lines of code reduced to 141 lines!

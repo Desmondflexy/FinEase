@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { networkLogo, phoneNumberRegex } from "../../utils/constants";
 import { useForm } from "react-hook-form";
-import { handleError } from "../../utils/helpers";
+import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 
 function AirtimeForm() {
@@ -16,52 +16,51 @@ function AirtimeForm() {
     });
     const [user, setUser] = useOutletContext() as OutletContextType;
     const { register, reset, watch, handleSubmit } = useForm<DataInputs>();
-    const options = state.networks.map(network => {
+    const networkOptions = state.networks.map(network => {
         return <option key={network.id} value={network.id}>{network.name}</option>
     });
 
     useEffect(fetchNetworks, []);
 
-    function fetchNetworks() {
-        apiService.getNetworks()
-            .then(res => {
-                const { networks } = res.data
-                setState(s => ({ ...s, networks, errorFeedback: '' }));
-            })
-            .catch(() => {
-                setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
-            });
-    }
-
     const phone = watch('phone');
 
+    function fetchNetworks() {
+        apiService.getNetworks().then(res => {
+            const { networks } = res.data
+            setState(s => ({ ...s, networks, errorFeedback: '' }));
+        }).catch(err => {
+            toastError(err, toast);
+            setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
+        });
+    }
+
     function buyAirtime(operatorId: string, amount: string, phone: string) {
-        apiService.buyAirtime(operatorId, amount, phone)
-            .then(res => {
-                toast.success(res.data.message);
-                setState(s => ({ ...s, processing: false, logoUrl: '' }));
-                setUser({ ...user, balance: res.data.balance });
-                reset();
-            })
-            .catch(err => {
-                handleError(err, toast);
-                setState(s => ({ ...s, processing: false }));
-            });
+        apiService.buyAirtime(operatorId, amount, phone).then(res => {
+            const { message, balance } = res.data;
+            toast.success(message);
+            setState(s => ({ ...s, processing: false, logoUrl: '' }));
+            setUser({ ...user, balance });
+            reset();
+        }).catch(err => {
+            toastError(err, toast);
+            setState(s => ({ ...s, processing: false }));
+        });
     }
 
     function determineNetwork() {
+        if (!phone) return;
         if (!phoneNumberRegex.test(phone)) {
             setState(s => ({ ...s, logoUrl: '' }));
+            toastError(new Error("Invalid phone number"), toast, true);
             return;
         }
-        apiService.getMobileNetwork(phone)
-            .then(res => {
-                const network = res.data.network.toLowerCase() as string;
-                setState(s => ({ ...s, logoUrl: networkLogo[network] }));
-            })
-            .catch(() => {
-                setState(s => ({ ...s, logoUrl: '' }));
-            });
+        apiService.getMobileNetwork(phone).then(res => {
+            const network = res.data.network.toLowerCase();
+            setState(s => ({ ...s, logoUrl: networkLogo[network] }));
+        }).catch(err => {
+            toastError(err, toast);
+            setState(s => ({ ...s, logoUrl: '' }));
+        });
     }
 
     function onSubmit(data: DataInputs) {
@@ -79,7 +78,7 @@ function AirtimeForm() {
                     <div className="form-floating">
                         <select {...register('operatorId')} className="form-control" required id="network">
                             <option value="">-- SELECT NETWORK --</option>
-                            {options}
+                            {networkOptions}
                         </select>
                         <label htmlFor="network">Network</label>
                     </div>

@@ -60,15 +60,17 @@ export function greet() {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function handleError(err: any, toast: any) {
+export function toastError(err: any, toast: any, warn: boolean = false) {
+    let xx = 'error';
+    if (warn) xx = 'warn';
     if (err.response) {
         const error = err.response.data.message;
         if (typeof error === "string") {
-            toast.error(error);
+            toast[xx](error);
         } else {
-            toast.error(error[0]);
+            toast[xx](error[0]);
         }
     } else {
-        toast.error(err.message);
+        toast[xx](err.message);
     }
 }

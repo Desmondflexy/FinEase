@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { IDisco, OutletContextType } from "../../utils/types";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { handleError } from "../../utils/helpers";
+import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 
 type DataInputs = {
@@ -99,7 +99,7 @@ function ElectricityForm() {
                 reset();
             })
             .catch(err => {
-                handleError(err, toast);
+                toastError(err, toast);
                 setState(s => ({ ...s, processing: false }));
             });
     }

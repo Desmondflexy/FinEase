@@ -1,7 +1,7 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from "react-toastify";
 import { useEffect } from 'react';
-import { handleError } from '../utils/helpers';
+import { toastError } from '../utils/helpers';
 import { apiService } from '../api.service';
 export default function VerifyEmail() {
     const { verifyId } = useParams() as { verifyId: string };
@@ -17,7 +17,7 @@ export default function VerifyEmail() {
             })
             .catch(error => {
                 navigate('/auth/login');
-                handleError(error, toast);
+                toastError(error, toast);
             });
     });
 

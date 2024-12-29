@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { handleError } from "../../../utils/helpers";
+import { toastError } from "../../../utils/helpers";
 import { apiService } from "../../../api.service";
 
 interface DataType {
@@ -38,7 +38,7 @@ export function ResetPassword() {
                     setState((s) => ({ ...s, loading: false }));
                 })
                 .catch((err) => {
-                    handleError(err, toast);
+                    toastError(err, toast);
                     setState((s) => ({ ...s, loading: false }));
                 });
         }

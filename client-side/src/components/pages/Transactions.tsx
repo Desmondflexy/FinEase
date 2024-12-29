@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Error from "./Error";
-import { formatDateTime, formatNumber, handleError } from "../../utils/helpers";
+import { formatDateTime, formatNumber, toastError } from "../../utils/helpers";
 import Loading from "./Loading";
 import { ApiStatus, ITransaction } from "../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -52,7 +52,7 @@ export default function Transactions() {
                 return;
             }
             const { status, statusText } = err.response;
-            handleError(err, toast);
+            toastError(err, toast);
             setState(s => ({
                 ...s,
                 apiStatus: ApiStatus.ERROR,
