@@ -83,7 +83,7 @@ export default function AllTransactions() {
     }
 
     if (apiStatus === ApiStatus.SUCCESS) {
-        return <section id="all-transactions">
+        return <div id="all-transactions">
             <h3>All Transactions</h3>
             <input {...register("search")} type="search" placeholder="Search transaction..." />
             <hr />
@@ -134,7 +134,7 @@ export default function AllTransactions() {
                     <button disabled={nextBtnDisabled} onClick={handleNext}>Next Page</button>
                 </div>}
             <p>Showing {apiMeta.itemCount} of {apiMeta.totalItems} transactions</p>
-        </section>
+        </div>
     }
 
     if (apiStatus === ApiStatus.ERROR) {

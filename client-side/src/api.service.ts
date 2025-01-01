@@ -124,6 +124,18 @@ class ApiService {
     logout() {
         return this.Api.post('auth/logout');
     }
+
+    registerDevice(data: { fullName: string, operatorId: string, address: string }) {
+        return this.Api.post('admin/add-device', data);
+    }
+
+    getDevices() {
+        return this.Api.get('admin/devices');
+    }
+
+    getDevice<T>(id: string) {
+        return this.Api.get<T>(`admin/device/${id}`);
+    }
 }
 
 export const apiService = new ApiService();

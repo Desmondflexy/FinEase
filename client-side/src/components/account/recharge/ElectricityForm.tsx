@@ -49,7 +49,7 @@ function ElectricityForm() {
     const { register, handleSubmit, watch, reset, setValue } = useForm<DataInputs>();
     const operatorId = watch('operatorId');
     const meterNumber = watch('meterNumber');
-    const discoInfo = state.discos.find(disco => disco.id === operatorId)?.desc || '';
+    const discoInfo = discos.find(disco => disco.id === operatorId)?.desc || '';
     const discoOptions = discos.map((disco: IDisco) => {
         return <option key={disco.id} value={disco.id}>{disco.name}</option>
     });

@@ -39,7 +39,9 @@ export default function UsersList() {
     let prevBtnDisabled = !state.apiLinks?.previous;
     if (state.fetchingData) prevBtnDisabled = true;
 
-    useEffect(() => {
+    useEffect(fetchAllUsers, [page, navigate, searchTerm, pgSize]);
+
+    function fetchAllUsers() {
         apiService.getAllUsers(page, pgSize, searchTerm)
             .then(res => {
                 const { users, links, meta } = res.data;
@@ -78,7 +80,7 @@ export default function UsersList() {
                     setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
                 }
             });
-    }, [page, navigate, searchTerm, pgSize]);
+    }
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
@@ -95,53 +97,55 @@ export default function UsersList() {
     }
 
     if (apiStatus === ApiStatus.SUCCESS) {
-        return <section id="admin">
-            <h3>Active Users</h3>
-            <input type="search" placeholder="Search for user" {...register("search")} />
-            <hr />
-            <div className="pg-size">
-                <label htmlFor="pg-size">Size: </label>
-                <select name="pg-size" id="pg-size" onChange={handlePgSizeChange} value={pgSize}>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
-            <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>S/N</th>
-                            <th><span>Name</span></th>
-                            <th><span>Username</span></th>
-                            <th><span>Email</span></th>
-                            <th><span>Phone</span></th>
-                            <th><span>Date Registered</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map((user: IUser, index: number) => (
-                            <tr key={user.id}>
-                                <td>{index + 1}</td>
-                                <td>{user.fullName}</td>
-                                <td>{user.username}</td>
-                                <td>{user.email}</td>
-                                <td>{user.phone}</td>
-                                <td>{user.createdAt.split('T')[0]}</td>
+        return (
+            <div id="all-users">
+                <h3>Active Users</h3>
+                <input type="search" placeholder="Search for user" {...register("search")} />
+                <hr />
+                <div className="pg-size">
+                    <label htmlFor="pg-size">Size: </label>
+                    <select name="pg-size" id="pg-size" onChange={handlePgSizeChange} value={pgSize}>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <div className="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S/N</th>
+                                <th><span>Name</span></th>
+                                <th><span>Username</span></th>
+                                <th><span>Email</span></th>
+                                <th><span>Phone</span></th>
+                                <th><span>Date Registered</span></th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {users.map((user: IUser, index: number) => (
+                                <tr key={user.id}>
+                                    <td>{index + 1}</td>
+                                    <td>{user.fullName}</td>
+                                    <td>{user.username}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.phone}</td>
+                                    <td>{user.createdAt.split('T')[0]}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {apiMeta.totalPages === 1 ? null :
+                    <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
+                        <button disabled={prevBtnDisabled} onClick={handlePrevious}>Prev Page</button>
+                        <span>{state.fetchingData ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
+                        <button disabled={nextBtnDisabled} onClick={handleNext}>Next Page</button>
+                    </div>}
+                <p>Showing {apiMeta.itemCount} of {apiMeta.totalItems} users</p>
             </div>
-            {apiMeta.totalPages === 1 ? null :
-                <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
-                    <button disabled={prevBtnDisabled} onClick={handlePrevious}>Prev Page</button>
-                    <span>{state.fetchingData ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
-                    <button disabled={nextBtnDisabled} onClick={handleNext}>Next Page</button>
-                </div>}
-            <p>Showing {apiMeta.itemCount} of {apiMeta.totalItems} users</p>
-        </section>;
+        );
     }
 
     if (apiStatus === ApiStatus.ERROR) {

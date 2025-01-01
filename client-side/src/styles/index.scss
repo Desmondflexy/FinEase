@@ -262,6 +262,20 @@ button.icon {
             }
         }
     }
+
+    &>div>h3 {
+        margin-top: 20px;
+    }
+
+    #device-info > div {
+        border: 4px solid rgb(37, 37, 84);
+        background-color: #bdd0e7;
+        padding: 20px;
+
+        b {
+            font-size: 14px;
+        }
+    }
 }
 
 .pg-size {
@@ -269,4 +283,16 @@ button.icon {
     font-size: 1em;
     gap: 10px;
     margin: 10px 0;
+}
+
+.naked-btn {
+    background: none;
+    border: none;
+    cursor: default;
+
+    &:hover {
+        text-decoration: underline;
+        color: #fff;
+        background: #666;
+    }
 }

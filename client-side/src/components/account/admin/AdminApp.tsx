@@ -2,6 +2,9 @@ import { Link, Navigate, Route, Routes } from "react-router-dom"
 import AllTransactions from "./AllTransactions"
 import AllUsers from "./AllUsers"
 import AppError from "../../AppError"
+import AddDevice from "./AddDevice";
+import Devices from "./Devices";
+import DeviceInfo from "./DeviceInfo";
 
 export default function AdminApp() {
     return (
@@ -9,6 +12,9 @@ export default function AdminApp() {
             <ul className="nav">
                 <li><Link to="users?page=1">Users</Link></li>
                 <li><Link to="transactions?page=1">Transactions</Link></li>
+                <li><Link to="devices">Devices</Link></li>
+                <li><Link to="add-device">Add Device</Link></li>
+                <li><Link to="devices/:id"></Link></li>
             </ul>
 
             <Outlet />
@@ -22,6 +28,9 @@ function Outlet() {
             <Route index element={<Navigate to='users?page=1' />} />
             <Route path='users' element={<AllUsers />} />
             <Route path='transactions' element={<AllTransactions />} />
+            <Route path='devices' element={<Devices />} />
+            <Route path='add-device' element={<AddDevice />} />
+            <Route path='devices/:id' element={<DeviceInfo />} />
             <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
         </Routes>
     );
