@@ -13,7 +13,7 @@ function AirtimeForm() {
         logoUrl: '',
         errorFeedback: 'Fetching networks...',
     });
-    const {user, setUser} = useUserHook()
+    const { user, setUser } = useUserHook()
     const { register, reset, watch, handleSubmit } = useForm<DataInputs>();
     const networkOptions = state.networks.map(network => {
         return <option key={network.id} value={network.id}>{network.name}</option>
@@ -25,11 +25,17 @@ function AirtimeForm() {
 
     function fetchNetworks() {
         apiService.getNetworks().then(res => {
-            const { networks } = res.data
-            setState(s => ({ ...s, networks, errorFeedback: '' }));
+            setState(s => ({
+                ...s,
+                networks: res.data.operators,
+                errorFeedback: ''
+            }));
         }).catch(err => {
             toastError(err, toast);
-            setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
+            setState(s => ({
+                ...s,
+                errorFeedback: 'Service unavailable. Please try again later.'
+            }));
         });
     }
 

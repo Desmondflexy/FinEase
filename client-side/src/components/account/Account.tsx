@@ -28,7 +28,7 @@ export default function Account() {
     const { apiStatus, error } = state;
 
     useEffect(() => {
-        document.title = 'FinEase | Account';
+        document.title = 'FinEase - Account';
     });
 
     const navigate = useNavigate();

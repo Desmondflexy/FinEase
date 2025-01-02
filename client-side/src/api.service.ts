@@ -81,7 +81,7 @@ class ApiService {
     }
 
     getNetworks() {
-        return this.Api.get('transaction/networks');
+        return this.Api.get('transaction/operators?bill=telco');
     }
 
     buyAirtime(operatorId: string, amount: string, phone: string) {
@@ -97,11 +97,11 @@ class ApiService {
     }
 
     getOperatorDataPlans(operatorId: string) {
-        return this.Api.get(`transaction/data-plans?operatorId=${operatorId}`)
+        return this.Api.get(`transaction/${operatorId}/data-plans`);
     }
 
     getDiscos() {
-        return this.Api.get('transaction/discos');
+        return this.Api.get('transaction/operators?bill=electricity');
     }
 
     validateMeter(operatorId: string, meterNumber: string) {
@@ -135,6 +135,10 @@ class ApiService {
 
     getDevice<T>(id: string) {
         return this.Api.get<T>(`admin/device/${id}`);
+    }
+
+    getOperatorTvPlans(operatorId: string) {
+        return this.Api.get(`transaction/${operatorId}/tv-plans`);
     }
 }
 

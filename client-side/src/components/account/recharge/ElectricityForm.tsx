@@ -6,111 +6,109 @@ import { toastError } from "../../../utils/helpers";
 import { apiService } from "../../../api.service";
 import { useUserHook } from "../../../utils/hooks";
 
-type DataInputs = {
-    operatorId: string;
-    meterType: string;
-    meterNumber: string;
-    amount: string;
-}
-
-type State = {
-    processing: boolean;
-    token: string;
-    units: number;
-    discos: IDisco[];
-    feedback: {
-        message: string;
-        customer: {
-            address: string;
-            name: string;
-        } | null;
-        error: boolean;
-        loading: boolean;
-    };
-    fetchingMessage: string;
-}
-
 function ElectricityForm() {
-    const [state, setState] = useState<State>({
-        processing: false,
+    const [state, setState] = useState({
         token: '',
         units: 0,
-        discos: [],
-        feedback: {
-            message: '',
-            customer: null,
-            error: false,
-            loading: false,
-        },
-        fetchingMessage: 'Fetching discos...'
+        discos: [] as IDisco[],
+        error: false,
     });
-    const { processing, token, units, discos, feedback: { error, message, customer, loading } } = state;
+    const [customer, setCustomer] = useState<ICustomer | null>(null);
+    const [isLoading, setIsLoading] = useState({
+        discos: true,
+        customer: false,
+        submit: false,
+    });
+    const [feedbackText, setFeedbackText] = useState({
+        discos: 'Fetching discos...',
+        customer: '',
+        submit: 'Proceed',
+    });
+
+    const { token, units, discos, error } = state;
+
     const { user, setUser } = useUserHook();
     const { register, handleSubmit, watch, reset, setValue } = useForm<DataInputs>();
     const operatorId = watch('operatorId');
     const meterNumber = watch('meterNumber');
     const discoInfo = discos.find(disco => disco.id === operatorId)?.desc || '';
+
     const discoOptions = discos.map((disco: IDisco) => {
         return <option key={disco.id} value={disco.id}>{disco.name}</option>
     });
+
+    useEffect(() => {
+        setState(s => ({ ...s, error: false }));
+        setFeedbackText(s => ({ ...s, customer: '' }));
+    }, [meterNumber]);
 
     useEffect(fetchDiscos, []);
 
     useEffect(() => {
         setValue('meterType', '');
         setValue('meterNumber', '');
-        setState(s => ({ ...s, feedback: { ...s.feedback, customer: null } }));
+        setCustomer(null);
+        setFeedbackText(s => ({ ...s, customer: '' }));
+        setState(s => ({ ...s, error: false }));
     }, [operatorId, setValue]);
 
     function fetchDiscos() {
-        setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Fetching discos...', loading: true } }));
-        apiService.getDiscos()
-            .then(res => {
-                setState(s => ({ ...s, fetchingMessage: '', discos: res.data.discos, feedback: { ...s.feedback, customer: null, message: '', loading: false } }));
-            })
-            .catch(() => {
-                setState(s => ({ ...s, fetchingMessage: 'Service unavailable. Please try again later.', feedback: { ...s.feedback, message: 'Error fetching discos', error: true, loading: false } }));
-            });
+        apiService.getDiscos().then(res => {
+            setState(s => ({ ...s, discos: res.data.operators }));
+            setFeedbackText(s => ({ ...s, discos: '' }));
+        }).catch(() => {
+            setState(s => ({ ...s, error: true }));
+            setFeedbackText(s => ({ ...s, discos: 'Service unavailable. Please try again later.' }));
+        }).finally(() => {
+            setIsLoading(s => ({ ...s, discos: false }));
+        })
     }
 
     function confirmUser() {
         if (!meterNumber) {
-            setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Meter number is required!', error: true } }));
+            setState(s => ({ ...s, error: true }));
+            setFeedbackText(s => ({ ...s, customer: 'Meter number is required!' }));
             return;
         }
-        setState(s => ({ ...s, feedback: { ...s.feedback, message: 'Validating customer info. Please wait...', error: false, loading: true } }));
-        apiService.validateMeter(operatorId, meterNumber)
-            .then(res => {
-                const { address, name } = res.data.customer;
-                setState(s => ({ ...s, feedback: { ...s.feedback, message: '', customer: { address, name }, loading: false } }));
-            })
-            .catch((err) => {
-                setState(s => ({ ...s, feedback: { ...s.feedback, message: err.response.data.message, error: true, loading: false } }));
-            });
+        setIsLoading(s => ({ ...s, customer: true }));
+        setFeedbackText(s => ({ ...s, customer: 'Validating customer info. Please wait...' }));
+        setState(s => ({ ...s, error: false }));
+        apiService.validateMeter(operatorId, meterNumber).then(res => {
+            setCustomer(res.data.customer);
+            setFeedbackText(s => ({ ...s, customer: '' }));
+        }).catch((err) => {
+            setState(s => ({ ...s, error: true }));
+            setFeedbackText(s => ({ ...s, customer: err.response.data.message }));
+        }).finally(() => {
+            setIsLoading(s => ({ ...s, customer: false }));
+        })
     }
 
     function buyElectricity(amount: string, operatorId: string, meterType: string, meterNumber: string) {
-        apiService.buyElectricity(operatorId, amount, meterNumber, meterType)
-            .then((res) => {
-                const { message, units, token } = res.data;
-                toast.success(message);
-                setState(s => ({ ...s, token, units, processing: false }));
-                setUser({ ...user, balance: res.data.balance });
-                reset();
-            })
-            .catch(err => {
-                toastError(err, toast);
-                setState(s => ({ ...s, processing: false }));
-            });
+        apiService.buyElectricity(operatorId, amount, meterNumber, meterType).then((res) => {
+            const { message, units, token } = res.data;
+            toast.success(message);
+            setState(s => ({ ...s, token, units }));
+            setUser({ ...user, balance: res.data.balance });
+            reset();
+        }).catch(err => {
+            toastError(err, toast);
+            setState(s => ({ ...s, error: true }));
+        }).finally(() => {
+            setIsLoading(s => ({ ...s, submit: false }));
+            setFeedbackText(s => ({ ...s, submit: 'Proceed' }));
+        })
     }
 
     function onSubmit(data: DataInputs) {
         const { amount, meterNumber, meterType, operatorId } = data;
-        setState(s => ({ ...s, processing: true }));
+        setIsLoading(s => ({ ...s, submit: true }));
+        setFeedbackText(s => ({ ...s, submit: 'Transaction processing! Please wait...' }));
         buyElectricity(amount, operatorId, meterType, meterNumber);
         document.querySelector('button')?.focus();
     }
 
+    const processing = isLoading.discos || isLoading.customer || isLoading.submit;
     return (
         <div id="electricity-recharge">
             <h2>Electricity</h2>
@@ -151,24 +149,39 @@ function ElectricityForm() {
                         <label htmlFor="amount">Amount</label>
                     </div>
                 </div>
-                <button className="btn btn-danger w-100" disabled={processing || loading}>{processing ? 'Transaction processing! Please wait...' : 'Proceed'}</button>
+                <button className="btn btn-danger w-100" disabled={processing || error}>{feedbackText.submit}</button>
             </form>
-            {state.fetchingMessage && <i className="text-danger">{state.fetchingMessage}</i>}
+            {<i className="text-danger">{feedbackText.discos}</i>}
 
-            {discoInfo && <div className="details">
-                <div className="my-4 bg-info-subtle">
-                    <p>{discoInfo}</p>
-                    {message && <i className={`text-${error ? 'danger' : 'primary'}`}>{message}</i>}
-                    {(customer && !message) && (
-                        <div>
-                            <p>Name: {customer.name}</p>
-                            <p>Address: {customer.address}</p>
-                        </div>
-                    )}
+            {discoInfo &&
+                <div className="details">
+                    <div className="my-4 bg-info-subtle">
+                        <p>{discoInfo}</p>
+                        {feedbackText.customer && <i className={`text-${error ? 'danger' : 'primary'}`}>{feedbackText.customer}</i>}
+                        {customer && (
+                            <div>
+                                <p>Name: {customer.name}</p>
+                                <p>Address: {customer.address}</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>}
+            }
         </div>
     );
 }
 
 export default ElectricityForm;
+
+
+type DataInputs = {
+    operatorId: string;
+    meterType: string;
+    meterNumber: string;
+    amount: string;
+}
+
+type ICustomer = {
+    name: string;
+    address: string;
+};

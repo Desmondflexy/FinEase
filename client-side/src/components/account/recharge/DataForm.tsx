@@ -33,11 +33,17 @@ export default function DataForm() {
 
     function fetchNetworks() {
         apiService.getNetworks().then(res => {
-            const { networks } = res.data
-            setState(s => ({ ...s, networks, errorFeedback: '' }));
+            setState(s => ({
+                ...s,
+                networks: res.data.operators,
+                errorFeedback: ''
+            }));
         }).catch(err => {
             toastError(err, toast);
-            setState(s => ({ ...s, errorFeedback: 'Service unavailable. Please try again later.' }));
+            setState(s => ({
+                ...s,
+                errorFeedback: 'Service unavailable. Please try again later.'
+            }));
         });
     }
 

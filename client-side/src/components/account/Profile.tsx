@@ -1,9 +1,7 @@
-import { IUser } from "../../utils/types";
 import { useUserHook } from "../../utils/hooks";
 
 export default function Profile() {
-    const vv = useUserHook();
-    const user = vv.user as IUser;
+    const { user } = useUserHook();
 
     return (
         <div id="user-profile">

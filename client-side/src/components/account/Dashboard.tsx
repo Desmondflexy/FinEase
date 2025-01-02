@@ -11,17 +11,15 @@ import { apiService } from "../../api.service";
 import { useUserHook } from "../../utils/hooks";
 
 export default function Dashboard() {
-    const vv = useUserHook();
-    const user = vv.user;
-
+    const { user } = useUserHook();
     const [state, setState] = useState<IState>({
-        balance: 0,
+        balance: formatNumber(user.balance),
         recent10: [],
         modal: {
             fundWallet: false,
             transferWallet: false,
         },
-        totalExpense: 0,
+        totalExpense: "...",
     });
 
     const { balance, recent10, totalExpense } = state;
@@ -37,13 +35,9 @@ export default function Dashboard() {
     }, []);
 
     useEffect(() => {
-        setState(s => ({ ...s, balance: user.balance }));
-    }, [user.balance]);
-
-    useEffect(() => {
         apiService.getMonthlyExpense()
             .then(res => {
-                setState(s => ({ ...s, totalExpense: res.data.total }));
+                setState(s => ({ ...s, totalExpense: formatNumber(res.data.total) }));
             })
             .catch(err => {
                 console.error(err.response.data);
@@ -62,14 +56,14 @@ export default function Dashboard() {
             <section>
                 <div className="cards mb-3">
                     <div className="bg-danger text-white">
-                        <h2>{formatNumber(balance)}</h2>
+                        <h2>{balance}</h2>
                         <p>Current Wallet Balance</p>
                         <div className="wallet-icon">
                             <IoWalletOutline />
                         </div>
                     </div>
                     <div className="text-white bg-facebook">
-                        <h2>{formatNumber(totalExpense)}</h2>
+                        <h2>{totalExpense}</h2>
                         <p>Total Monthly Expense</p>
                         <div className="wallet-icon">
                             <GiExpense />
@@ -128,11 +122,11 @@ export default function Dashboard() {
 }
 
 type IState = {
-    balance: number;
+    balance: string;
     recent10: ITransaction[];
     modal: {
         fundWallet: boolean;
         transferWallet: boolean;
     },
-    totalExpense: number;
+    totalExpense: string;
 }
