@@ -10,6 +10,7 @@ type DataInputs = {
     operatorId: string;
     fullName: string;
     address: string;
+    phone: string;
 }
 
 export default function AddDevice() {
@@ -67,7 +68,7 @@ function RegisterMeterForm() {
         setState(s => ({ ...s, loading: true }));
         apiService.getDiscos()
             .then(res => {
-                setState(s => ({ ...s, discos: res.data.discos }));
+                setState(s => ({ ...s, discos: res.data.operators }));
             })
             .catch(err => {
                 toastError(err, toast);
@@ -105,9 +106,79 @@ function RegisterMeterForm() {
 }
 
 function RegisterDecoderForm() {
+    type State = {
+        operators: Operator[];
+        loading: boolean;
+    }
+    const [state, setState] = useState<State>({
+        operators: [],
+        loading: false,
+    });
+    useEffect(fetchCableOperators, []);
+    const { operators, loading } = state;
+    const { register, handleSubmit, watch, reset } = useForm<DataInputs>();
+    const operatorId = watch('operatorId');
+
+    const cableOptions = operators.map(disco => {
+        return <option key={disco.id} value={disco.id}>{disco.desc}</option>
+    });
+
+    function onSubmit(data: DataInputs) {
+        setState(s => ({ ...s, loading: true }));
+        apiService.registerDevice(data).then(res => {
+            toast.success(res.data.message);
+            reset();
+        }).catch(err => {
+            toastError(err, toast);
+        }).finally(() => {
+            setState(s => ({ ...s, loading: false }));
+        });
+    }
+
+    function fetchCableOperators() {
+        setState(s => ({ ...s, loading: true }));
+        apiService.getTvOperators()
+            .then(res => {
+                setState(s => ({ ...s, operators: res.data.operators }));
+            })
+            .catch(err => {
+                toastError(err, toast);
+            }).finally(() => {
+                setState(s => ({ ...s, loading: false }));
+            })
+    }
     return (
-        <form>
-            Coming soon...
+        <form className="form" onSubmit={handleSubmit(onSubmit)}>
+            <div className="input-group mb-3">
+                <div className="form-floating">
+                    <select {...register('operatorId')} className="form-control" id="cable-tv" required>
+                        <option value=""> -- SELECT CABLE TV -- </option>
+                        {cableOptions}
+                    </select>
+                    <label htmlFor="cable-tv">Cable Tv</label>
+                </div>
+            </div>
+            <div className="input-group mb-3">
+                <div className="form-floating">
+                    <input {...register('fullName')} disabled={!operatorId} className="form-control" id="customer-name" placeholder="Enter customer name" required />
+                    <label htmlFor="customer-name">Customer Name</label>
+                </div>
+            </div>
+            <div className="input-group mb-3">
+                <div className="form-floating">
+                    <input {...register('address')} disabled={!operatorId} className="form-control" id="customer-address" placeholder="Enter customer address" />
+                    <label htmlFor="customer-address">Customer Address</label>
+                </div>
+            </div>
+
+            <div className="input-group mb-3">
+                <div className="form-floating">
+                    <input {...register('phone')} disabled={!operatorId} className="form-control" id="customer-phone" placeholder="Enter customer phone number" />
+                    <label htmlFor="customer-phone">Customer Phone Number</label>
+                </div>
+            </div>
+
+            <button className="w-100 btn btn-secondary" disabled={loading} >Submit</button>
         </form>
     )
 }
