@@ -88,7 +88,7 @@ export default function Account() {
 
                     {/* main */}
                     <div className="app-body">
-                        <SideBar user={user} />
+                        <SideBar />
 
                         <main className="main p-3">
                             <Outlet />
