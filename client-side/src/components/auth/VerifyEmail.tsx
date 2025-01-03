@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { useEffect } from 'react';
 import { toastError } from '../../utils/helpers';
 import { apiService } from '../../api.service';
+import { FineaseRoute } from '../../utils/constants';
 export default function VerifyEmail() {
     const { verifyId } = useParams() as { verifyId: string };
     const [searchParams] = useSearchParams();
@@ -11,10 +12,10 @@ export default function VerifyEmail() {
     const navigate = useNavigate();
     useEffect(() => {
         apiService.verifyEmail(verifyId, email).then(res => {
-            navigate('/auth/login');
+            navigate(FineaseRoute.LOGIN);
             toast.success(res.data.message);
         }).catch(error => {
-            navigate('/auth/login');
+            navigate(FineaseRoute.LOGIN);
             toastError(error, toast);
         });
     });

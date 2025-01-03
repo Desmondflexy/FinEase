@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
+import { FineaseRoute } from "../../utils/constants";
 
 interface SignupInputs {
     username: string;
@@ -40,8 +41,8 @@ export default function Signup({ admin }: { admin: boolean }) {
     function onSubmit(data: SignupInputs) {
         const { username, first, last, email, phone, password, confirm, adminKey } = data;
         const endpoint = admin
-            ? { url: "/auth/admin-signup", inputs: { username, first, last, email, phone, password, confirm, adminKey } }
-            : { url: "/auth/signup", inputs: { username, first, last, email, phone, password, confirm } };
+            ? { url: FineaseRoute.ADMIN_SIGNUP, inputs: { username, first, last, email, phone, password, confirm, adminKey } }
+            : { url: FineaseRoute.SIGNUP, inputs: { username, first, last, email, phone, password, confirm } };
 
         const { url, inputs } = endpoint;
 
@@ -53,7 +54,7 @@ export default function Signup({ admin }: { admin: boolean }) {
             apiService.signup(url, inputs)
                 .then((res) => {
                     toast.success(res.data.message);
-                    navigate('/auth/login');
+                    navigate(FineaseRoute.LOGIN);
                     setState((s) => ({ ...s, loading: false }));
                 })
                 .catch((err) => {
@@ -150,7 +151,7 @@ export default function Signup({ admin }: { admin: boolean }) {
             </div>
 
             <p className="my-2 text-center">
-                Already have an account? <Link to={'/auth/login'}>Log In</Link>
+                Already have an account? <Link to={FineaseRoute.LOGIN}>Log In</Link>
             </p>
         </form>
     );

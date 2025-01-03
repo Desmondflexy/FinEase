@@ -6,6 +6,7 @@ import { Logout } from "./Logout";
 import { ResetPassword } from "./ResetPassword";
 import Signup from "./Signup";
 import VerifyEmail from "./VerifyEmail";
+import { FineaseRoute } from "../../utils/constants";
 
 export default function Auth() {
     return (
@@ -23,20 +24,20 @@ function FormNav() {
     const [active, setActive] = useState("");
     const location = useLocation();
     useEffect(() => {
-        if (location.pathname === '/auth/login') {
-            setActive('/auth/login');
+        if (location.pathname === FineaseRoute.LOGIN) {
+            setActive(FineaseRoute.LOGIN);
         } else {
-            setActive('/auth/signup');
+            setActive(FineaseRoute.SIGNUP);
         }
     }, [location.pathname]);
 
     return (
         <ul className="nav nav-tabs">
             <li className='nav-item'>
-                <Link to='/auth/signup' className={`nav-link ${active === '/auth/signup' ? "active" : ""}`}>Signup</Link>
+                <Link to={FineaseRoute.SIGNUP} className={`nav-link ${active === FineaseRoute.SIGNUP ? "active" : ""}`}>Signup</Link>
             </li>
             <li className="nav-item">
-                <Link to='/auth/login' className={`nav-link ${active === '/auth/login' ? "active" : ""}`}>Login</Link>
+                <Link to={FineaseRoute.LOGIN} className={`nav-link ${active === FineaseRoute.LOGIN ? "active" : ""}`}>Login</Link>
             </li>
         </ul>
     );

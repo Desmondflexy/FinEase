@@ -4,6 +4,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
+import { FineaseRoute } from "../../utils/constants";
 
 export function ResetPassword() {
     const [state, setState] = useState({
@@ -28,7 +29,7 @@ export function ResetPassword() {
         function reset() {
             apiService.resetPassword({ resetId, email, password, confirm })
                 .then(() => {
-                    navigate("/auth/login");
+                    navigate(FineaseRoute.LOGIN);
                     toast.success("Password reset successful");
                     setState((s) => ({ ...s, loading: false }));
                 })

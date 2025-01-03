@@ -7,7 +7,7 @@ import Loading from "../../Loading";
 import { toastError } from "../../../utils/helpers";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { APP_ROUTES } from "../../../utils/constants";
+import { FineaseRoute } from "../../../utils/constants";
 
 export default function UsersList() {
     const [searchParams] = useSearchParams();
@@ -47,7 +47,7 @@ export default function UsersList() {
                 const { users, links, meta } = res.data;
 
                 if (page > meta.totalPages) {
-                    navigate(`${APP_ROUTES.ALL_USERS}?page=${meta.totalPages}`);
+                    navigate(`${FineaseRoute.ALL_USERS}?page=${meta.totalPages}`);
                     return;
                 }
                 setState(s => ({
@@ -60,7 +60,7 @@ export default function UsersList() {
                 }));
             }).catch(err => {
                 if (page < 1) {
-                    navigate(`${APP_ROUTES.ALL_USERS}?page=1`);
+                    navigate(`${FineaseRoute.ALL_USERS}?page=1`);
                     return;
                 }
                 setState(s => ({ ...s, apiStatus: ApiStatus.ERROR }));
@@ -73,7 +73,7 @@ export default function UsersList() {
                             ...s.error,
                             status,
                             statusText,
-                            goto: status >= 401 && status <= 499 ? '/auth/login' : s.error.goto
+                            goto: status >= 401 && status <= 499 ? FineaseRoute.LOGIN : s.error.goto
                         }
                     }));
                 } else {
@@ -84,12 +84,12 @@ export default function UsersList() {
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`${APP_ROUTES.ALL_USERS}?page=${page + 1}`);
+        navigate(`${FineaseRoute.ALL_USERS}?page=${page + 1}`);
     }
 
     function handlePrevious() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`${APP_ROUTES.ALL_USERS}?page=${page - 1}`);
+        navigate(`${FineaseRoute.ALL_USERS}?page=${page - 1}`);
     }
 
     function handlePgSizeChange(e: React.ChangeEvent<HTMLSelectElement>) {

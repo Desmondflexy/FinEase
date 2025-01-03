@@ -9,6 +9,7 @@ import TransferWallet from "../modals/TransferWallet";
 import { FundWalletModal } from "../modals/FundWallet";
 import { apiService } from "../../api.service";
 import { useUserHook } from "../../utils/hooks";
+import { FineaseRoute } from "../../utils/constants";
 
 export default function Dashboard() {
     const { user } = useUserHook();
@@ -19,33 +20,37 @@ export default function Dashboard() {
             fundWallet: false,
             transferWallet: false,
         },
-        totalExpense: "...",
+        totalExpense: "NGN ...",
     });
 
     const { balance, recent10, totalExpense } = state;
 
-    useEffect(() => {
-        apiService.getRecentTransactions()
-            .then(res => {
-                setState(s => ({ ...s, recent10: res.data.transactions }));
-            })
-            .catch(err => {
-                console.error(err.response.data);
-            })
-    }, []);
+    useEffect(getRecentTransactions, []);
+    useEffect(getMonthlyExpense, []);
 
-    useEffect(() => {
-        apiService.getMonthlyExpense()
-            .then(res => {
-                setState(s => ({ ...s, totalExpense: formatNumber(res.data.total) }));
-            })
-            .catch(err => {
-                console.error(err.response.data);
-            })
-    }, []);
+    function getRecentTransactions() {
+        apiService.getRecentTransactions().then(res => {
+            setState(s => ({ ...s, recent10: res.data.transactions }));
+        }).catch(err => {
+            console.error(err.response.data);
+        });
+    }
+
+    function getMonthlyExpense() {
+        apiService.getMonthlyExpense().then(res => {
+            setState(s => ({ ...s, totalExpense: formatNumber(res.data.total) }));
+        }).catch(err => {
+            console.error(err.response.data);
+        })
+    }
 
     function toggleModal(modal: 'fundWallet' | 'transferWallet') {
-        setState(s => ({ ...s, modal: { ...s.modal, [modal]: !state.modal[modal] } }));
+        const modalElement = document.getElementById(modal);
+        if (modalElement) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            modalInstance.hide();
+        }
+        setState(s => ({ ...s, modal: { ...s.modal, [modal]: !s.modal[modal] } }));
     }
 
     return (
@@ -104,7 +109,7 @@ export default function Dashboard() {
 
                     </table>
                 </div>
-                <Link to='/account/transactions?page=1' className="btn btn-primary my-2 btn-sm">See more</Link>
+                <Link to={FineaseRoute.TRANSACTIONS + '?page=1'} className="btn btn-primary my-2 btn-sm">See more</Link>
             </section>
 
             <FormModal closeModal={() => toggleModal('transferWallet')} id='transferWallet' title="Wallet to Wallet Transfer">
@@ -130,3 +135,14 @@ type IState = {
     },
     totalExpense: string;
 }
+
+declare class Modal {
+    constructor(element: HTMLElement);
+    static getInstance(element: HTMLElement): Modal;
+    show(): void;
+    hide(): void;
+}
+
+declare const bootstrap: {
+    Modal: typeof Modal;
+};

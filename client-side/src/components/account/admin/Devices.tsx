@@ -7,6 +7,7 @@ import { toastError } from "../../../utils/helpers";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { FineaseRoute } from "../../../utils/constants";
 
 export default function UsersList() {
     const [state, setState] = useState<IState>({
@@ -42,7 +43,7 @@ export default function UsersList() {
                             ...s.error,
                             status,
                             statusText,
-                            goto: status >= 401 && status <= 499 ? '/auth/login' : s.error.goto
+                            goto: status >= 401 && status <= 499 ? FineaseRoute.LOGIN : s.error.goto
                         }
                     }));
                 } else {
@@ -81,7 +82,7 @@ export default function UsersList() {
                         </thead>
                         <tbody>
                             {devices.map((device, index) => (
-                                <tr key={device.id} className="naked-btn" onClick={() => navigate(`/account/admin/devices/${device.id}`)}>
+                                <tr key={device.id} className="naked-btn" onClick={() => navigate(`${FineaseRoute.DEVICES}/${device.id}`)}>
                                     <td>{index + 1}</td>
                                     <td>{device.deviceNumber}</td>
                                     <td>{device.fullName}</td>

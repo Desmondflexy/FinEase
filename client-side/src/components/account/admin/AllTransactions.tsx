@@ -7,7 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiService } from "../../../api.service";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { APP_ROUTES } from "../../../utils/constants";
+import { FineaseRoute } from "../../../utils/constants";
 
 export default function AllTransactions() {
     const [searchParams] = useSearchParams();
@@ -36,7 +36,7 @@ export default function AllTransactions() {
             const { transactions, links, meta } = res.data;
 
             if (page > meta.totalPages) {
-                navigate(`${APP_ROUTES.ALL_TRANSACTIONS}?page=${meta.totalPages}`);
+                navigate(`${FineaseRoute.ALL_TRANSACTIONS}?page=${meta.totalPages}`);
                 return;
             }
             setState(s => ({
@@ -49,7 +49,7 @@ export default function AllTransactions() {
             }));
         }).catch(err => {
             if (page < 1) {
-                navigate(`${APP_ROUTES.ALL_TRANSACTIONS}page=1`);
+                navigate(`${FineaseRoute.ALL_TRANSACTIONS}page=1`);
                 return;
             }
             const { status, statusText } = err.response;
@@ -70,12 +70,12 @@ export default function AllTransactions() {
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`${APP_ROUTES.ALL_TRANSACTIONS}?page=${page + 1}`);
+        navigate(`${FineaseRoute.ALL_TRANSACTIONS}?page=${page + 1}`);
     }
 
     function handlePrevious() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`${APP_ROUTES.ALL_TRANSACTIONS}?page=${page - 1}`);
+        navigate(`${FineaseRoute.ALL_TRANSACTIONS}?page=${page - 1}`);
     }
 
     function handlePgSizeChange(e: React.ChangeEvent<HTMLSelectElement>) {

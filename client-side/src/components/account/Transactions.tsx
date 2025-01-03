@@ -7,13 +7,14 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiService } from "../../api.service";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { FineaseRoute } from "../../utils/constants";
 
 export default function Transactions() {
     const [searchParams] = useSearchParams();
     const [state, setState] = useState<IState>({
         transactions: [],
         apiStatus: ApiStatus.LOADING,
-        error: { status: 0, statusText: '', goto: '/' },
+        error: { status: 0, statusText: '', goto: FineaseRoute.HOME },
         fetchingData: true,
         apiMeta: {
             itemCount: 0,
@@ -35,7 +36,7 @@ export default function Transactions() {
             const { transactions, links, meta } = res.data;
 
             if (page > meta.totalPages) {
-                navigate(`/account/transactions?page=${meta.totalPages}`);
+                navigate(`${FineaseRoute.TRANSACTIONS}?page=${meta.totalPages}`);
                 return;
             }
             setState(s => ({
@@ -48,7 +49,7 @@ export default function Transactions() {
             }));
         }).catch(err => {
             if (page < 1) {
-                navigate(`/account/transactions?page=1`);
+                navigate(`${FineaseRoute.TRANSACTIONS}?page=1`);
                 return;
             }
             const { status, statusText } = err.response;
@@ -69,12 +70,12 @@ export default function Transactions() {
 
     function handleNext() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`/account/transactions?page=${page + 1}`);
+        navigate(`${FineaseRoute.TRANSACTIONS}?page=${page + 1}`);
     }
 
     function handlePrevious() {
         setState(s => ({ ...s, fetchingData: true }));
-        navigate(`/account/transactions?page=${page - 1}`);
+        navigate(`${FineaseRoute.TRANSACTIONS}?page=${page - 1}`);
     }
 
     function handlePgSizeChange(e: React.ChangeEvent<HTMLSelectElement>) {

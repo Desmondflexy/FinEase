@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { toastError } from "../../utils/helpers";
+import { formatNumber, toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
-import { useUserHook } from "../../utils/hooks";
+import { FineaseRoute } from "../../utils/constants";
+import { useNavigate } from "react-router-dom";
 
 function TransferWalletModal({ closeModal }: Prop) {
     const [state, setState] = useState<IState>({
@@ -13,7 +14,7 @@ function TransferWalletModal({ closeModal }: Prop) {
 
     const { processing, feedback } = state;
     const { register, handleSubmit, setValue } = useForm<DataInputs>();
-    const { user, setUser } = useUserHook();
+    const navigate = useNavigate();
 
     function onSubmit(data: DataInputs) {
         setState(s => ({ ...s, processing: true }));
@@ -22,33 +23,31 @@ function TransferWalletModal({ closeModal }: Prop) {
 
     function transferFunds(data: DataInputs) {
         const { acctNoOrUsername, amount, password } = data;
-        apiService.transferWallet(acctNoOrUsername, amount, password)
-            .then(res => {
-                setUser({ ...user, balance: res.data.balance });
-                toast.success(res.data.message);
-                setState(s => ({ ...s, processing: false, feedback: '' }));
-                setValue('acctNoOrUsername', '');
-                setValue('amount', '');
-                setValue('password', '');
-                closeModal('transferWallet');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 3000);
-            })
-            .catch(err => {
-                toastError(err, toast);
-                setState(s => ({ ...s, processing: false }));
-            });
+        apiService.transferWallet(acctNoOrUsername, amount, password).then(res => {
+            // setUser({ ...user, balance: res.data.balance });
+            setState(s => ({ ...s, balance: formatNumber(res.data.balance), processing: false, feedback: '' }));
+            toast.success(res.data.message);
+            // setState(s => ({ ...s, processing: false, feedback: '' }));
+            setValue('acctNoOrUsername', '');
+            setValue('amount', '');
+            setValue('password', '');
+            closeModal();
+        }).catch(err => {
+            toastError(err, toast);
+            setState(s => ({ ...s, processing: false }));
+        });
     }
 
     function confirmUser(e: React.FocusEvent<HTMLInputElement>) {
-        apiService.confirmWalletRecipient(e.target.value)
-            .then(res => {
-                setState(s => ({ ...s, feedback: res.data.fullName }));
-            })
-            .catch(() => {
-                setState(s => ({ ...s, feedback: 'Invalid username or account number' }));
-            });
+        apiService.confirmWalletRecipient(e.target.value).then(res => {
+            setState(s => ({ ...s, feedback: res.data.fullName }));
+        }).catch(err => {
+            if (err.status === 401) {
+                navigate(FineaseRoute.LOGIN);
+                return;
+            }
+            setState(s => ({ ...s, feedback: 'Invalid username or account number' }));
+        });
     }
 
     return (
@@ -69,7 +68,7 @@ function TransferWalletModal({ closeModal }: Prop) {
 }
 
 type Prop = {
-    closeModal: (id: string) => void;
+    closeModal: () => void;
 }
 
 type DataInputs = {

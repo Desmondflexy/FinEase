@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
+import { FineaseRoute } from "../../utils/constants";
 
 type LoginInputs = {
     username_email: string;
@@ -30,7 +31,7 @@ export function Login() {
             apiService.login({ emailOrUsername: username_email, password })
                 .then((res) => {
                     localStorage.setItem("token", res.data.token);
-                    navigate("/account/dashboard");
+                    navigate(FineaseRoute.DASHBOARD);
                     setState((s) => ({ ...s, loading: false }));
                 })
                 .catch((err) => {
@@ -68,11 +69,11 @@ export function Login() {
             </div>
 
             <div className="my-2">
-                <Link to="/auth/forgot-password">Forgot Password?</Link>
+                <Link to={FineaseRoute.FORGOT_PASSWORD}>Forgot Password?</Link>
             </div>
 
             <p className="my-2 text-center">
-                Don't have an account? <Link to='/auth/signup'>Sign Up</Link>
+                Don't have an account? <Link to={FineaseRoute.SIGNUP}>Sign Up</Link>
             </p>
         </form>
     );

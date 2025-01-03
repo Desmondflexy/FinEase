@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { UserContext } from "../components/account/Account";
+import { UserContext } from "./contexts";
 
 /**Get authenticated user details and setter function. */
 export function useUserHook() {

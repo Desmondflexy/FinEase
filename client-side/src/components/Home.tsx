@@ -1,6 +1,7 @@
 import './Home.css';
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { FineaseRoute } from '../utils/constants';
 
 export default function HomePage() {
     useEffect(() => {
@@ -22,7 +23,7 @@ export default function HomePage() {
                         <ul className="navbar-nav">
                             <li className="nav-item"><a className="nav-link" href="#features">Features</a></li>
                             <li className="nav-item"><a className="nav-link" href="#contact">Contact</a></li>
-                            <li className="nav-item"><Link className="nav-link" to="/account/recharge">Recharge Now</Link></li>
+                            <li className="nav-item"><Link className="nav-link" to={FineaseRoute.RECHARGE}>Recharge Now</Link></li>
                         </ul>
                     </div>
                 </div>
@@ -34,8 +35,8 @@ export default function HomePage() {
                     <h2>Welcome to FinEase</h2>
                     <p>Your one-stop solution for buying airtime, data, and paying bills.</p>
                     <div className="d-flex justify-content-center gap-3">
-                        <Link to="/auth/login" className="btn btn-primary">Login</Link>
-                        <Link to="/auth/signup" className="btn btn-primary">Signup</Link>
+                        <Link to={FineaseRoute.LOGIN} className="btn btn-primary">Login</Link>
+                        <Link to={FineaseRoute.SIGNUP} className="btn btn-primary">Signup</Link>
                     </div>
                 </div>
             </header>
@@ -69,7 +70,7 @@ export default function HomePage() {
                 <div className="container">
                     <h2>Create An Account Now</h2>
                     <p>Experience the convenience of managing your finances on the go.</p>
-                    <Link to="/auth/signup" className="btn btn-primary">Get Started</Link>
+                    <Link to={FineaseRoute.SIGNUP} className="btn btn-primary">Get Started</Link>
                 </div>
             </section>
 

@@ -4,6 +4,7 @@ import { apiService } from "../../../api.service";
 import Loading from "../../Loading";
 import { formatDateTime, toastError } from "../../../utils/helpers";
 import { toast } from "react-toastify";
+import { FineaseRoute } from "../../../utils/constants";
 
 export default function DeviceInfo() {
     const { id } = useParams();
@@ -19,7 +20,7 @@ export default function DeviceInfo() {
             setDevice(res.data.device);
         }).catch(err => {
             toastError(err, toast);
-            navigate('/account/admin/devices');
+            navigate(FineaseRoute.DEVICES);
         }).finally(() => setLoading(false));
     }
 

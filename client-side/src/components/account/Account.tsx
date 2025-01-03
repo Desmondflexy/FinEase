@@ -1,9 +1,9 @@
 import { useLocation, Link, useNavigate, Routes, Navigate, Route } from "react-router-dom";
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Loading from "../Loading";
 import { CgProfile } from "react-icons/cg";
 import AppError from "../AppError";
-import { ApiStatus, IUser } from "../../utils/types";
+import { ApiStatus, IUser, UserContextType } from "../../utils/types";
 import { IoMenu } from "react-icons/io5";
 import SideBar from "../SideBar";
 import { apiService } from "../../api.service";
@@ -13,6 +13,8 @@ import Profile from "./Profile";
 import Recharge from "./recharge/Recharge";
 import Settings from "./Settings";
 import Transactions from "./Transactions";
+import { UserContext } from "../../utils/contexts";
+import { FineaseRoute } from "../../utils/constants";
 
 export default function Account() {
     const [user, setUser] = useState<IUser | null>(null);
@@ -34,7 +36,7 @@ export default function Account() {
     const navigate = useNavigate();
 
     if (!token) {
-        navigate("/auth/login");
+        navigate(FineaseRoute.LOGIN);
     }
 
     useEffect(() => {
@@ -47,7 +49,7 @@ export default function Account() {
                 const { status, statusText } = err.response;
                 setState(s => ({
                     ...s,
-                    error: { status, statusText, goto: status >= 400 && status <= 499 ? '/auth/login' : s.error.goto }
+                    error: { status, statusText, goto: status >= 400 && status <= 499 ? FineaseRoute.LOGIN : s.error.goto }
                 }));
             } else {
                 setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
@@ -76,8 +78,8 @@ export default function Account() {
                                         <CgProfile /><span>{user.username}</span>
                                     </button>
                                     <ul className="dropdown-menu" style={{ fontSize: '12px' }}>
-                                        <li><Link className="dropdown-item" to="/account/profile">Profile</Link></li>
-                                        <li><Link className="dropdown-item" to="/auth/logout">Logout</Link></li>
+                                        <li><Link className="dropdown-item" to={FineaseRoute.PROFILE}>Profile</Link></li>
+                                        <li><Link className="dropdown-item" to={FineaseRoute.LOGOUT}>Logout</Link></li>
                                     </ul>
                                 </div>
                             </li>
@@ -105,8 +107,7 @@ export default function Account() {
     return <AppError code={error.status} message={error.statusText} goto={error.goto} />;
 }
 
-// UserContext variable is required by useUser hook function
-export const UserContext = createContext<UserContextType | null>(null);
+
 function UserProvider({ children, value }: { children: React.ReactNode, value: UserContextType }) {
     return (
         <UserContext.Provider value={value}>
@@ -126,11 +127,6 @@ type IState = {
         sideBar: boolean;
     }
 }
-
-type UserContextType = {
-    user: IUser;
-    setUser: (user: IUser) => void
-};
 
 function Outlet() {
     return (

@@ -5,6 +5,7 @@ import Home from './Home'
 import AppError from './AppError';
 import Auth from './auth/Auth';
 import Account from './account/Account';
+import { FineaseRoute } from '../utils/constants';
 
 export default function App() {
     return (
@@ -13,7 +14,7 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path='/auth/*' element={<Auth />} />
                 <Route path='/account/*' element={<Account />} />
-                <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={'/'} />} />
+                <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={FineaseRoute.HOME} />} />
             </Routes>
             <ToastContainer />
         </BrowserRouter>

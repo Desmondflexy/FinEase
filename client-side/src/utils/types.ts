@@ -52,3 +52,8 @@ export type ICustomer = {
     name: string;
     address: string;
 };
+
+export type UserContextType = {
+    user: IUser;
+    setUser: (user: IUser) => void
+};
