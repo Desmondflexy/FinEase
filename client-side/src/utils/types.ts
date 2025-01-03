@@ -25,10 +25,11 @@ export type ITransaction = {
 // shape for [user, setUser] context
 export type OutletContextType = [IUser, React.Dispatch<React.SetStateAction<IUser>>];
 
-export type IDisco = {
+export type Operator = {
     desc: string;
     id: string;
     name: string;
+    sector: string;
 }
 
 export enum ApiStatus {
@@ -36,3 +37,18 @@ export enum ApiStatus {
     SUCCESS = 'SUCCESS',
     ERROR = 'ERROR',
 }
+
+export type CableTvPlan = {
+    id: string;
+    name: string;
+    category: string;
+    meta: {
+        currency: string;
+        fee: string;
+    };
+}
+
+export type ICustomer = {
+    name: string;
+    address: string;
+};

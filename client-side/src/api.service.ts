@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { CableTvPlan, Operator } from "./utils/types";
 
 class ApiService {
     private Api: AxiosInstance;
@@ -81,7 +82,7 @@ class ApiService {
     }
 
     getNetworks() {
-        return this.Api.get('transaction/operators?bill=telco');
+        return this.Api.get<{ operators: Operator[] }>('transaction/operators?bill=telco');
     }
 
     buyAirtime(operatorId: string, amount: string, phone: string) {
@@ -101,7 +102,7 @@ class ApiService {
     }
 
     getDiscos() {
-        return this.Api.get('transaction/operators?bill=electricity');
+        return this.Api.get<{ operators: Operator[] }>('transaction/operators?bill=electricity');
     }
 
     validateMeter(operatorId: string, meterNumber: string) {
@@ -138,7 +139,16 @@ class ApiService {
     }
 
     getOperatorTvPlans(operatorId: string) {
-        return this.Api.get(`transaction/${operatorId}/tv-plans`);
+        return this.Api.get<{ products: CableTvPlan[] }>(`transaction/${operatorId}/tv-plans`);
+    }
+
+    getTvOperators() {
+        return this.Api.get<{ operators: Operator[] }>('transaction/operators?bill=television');
+    }
+
+    payCableTv(operatorId: string, smartCardNumber: string, productId: string) {
+        const data = { operatorId, smartCardNumber, productId };
+        return this.Api.post('transaction/pay-tv', data);
     }
 }
 

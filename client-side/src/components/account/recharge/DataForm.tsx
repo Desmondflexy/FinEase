@@ -114,7 +114,6 @@ export default function DataForm() {
                         </select>
                         <label htmlFor="data-plan">Data Plan</label>
                     </div>
-
                 </div>
                 <div className="input-group mb-3">
                     <div className="form-floating">

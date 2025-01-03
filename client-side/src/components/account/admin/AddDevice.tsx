@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { IDisco } from "../../../utils/types";
+import { Operator } from "../../../utils/types";
 import { useEffect, useState } from "react";
 import { apiService } from "../../../api.service";
 import { toast } from "react-toastify";
@@ -35,7 +35,7 @@ export default function AddDevice() {
 
 function RegisterMeterForm() {
     type State = {
-        discos: IDisco[];
+        discos: Operator[];
         loading: boolean;
     }
     const [state, setState] = useState<State>({

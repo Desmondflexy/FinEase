@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IDisco } from "../../../utils/types";
+import { Operator } from "../../../utils/types";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { toastError } from "../../../utils/helpers";
@@ -10,7 +10,7 @@ function ElectricityForm() {
     const [state, setState] = useState({
         token: '',
         units: 0,
-        discos: [] as IDisco[],
+        discos: [] as Operator[],
         error: false,
     });
     const [customer, setCustomer] = useState<ICustomer | null>(null);
@@ -33,7 +33,7 @@ function ElectricityForm() {
     const meterNumber = watch('meterNumber');
     const discoInfo = discos.find(disco => disco.id === operatorId)?.desc || '';
 
-    const discoOptions = discos.map((disco: IDisco) => {
+    const discoOptions = discos.map((disco: Operator) => {
         return <option key={disco.id} value={disco.id}>{disco.name}</option>
     });
 
@@ -93,7 +93,6 @@ function ElectricityForm() {
             reset();
         }).catch(err => {
             toastError(err, toast);
-            setState(s => ({ ...s, error: true }));
         }).finally(() => {
             setIsLoading(s => ({ ...s, submit: false }));
             setFeedbackText(s => ({ ...s, submit: 'Proceed' }));
