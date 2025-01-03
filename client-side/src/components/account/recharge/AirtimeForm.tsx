@@ -4,7 +4,7 @@ import { networkLogo, phoneNumberRegex } from "../../../utils/constants";
 import { useForm } from "react-hook-form";
 import { toastError } from "../../../utils/helpers";
 import { apiService } from "../../../api.service";
-import { useUserHook } from "../../../utils/hooks";
+import { useUser } from "../../../utils/hooks";
 
 function AirtimeForm() {
     const [state, setState] = useState<IState>({
@@ -13,7 +13,7 @@ function AirtimeForm() {
         logoUrl: '',
         errorFeedback: 'Fetching networks...',
     });
-    const { user, setUser } = useUserHook()
+    const { user, setUser } = useUser()
     const { register, reset, watch, handleSubmit } = useForm<DataInputs>();
     const networkOptions = state.networks.map(network => {
         return <option key={network.id} value={network.id}>{network.name}</option>

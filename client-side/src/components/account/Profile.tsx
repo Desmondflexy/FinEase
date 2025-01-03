@@ -1,7 +1,7 @@
-import { useUserHook } from "../../utils/hooks";
+import { useUser } from "../../utils/hooks";
 
 export default function Profile() {
-    const { user } = useUserHook();
+    const { user } = useUser();
 
     return (
         <div id="user-profile">

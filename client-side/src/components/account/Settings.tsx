@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { toastError } from "../../utils/helpers";
 import { apiService } from "../../api.service";
-import { useUserHook } from "../../utils/hooks";
+import { useUser } from "../../utils/hooks";
 
 
 function BasicInfoEditForm() {
@@ -11,7 +11,7 @@ function BasicInfoEditForm() {
         loading: false
     });
     const { loading } = state;
-    const { user, setUser } = useUserHook();
+    const { user, setUser } = useUser();
 
     const { register, handleSubmit, setValue } = useForm<BasicInputs>();
     resetValues();

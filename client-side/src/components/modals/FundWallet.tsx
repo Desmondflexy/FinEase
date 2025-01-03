@@ -3,7 +3,7 @@ import { payWithPaystack, toastError } from "../../utils/helpers";
 import { toast } from "react-toastify";
 import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
-import { useUserHook } from "../../utils/hooks";
+import { useUser } from "../../utils/hooks";
 
 type Props = {
     closeModal: () => void;
@@ -15,7 +15,7 @@ type DataInputs = {
 
 export function FundWalletModal({ closeModal }: Props) {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { user, setUser } = useUserHook();
+    const { user, setUser } = useUser();
     const { register, handleSubmit, setValue } = useForm<DataInputs>();
 
     function onSubmit(data: DataInputs) {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { CableTvPlan, Operator } from "../../../utils/types";
 import { toast } from "react-toastify";
 import { toastError } from "../../../utils/helpers";
-import { useUserHook } from "../../../utils/hooks";
+import { useUser } from "../../../utils/hooks";
 
 export default function Tv() {
     const { register, handleSubmit, watch, reset } = useForm<InputData>();
@@ -12,19 +12,19 @@ export default function Tv() {
         operators: [] as Operator[],
         products: [] as CableTvPlan[],
     });
-    const { user, setUser } = useUserHook();
+    const { user, setUser } = useUser();
 
-        // const [customer, setCustomer] = useState<ICustomer | null>(null);
-        // const [isLoading, setIsLoading] = useState({
-        //     products: true,
-        //     customer: false,
-        //     submit: false,
-        // });
-        // const [feedbackText, setFeedbackText] = useState({
-        //     products: 'Fetching products...',
-        //     customer: '',
-        //     submit: 'Proceed',
-        // });
+    // const [customer, setCustomer] = useState<ICustomer | null>(null);
+    // const [isLoading, setIsLoading] = useState({
+    //     products: true,
+    //     customer: false,
+    //     submit: false,
+    // });
+    // const [feedbackText, setFeedbackText] = useState({
+    //     products: 'Fetching products...',
+    //     customer: '',
+    //     submit: 'Proceed',
+    // });
 
     const operatorId = watch('operatorId');
 

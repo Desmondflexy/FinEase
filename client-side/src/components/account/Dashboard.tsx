@@ -8,11 +8,11 @@ import FormModal from "../modals/FormModal";
 import TransferWallet from "../modals/TransferWallet";
 import { FundWalletModal } from "../modals/FundWallet";
 import { apiService } from "../../api.service";
-import { useUserHook } from "../../utils/hooks";
+import { useUser } from "../../utils/hooks";
 import { FineaseRoute } from "../../utils/constants";
 
 export default function Dashboard() {
-    const { user } = useUserHook();
+    const { user } = useUser();
     const [state, setState] = useState<IState>({
         balance: formatNumber(user.balance),
         recent10: [],

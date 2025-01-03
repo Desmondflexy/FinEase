@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Loading from "../Loading";
 import { CgProfile } from "react-icons/cg";
 import AppError from "../AppError";
-import { ApiStatus, IUser, UserContextType } from "../../utils/types";
+import { ApiStatus, IUser } from "../../utils/types";
 import { IoMenu } from "react-icons/io5";
 import SideBar from "../SideBar";
 import { apiService } from "../../api.service";
@@ -13,8 +13,8 @@ import Profile from "./Profile";
 import Recharge from "./recharge/Recharge";
 import Settings from "./Settings";
 import Transactions from "./Transactions";
-import { UserContext } from "../../utils/contexts";
 import { FineaseRoute } from "../../utils/constants";
+import UserProvider from "../../providers/UserProvider";
 
 export default function Account() {
     const [user, setUser] = useState<IUser | null>(null);
@@ -105,15 +105,6 @@ export default function Account() {
     }
 
     return <AppError code={error.status} message={error.statusText} goto={error.goto} />;
-}
-
-
-function UserProvider({ children, value }: { children: React.ReactNode, value: UserContextType }) {
-    return (
-        <UserContext.Provider value={value}>
-            {children}
-        </UserContext.Provider>
-    );
 }
 
 type IState = {

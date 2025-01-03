@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { toastError } from "../../../utils/helpers";
 import { apiService } from "../../../api.service";
-import { useUserHook } from "../../../utils/hooks";
+import { useUser } from "../../../utils/hooks";
 
 function ElectricityForm() {
     const [state, setState] = useState({
@@ -27,7 +27,7 @@ function ElectricityForm() {
 
     const { token, units, discos, error } = state;
 
-    const { user, setUser } = useUserHook();
+    const { user, setUser } = useUser();
     const { register, handleSubmit, watch, reset, setValue } = useForm<DataInputs>();
     const operatorId = watch('operatorId');
     const meterNumber = watch('meterNumber');
