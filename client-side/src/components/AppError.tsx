@@ -9,9 +9,14 @@ export default function AppError(err: IError) {
     const { code, message, goto } = err;
 
     useEffect(() => {
-        if (code === 401 || code === 403) {
+        if (code === 401) {
             localStorage.removeItem('token');
             navigate(FineaseRoute.LOGIN);
+            return;
+        }
+        if (code === 403) {
+            navigate(FineaseRoute.DASHBOARD);
+            return;
         }
     }, [code, navigate]);
 

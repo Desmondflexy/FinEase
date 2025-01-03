@@ -23,7 +23,7 @@ export default function Account() {
     const token = localStorage.getItem('token');
     const [state, setState] = useState<IState>({
         apiStatus: ApiStatus.LOADING,
-        error: { status: 0, statusText: '', goto: '/' },
+        error: { status: 0, statusText: '', goto: FineaseRoute.HOME },
         isVisible: { sideBar: false },
     });
 
@@ -31,13 +31,18 @@ export default function Account() {
 
     useEffect(() => {
         document.title = 'FinEase - Account';
-    });
+    }, []);
 
     const navigate = useNavigate();
 
     if (!token) {
         navigate(FineaseRoute.LOGIN);
     }
+
+    if (paths.includes('admin') && user && !user.isAdmin) {
+        navigate(FineaseRoute.DASHBOARD);
+    }
+
 
     useEffect(() => {
         apiService.getAccountInfo().then(res => {

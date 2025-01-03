@@ -21,15 +21,19 @@ function SideBar() {
                     <Link to={FineaseRoute.TRANSACTIONS + '?page=1'} className={`${linkClassName} ${location === 'transactions' ? 'active' : ''}`}>Transactions</Link>
                     <Link to={FineaseRoute.PROFILE} className={`${linkClassName} ${location === 'profile' ? 'active' : ''}`}>Profile</Link>
                     <Link to={FineaseRoute.SETTINGS} className={`${linkClassName} ${location === 'settings' ? 'active' : ''}`} >Settings</Link>
-                    {
-                        user.isAdmin &&
-                        <Link to={FineaseRoute.ADMIN_AREA} className={`${linkClassName} ${location === 'admin' ? 'active' : ''}`}>Admin Area</Link>
-                    }
+                    <AdminAreaLink isAdmin={user.isAdmin} />
                     <Link to={FineaseRoute.LOGOUT} className="btn btn-danger mt-2">Logout</Link>
                 </ul>
             </div>
         </div>
     )
+}
+
+function AdminAreaLink({ isAdmin }: { isAdmin: boolean }) {
+    if (!isAdmin) return null;
+    return (
+        <Link to={FineaseRoute.ADMIN_AREA} className="list-group-item list-group-item-action list-group-item-dark">Admin Area</Link>
+    );
 }
 
 export default SideBar;
