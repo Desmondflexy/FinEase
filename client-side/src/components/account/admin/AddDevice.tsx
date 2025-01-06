@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import { Operator } from "../../../utils/types";
 import { useEffect, useState } from "react";
 import { apiService } from "../../../api.service";
 import { toast } from "react-toastify";
@@ -13,7 +12,7 @@ type DataInputs = {
     phone: string;
 }
 
-export default function AddDevice() {
+export default function AddDevice({ isAdmin }: { isAdmin: boolean }) {
     const [deviceType, setDeviceType] = useState('');
 
     return (
@@ -28,13 +27,13 @@ export default function AddDevice() {
                 </select>
             </form>
 
-            {deviceType === 'meter' && <RegisterMeterForm />}
-            {deviceType === 'decoder' && <RegisterDecoderForm />}
+            {deviceType === 'meter' && <RegisterMeterForm isAdmin={isAdmin} />}
+            {deviceType === 'decoder' && <RegisterDecoderForm isAdmin={isAdmin} />}
         </div>
     )
 }
 
-function RegisterMeterForm() {
+function RegisterMeterForm({ isAdmin }: { isAdmin: boolean }) {
     type State = {
         discos: Operator[];
         loading: boolean;
@@ -52,9 +51,21 @@ function RegisterMeterForm() {
         return <option key={disco.id} value={disco.id}>{disco.desc}</option>
     });
 
-    function onSubmit(data: DataInputs) {
+    function onSubmitAdmin(data: DataInputs) {
         setState(s => ({ ...s, loading: true }));
         apiService.registerDevice(data).then(res => {
+            toast.success(res.data.message);
+            reset();
+        }).catch(err => {
+            toastError(err, toast);
+        }).finally(() => {
+            setState(s => ({ ...s, loading: false }));
+        });
+    }
+
+    function onSubmitUser(data: DataInputs) {
+        setState(s => ({ ...s, loading: true }));
+        apiService.requestDeviceApproval(data).then(res => {
             toast.success(res.data.message);
             reset();
         }).catch(err => {
@@ -76,8 +87,9 @@ function RegisterMeterForm() {
                 setState(s => ({ ...s, loading: false }));
             })
     }
+    console.log(isAdmin);
     return (
-        <form className="form" onSubmit={handleSubmit(onSubmit)}>
+        <form className="form" onSubmit={handleSubmit(isAdmin? onSubmitAdmin: onSubmitUser)}>
             <div className="input-group mb-3">
                 <div className="form-floating">
                     <select {...register('operatorId')} className="form-control" id="disco" required>
@@ -105,7 +117,7 @@ function RegisterMeterForm() {
     )
 }
 
-function RegisterDecoderForm() {
+function RegisterDecoderForm({ isAdmin }: { isAdmin: boolean }) {
     type State = {
         operators: Operator[];
         loading: boolean;
@@ -123,9 +135,21 @@ function RegisterDecoderForm() {
         return <option key={disco.id} value={disco.id}>{disco.desc}</option>
     });
 
-    function onSubmit(data: DataInputs) {
+    function onSubmitAdmin(data: DataInputs) {
         setState(s => ({ ...s, loading: true }));
         apiService.registerDevice(data).then(res => {
+            toast.success(res.data.message);
+            reset();
+        }).catch(err => {
+            toastError(err, toast);
+        }).finally(() => {
+            setState(s => ({ ...s, loading: false }));
+        });
+    }
+
+    function onSubmitUser(data: DataInputs) {
+        setState(s => ({ ...s, loading: true }));
+        apiService.requestDeviceApproval(data).then(res => {
             toast.success(res.data.message);
             reset();
         }).catch(err => {
@@ -148,7 +172,7 @@ function RegisterDecoderForm() {
             })
     }
     return (
-        <form className="form" onSubmit={handleSubmit(onSubmit)}>
+        <form className="form" onSubmit={handleSubmit(isAdmin? onSubmitAdmin: onSubmitUser)}>
             <div className="input-group mb-3">
                 <div className="form-floating">
                     <select {...register('operatorId')} className="form-control" id="cable-tv" required>

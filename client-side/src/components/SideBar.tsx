@@ -6,7 +6,12 @@ function SideBar() {
     const location = useLocation().pathname.split('/')[2];
     const { user } = useUser();
 
-    const linkClassName = 'list-group-item list-group-item-action list-group-item-dark';
+    function getClassName(route: string) {
+        const linkClassName = 'list-group-item list-group-item-action list-group-item-dark';
+        const paths = route.split('/');
+        const last = paths[paths.length - 1];
+        return `${linkClassName} ${location === last ? 'active' : ''}`;
+    }
 
     return (
         <div className="offcanvas offcanvas-start" data-bs-scroll="true" tabIndex={-1} id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
@@ -16,12 +21,14 @@ function SideBar() {
             </div>
             <div className="offcanvas-body">
                 <ul className="list-group list-group-flush m-0">
-                    <Link to={FineaseRoute.DASHBOARD} className={`${linkClassName} ${location === 'dashboard' ? 'active' : ''}`} >Dashboard</Link>
-                    <Link to={FineaseRoute.RECHARGE} className={`${linkClassName} ${location === 'recharge' ? 'active' : ''}`} >Recharge</Link>
-                    <Link to={FineaseRoute.TRANSACTIONS + '?page=1'} className={`${linkClassName} ${location === 'transactions' ? 'active' : ''}`}>Transactions</Link>
-                    <Link to={FineaseRoute.PROFILE} className={`${linkClassName} ${location === 'profile' ? 'active' : ''}`}>Profile</Link>
-                    <Link to={FineaseRoute.SETTINGS} className={`${linkClassName} ${location === 'settings' ? 'active' : ''}`} >Settings</Link>
-                    <AdminAreaLink isAdmin={user.isAdmin} />
+                    <Link to={FineaseRoute.DASHBOARD} className={getClassName(FineaseRoute.DASHBOARD)} >Dashboard</Link>
+                    <Link to={FineaseRoute.RECHARGE} className={getClassName(FineaseRoute.RECHARGE)} >Recharge</Link>
+                    <Link to={FineaseRoute.RECEIPTS} className={getClassName(FineaseRoute.RECEIPTS)}>Receipts</Link>
+                    <Link to={FineaseRoute.TRANSACTIONS + '?page=1'} className={getClassName(FineaseRoute.TRANSACTIONS)}>Transactions</Link>
+                    <Link to={FineaseRoute.PROFILE} className={getClassName(FineaseRoute.PROFILE)}>Profile</Link>
+                    <Link to={FineaseRoute.SETTINGS} className={getClassName(FineaseRoute.SETTINGS)} >Settings</Link>
+                    <AdminAreaLink isAdmin={user.isAdmin} className={getClassName(FineaseRoute.ADMIN_AREA)} />
+                    <Link to={FineaseRoute.FEATURES} className={getClassName(FineaseRoute.FEATURES)}>Features</Link>
                     <Link to={FineaseRoute.LOGOUT} className="btn btn-danger mt-2">Logout</Link>
                 </ul>
             </div>
@@ -29,10 +36,10 @@ function SideBar() {
     )
 }
 
-function AdminAreaLink({ isAdmin }: { isAdmin: boolean }) {
+function AdminAreaLink({ isAdmin, className }: { isAdmin: boolean; className: string }) {
     if (!isAdmin) return null;
     return (
-        <Link to={FineaseRoute.ADMIN_AREA} className="list-group-item list-group-item-action list-group-item-dark">Admin Area</Link>
+        <Link to={FineaseRoute.ADMIN_AREA} className={className}>Admin Area</Link>
     );
 }
 

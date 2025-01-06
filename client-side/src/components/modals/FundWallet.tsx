@@ -4,19 +4,16 @@ import { toast } from "react-toastify";
 import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
 import { useUser } from "../../utils/hooks";
-
-type Props = {
-    closeModal: () => void;
-}
-
-type DataInputs = {
-    fundAmount: string;
-}
+import { FineaseRoute } from "../../utils/constants";
+import { useNavigate } from "react-router-dom";
 
 export function FundWalletModal({ closeModal }: Props) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { user, setUser } = useUser();
     const { register, handleSubmit, setValue } = useForm<DataInputs>();
+    const navigate = useNavigate();
+
+    const buttonText = isSubmitting ? 'Processing...' : 'Proceed';
 
     function onSubmit(data: DataInputs) {
         setIsSubmitting(true);
@@ -34,6 +31,10 @@ export function FundWalletModal({ closeModal }: Props) {
             toast.success('Wallet funded successfully!');
             setValue('fundAmount', '');
         }).catch(err => {
+            if (err.status === 401) {
+                navigate(FineaseRoute.LOGIN);
+                return;
+            }
             toastError(err, toast);
         }).finally(() => {
             setIsSubmitting(false);
@@ -45,7 +46,15 @@ export function FundWalletModal({ closeModal }: Props) {
             <div className="mb-3">
                 <input className="form-control" disabled={isSubmitting} placeholder="amount" autoComplete="off" type="number" min={100} id="amount" {...register("fundAmount")} required />
             </div>
-            <button className="btn btn-primary w-100" disabled={isSubmitting}>{isSubmitting ? 'Processing...' : 'Proceed'}</button>
+            <button className="btn btn-primary w-100" disabled={isSubmitting}>{buttonText}</button>
         </form>
     )
+}
+
+type Props = {
+    closeModal: () => void;
+}
+
+type DataInputs = {
+    fundAmount: string;
 }

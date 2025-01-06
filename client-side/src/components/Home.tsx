@@ -6,7 +6,7 @@ import { FineaseRoute } from '../utils/constants';
 export default function HomePage() {
     useEffect(() => {
         document.title = "FinEase - Home";
-    });
+    }, []);
 
     const copyrightDate = new Date();
 

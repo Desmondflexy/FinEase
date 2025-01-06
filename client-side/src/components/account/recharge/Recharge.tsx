@@ -3,6 +3,8 @@ import ElectricityForm from "./ElectricityForm";
 import Tv from "./TvForm";
 import AirtimeForm from "./AirtimeForm";
 import { useNavigate, Route, Routes, useLocation } from "react-router-dom";
+import { FineaseRoute } from "../../../utils/constants";
+import { getRoutePath } from "../../../utils/helpers";
 
 export default function Recharge() {
     const navigate = useNavigate();
@@ -30,10 +32,10 @@ export default function Recharge() {
 function Outlet() {
     return (
         <Routes>
-            <Route path='airtime' element={<AirtimeForm />} />
-            <Route path='data' element={<DataForm />} />
-            <Route path='electricity' element={<ElectricityForm />} />
-            <Route path='tv' element={<Tv />} />
+            <Route path={getRoutePath(FineaseRoute.AIRTIME)} element={<AirtimeForm />} />
+            <Route path={getRoutePath(FineaseRoute.DATA)} element={<DataForm />} />
+            <Route path={getRoutePath(FineaseRoute.ELECTRICITY)} element={<ElectricityForm />} />
+            <Route path={getRoutePath(FineaseRoute.TV)} element={<Tv />} />
         </Routes>
     );
 }

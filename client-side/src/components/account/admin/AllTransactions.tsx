@@ -1,102 +1,80 @@
-import { useEffect, useState } from "react";
-import AppError from "../../AppError";
+import { useCallback, useEffect, useState } from "react";
 import { formatDateTime, formatNumber, toastError } from "../../../utils/helpers";
-import Loading from "../../Loading";
-import { ApiStatus, ITransaction } from "../../../utils/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiService } from "../../../api.service";
 import { toast } from "react-toastify";
-import { useForm } from "react-hook-form";
 import { FineaseRoute } from "../../../utils/constants";
+import { PageSizeSelector } from "../../extras/PageSizeSelector";
+import { SearchBox } from "../../extras/SearchForm";
 
-export default function AllTransactions() {
+export default function Transactions() {
     const [searchParams] = useSearchParams();
-    const [state, setState] = useState<IState>({
-        transactions: [],
-        apiStatus: ApiStatus.LOADING,
-        error: { status: 0, statusText: '', goto: '/' },
-        fetchingData: true,
-        apiMeta: {
+    const navigate = useNavigate();
+
+    const [isPageLoading, setIsPageLoading] = useState(true);
+    const [data, setData] = useState({
+        transactions: [] as ITransaction[],
+        meta: {
             itemCount: 0,
             totalItems: 0,
-            totalPages: 1,
+            totalPages: 0
         },
-        pgSize: 10,
+        links: {
+            next: '',
+            previous: ''
+        },
+        isLoading: true,
     });
-
-    const { register, watch, } = useForm<{ search: string, pgSize: string }>();
-    const searchTerm = watch("search");
-
+    const { transactions, isLoading, meta, links } = data;
+    const [limit, setLimit] = useState(10);
     const page = Number(searchParams.get('page'));
-    const navigate = useNavigate();
-    const { apiStatus, error, apiMeta, transactions, pgSize, fetchingData, apiLinks } = state;
+    const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        apiService.fetchAllTransactions(page, pgSize, searchTerm).then(res => {
-            const { transactions, links, meta } = res.data;
+    useEffect(fetchTransactions, [page, navigate, searchTerm, limit]);
 
-            if (page > meta.totalPages) {
-                navigate(`${FineaseRoute.ALL_TRANSACTIONS}?page=${meta.totalPages}`);
+    let nextBtnDisabled = !links?.next, prevBtnDisabled = !links?.previous;
+    if (isLoading) nextBtnDisabled = true, prevBtnDisabled = true;
+
+    function fetchTransactions() {
+        if (page < 1) {
+            navigate(`${FineaseRoute.ALL_TRANSACTIONS}?page=1`);
+            return;
+        }
+        setData(s => ({ ...s, isLoading: true }));
+        apiService.fetchAllTransactions(page, limit, searchTerm).then(res => {
+            const { transactions, meta, links } = res.data;
+            const lastPage = meta.totalPages;
+            if (page > lastPage) {
+                navigate(`${FineaseRoute.ALL_TRANSACTIONS}?page=${lastPage}`);
                 return;
             }
-            setState(s => ({
-                ...s,
-                transactions,
-                apiStatus: ApiStatus.SUCCESS,
-                fetchingData: false,
-                apiMeta: meta,
-                apiLinks: links,
-            }));
+            setData(s => ({ ...s, transactions, meta, links }));
         }).catch(err => {
-            if (page < 1) {
-                navigate(`${FineaseRoute.ALL_TRANSACTIONS}page=1`);
-                return;
-            }
-            const { status, statusText } = err.response;
             toastError(err, toast);
-            setState(s => ({
-                ...s,
-                apiStatus: ApiStatus.ERROR,
-                error: { ...s.error, status, statusText }
-            }));
+        }).finally(() => {
+            setData(s => ({ ...s, isLoading: false }));
+            setIsPageLoading(false);
         });
-        setState(s => ({ ...s, searchResults: s.transactions }));
-    }, [page, navigate, searchTerm, pgSize]);
-
-    let nextBtnDisabled = !apiLinks?.next;
-    if (fetchingData) nextBtnDisabled = true;
-    let prevBtnDisabled = !apiLinks?.previous;
-    if (fetchingData) prevBtnDisabled = true;
+    }
 
     function handleNext() {
-        setState(s => ({ ...s, fetchingData: true }));
         navigate(`${FineaseRoute.ALL_TRANSACTIONS}?page=${page + 1}`);
     }
 
     function handlePrevious() {
-        setState(s => ({ ...s, fetchingData: true }));
         navigate(`${FineaseRoute.ALL_TRANSACTIONS}?page=${page - 1}`);
     }
 
-    function handlePgSizeChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        setState(s => ({ ...s, pgSize: +e.target.value }));
-    }
+    const handleSearch = useCallback((term: string) => {
+        setSearchTerm(term);
+    }, []);
 
-    if (apiStatus === ApiStatus.SUCCESS) {
-        return <div id="all-transactions">
-            <h3>All Transactions</h3>
-            <input {...register("search")} type="search" placeholder="Search transaction..." />
+    return (
+        <div id="all-transactions">
+            <h3>Transactions</h3>
+            <SearchBox onSearch={handleSearch} />
             <hr />
-
-            <div className="pg-size">
-                <label htmlFor="pg-size">Size: </label>
-                <select name="pg-size" id="pg-size" onChange={handlePgSizeChange} value={pgSize}>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
+            <PageSizeSelector onLimitChange={setLimit} />
             <div className="table-container">
                 <table>
                     <thead>
@@ -111,58 +89,30 @@ export default function AllTransactions() {
                         </tr>
                     </thead>
                     <tbody>
-                        {transactions.length
-                            ? transactions.map((trx: ITransaction, index: number) => (
-                                <tr key={trx.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{formatNumber(+trx.amount).slice(3)}</td>
-                                    <td>{trx.type}</td>
-                                    <td>{trx.description}</td>
-                                    <td>{trx.user?.username}</td>
-                                    <td>{trx.reference}</td>
-                                    <td>{formatDateTime(trx.createdAt)}</td>
-                                </tr>
-                            ))
-                            : <tr><td colSpan={6}>No transactions found</td></tr>}
+                        {isPageLoading ? <tr><td colSpan={6}>Loading...</td></tr>
+                            : !transactions.length ? <tr><td colSpan={6}>No transactions found</td></tr>
+                                : transactions.map((trx, index) => (
+                                    <tr key={trx.id}>
+                                        <td>{index + 1}</td>
+                                        <td>{formatNumber(+trx.amount).slice(3)}</td>
+                                        <td>{trx.type}</td>
+                                        <td>{trx.description}</td>
+                                        <td>{trx.user?.username}</td>
+                                        <td>{trx.reference}</td>
+                                        <td>{formatDateTime(trx.createdAt)}</td>
+                                    </tr>
+                                ))}
                     </tbody>
                 </table>
             </div>
-            {apiMeta.totalPages === 1 ? null :
+
+            {meta.totalPages > 1 &&
                 <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
                     <button disabled={prevBtnDisabled} onClick={handlePrevious}>Prev Page</button>
-                    <span>{state.fetchingData ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
+                    <span>{isLoading ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
                     <button disabled={nextBtnDisabled} onClick={handleNext}>Next Page</button>
                 </div>}
-            <p>Showing {apiMeta.itemCount} of {apiMeta.totalItems} transactions</p>
+            <p>Showing {meta.itemCount} of {meta.totalItems} transactions</p>
         </div>
-    }
-
-    if (apiStatus === ApiStatus.ERROR) {
-        return <AppError code={error.status} message={error.statusText} goto={error.goto} />
-    }
-
-    return <Loading />
-}
-
-type IState = {
-    transactions: ITransaction[];
-    apiStatus: ApiStatus;
-    error: {
-        status: number;
-        statusText: string;
-        goto: string;
-    };
-    fetchingData: boolean;
-    apiMeta: {
-        itemCount: number;
-        totalItems: number;
-        totalPages: number;
-    };
-    apiLinks?: {
-        first: string;
-        last: string;
-        previous: string;
-        next: string;
-    };
-    pgSize: number;
+    );
 }

@@ -1,180 +1,119 @@
-import { useState, useEffect } from "react";
-import { ApiStatus, IUser } from "../../../utils/types";
-import AppError from "../../AppError";
+import { useState, useEffect, useCallback } from "react";
+import { toastError } from "../../../utils/helpers";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { apiService } from "../../../api.service";
-import Loading from "../../Loading";
-import { toastError } from "../../../utils/helpers";
 import { toast } from "react-toastify";
-import { useForm } from "react-hook-form";
 import { FineaseRoute } from "../../../utils/constants";
+import { PageSizeSelector } from "../../extras/PageSizeSelector";
+import { SearchBox } from "../../extras/SearchForm";
 
 export default function UsersList() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const [isPageLoading, setIsPageLoading] = useState(true);
 
-    const [state, setState] = useState<IState>({
-        users: [],
-        apiStatus: ApiStatus.LOADING,
-        error: { status: 0, statusText: '', goto: '/' },
-        totalPages: 1,
-        fetchingData: false,
-        apiMeta: {
+    const [data, setData] = useState({
+        users: [] as IUser[],
+        meta: {
             itemCount: 0,
             totalItems: 0,
-            totalPages: 1,
+            totalPages: 0
         },
-        pgSize: 10,
+        links: {
+            next: '',
+            previous: ''
+        },
+        isLoading: true,
     });
 
-    const { register, watch, } = useForm<{ search: string }>();
-    const searchTerm = watch("search");
 
-    const { apiStatus, error, apiMeta, users, pgSize } = state;
 
+    const { users, isLoading, meta, links } = data;
+    const [limit, setLimit] = useState(10);
     const page = Number(searchParams.get('page'));
+    const [searchTerm, setSearchTerm] = useState('');
 
-    let nextBtnDisabled = !state.apiLinks?.next;
-    if (state.fetchingData) nextBtnDisabled = true;
-    let prevBtnDisabled = !state.apiLinks?.previous;
-    if (state.fetchingData) prevBtnDisabled = true;
+    useEffect(fetchAllUsers, [page, navigate, searchTerm, limit]);
 
-    useEffect(fetchAllUsers, [page, navigate, searchTerm, pgSize]);
+    let nextBtnDisabled = !links.next, prevBtnDisabled = !links.previous;
+    if (isLoading) nextBtnDisabled = true, prevBtnDisabled = true;
 
     function fetchAllUsers() {
-        apiService.getAllUsers(page, pgSize, searchTerm)
-            .then(res => {
-                const { users, links, meta } = res.data;
-
-                if (page > meta.totalPages) {
-                    navigate(`${FineaseRoute.ALL_USERS}?page=${meta.totalPages}`);
-                    return;
-                }
-                setState(s => ({
-                    ...s,
-                    users,
-                    apiStatus: ApiStatus.SUCCESS,
-                    fetchingData: false,
-                    apiMeta: meta,
-                    apiLinks: links,
-                }));
-            }).catch(err => {
-                if (page < 1) {
-                    navigate(`${FineaseRoute.ALL_USERS}?page=1`);
-                    return;
-                }
-                setState(s => ({ ...s, apiStatus: ApiStatus.ERROR }));
-                toastError(err, toast);
-                if (err.response) {
-                    const { status, statusText } = err.response;
-                    setState(s => ({
-                        ...s,
-                        error: {
-                            ...s.error,
-                            status,
-                            statusText,
-                            goto: status >= 401 && status <= 499 ? FineaseRoute.LOGIN : s.error.goto
-                        }
-                    }));
-                } else {
-                    setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
-                }
-            });
+        if (page < 1) {
+            navigate(`${FineaseRoute.ALL_USERS}?page=1`);
+            return;
+        }
+        setData(s => ({ ...s, isLoading: true }));
+        apiService.getAllUsers(page, limit, searchTerm).then(res => {
+            const { users, links, meta } = res.data;
+            const lastPage = meta.totalPages;
+            if (lastPage > meta.totalPages) {
+                navigate(`${FineaseRoute.ALL_USERS}?page=${lastPage}`);
+                return;
+            }
+            setData(s => ({ ...s, users, meta, links }));
+        }).catch(err => {
+            toastError(err, toast);
+        }).finally(() => {
+            setData(s => ({ ...s, isLoading: false }));
+            setIsPageLoading(false);
+        });
     }
 
     function handleNext() {
-        setState(s => ({ ...s, fetchingData: true }));
         navigate(`${FineaseRoute.ALL_USERS}?page=${page + 1}`);
     }
 
     function handlePrevious() {
-        setState(s => ({ ...s, fetchingData: true }));
         navigate(`${FineaseRoute.ALL_USERS}?page=${page - 1}`);
     }
 
-    function handlePgSizeChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        setState(s => ({ ...s, pgSize: +e.target.value }));
-    }
+    const handleSearch = useCallback((term: string) => {
+        setSearchTerm(term);
+    }, []);
 
-    if (apiStatus === ApiStatus.SUCCESS) {
-        return (
-            <div id="all-users">
-                <h3>Active Users</h3>
-                <input type="search" placeholder="Search for user" {...register("search")} />
-                <hr />
-                <div className="pg-size">
-                    <label htmlFor="pg-size">Size: </label>
-                    <select name="pg-size" id="pg-size" onChange={handlePgSizeChange} value={pgSize}>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <div className="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>S/N</th>
-                                <th><span>Name</span></th>
-                                <th><span>Username</span></th>
-                                <th><span>Email</span></th>
-                                <th><span>Phone</span></th>
-                                <th><span>Date Registered</span></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map((user: IUser, index: number) => (
-                                <tr key={user.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{user.fullName}</td>
-                                    <td>{user.username}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.phone}</td>
-                                    <td>{user.createdAt.split('T')[0]}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                {apiMeta.totalPages === 1 ? null :
-                    <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
-                        <button disabled={prevBtnDisabled} onClick={handlePrevious}>Prev Page</button>
-                        <span>{state.fetchingData ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
-                        <button disabled={nextBtnDisabled} onClick={handleNext}>Next Page</button>
-                    </div>}
-                <p>Showing {apiMeta.itemCount} of {apiMeta.totalItems} users</p>
+    return (
+        <div id="all-users">
+            <h3>Active Users</h3>
+            <SearchBox onSearch={handleSearch} />
+            <hr />
+            <PageSizeSelector onLimitChange={setLimit} />
+            <div className="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th><span>Name</span></th>
+                            <th><span>Username</span></th>
+                            <th><span>Email</span></th>
+                            <th><span>Phone</span></th>
+                            <th><span>Date Registered</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isPageLoading ? <tr><td colSpan={6}>Loading data...</td></tr>
+                            : !users.length ? <tr><td colSpan={6}>No users found</td></tr>
+                                : users.map((user, index) => (
+                                    <tr key={user.id}>
+                                        <td>{index + 1}</td>
+                                        <td>{user.fullName}</td>
+                                        <td>{user.username}</td>
+                                        <td>{user.email}</td>
+                                        <td>{user.phone}</td>
+                                        <td>{user.createdAt.split('T')[0]}</td>
+                                    </tr>
+                                ))}
+                    </tbody>
+                </table>
             </div>
-        );
-    }
 
-    if (apiStatus === ApiStatus.ERROR) {
-        return <AppError code={error.status} message={error.statusText} goto={error.goto} />
-    }
-
-    return <Loading />;
-}
-
-type IState = {
-    users: IUser[];
-    apiStatus: ApiStatus;
-    error: {
-        status: number;
-        statusText: string;
-        goto: string;
-    },
-    totalPages: number;
-    fetchingData: boolean;
-    apiMeta: {
-        itemCount: number;
-        totalItems: number;
-        totalPages: number;
-    };
-    apiLinks?: {
-        first: string;
-        last: string;
-        previous: string;
-        next: string;
-    };
-    pgSize: number;
+            {meta.totalPages > 1 &&
+                <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'black', color: 'white', alignItems: 'center', textAlign: 'center' }}>
+                    <button disabled={prevBtnDisabled} onClick={handlePrevious}>Prev Page</button>
+                    <span>{isLoading ? `fetching data on page ${page}...` : `PAGE ${page}`}</span>
+                    <button disabled={nextBtnDisabled} onClick={handleNext}>Next Page</button>
+                </div>}
+            <p>Showing {meta.itemCount} of {meta.totalItems} users</p>
+        </div>
+    );
 }

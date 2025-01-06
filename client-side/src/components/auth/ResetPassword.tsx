@@ -7,40 +7,30 @@ import { apiService } from "../../api.service";
 import { FineaseRoute } from "../../utils/constants";
 
 export function ResetPassword() {
-    const [state, setState] = useState({
-        loading: false,
-    });
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const { register, handleSubmit } = useForm<DataType>();
-
-    const { loading } = state;
     const navigate = useNavigate();
 
     useEffect(() => {
         document.title = 'FinEase - Reset Password';
-    });
+    }, []);
 
-    const { resetId } = useParams();
+    const urlParams = useParams();
+    const resetId = urlParams.resetId as string;
     const [searchParams] = useSearchParams();
-    const email = searchParams.get("email");
+    const email = searchParams.get("email") as string;
 
     function onSubmit(data: DataType) {
+        setIsSubmitting(true);
         const { password, confirm } = data;
-        function reset() {
-            apiService.resetPassword({ resetId, email, password, confirm })
-                .then(() => {
-                    navigate(FineaseRoute.LOGIN);
-                    toast.success("Password reset successful");
-                    setState((s) => ({ ...s, loading: false }));
-                })
-                .catch((err) => {
-                    toastError(err, toast);
-                    setState((s) => ({ ...s, loading: false }));
-                });
-        }
-
-        setState((s) => ({ ...s, loading: true }));
-        reset();
+        apiService.resetPassword(resetId, email, password, confirm).then(res => {
+            navigate(FineaseRoute.LOGIN);
+            toast.success(res.data.message);
+        }).catch((err) => {
+            toastError(err, toast);
+        }).finally(() => {
+            setIsSubmitting(false);
+        });
     }
 
     return (
@@ -54,8 +44,8 @@ export function ResetPassword() {
                 <label htmlFor="confirm">Confirm New Password</label>
             </div>
             <div>
-                <button className="btn btn-primary w-100" type="submit" disabled={loading}>
-                    {loading ? <>
+                <button className="btn btn-primary w-100" type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? <>
                         <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
                         <span role="status">Submitting... Please wait</span>
                     </> : "Submit"}

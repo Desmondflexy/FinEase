@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { formatDateTime, formatNumber, greet } from "../../utils/helpers";
 import { Link } from "react-router-dom";
-import { ITransaction } from "../../utils/types";
 import { IoWalletOutline } from "react-icons/io5";
 import { GiExpense } from "react-icons/gi";
 import FormModal from "../modals/FormModal";
@@ -14,7 +13,7 @@ import { FineaseRoute } from "../../utils/constants";
 export default function Dashboard() {
     const { user } = useUser();
     const [state, setState] = useState<IState>({
-        balance: formatNumber(user.balance),
+        balance: 'NGN ...',
         recent10: [],
         modal: {
             fundWallet: false,
@@ -25,8 +24,13 @@ export default function Dashboard() {
 
     const { balance, recent10, totalExpense } = state;
 
-    useEffect(getRecentTransactions, []);
-    useEffect(getMonthlyExpense, []);
+    useEffect(getRecentTransactions, [user.balance]);
+    useEffect(getMonthlyExpense, [user.balance]);
+    useEffect(updateWalletBalance, [user.balance]);
+
+    function updateWalletBalance() {
+        setState(s => ({ ...s, balance: formatNumber(user.balance) }));
+    }
 
     function getRecentTransactions() {
         apiService.getRecentTransactions().then(res => {
@@ -135,14 +139,3 @@ type IState = {
     },
     totalExpense: string;
 }
-
-declare class Modal {
-    constructor(element: HTMLElement);
-    static getInstance(element: HTMLElement): Modal;
-    show(): void;
-    hide(): void;
-}
-
-declare const bootstrap: {
-    Modal: typeof Modal;
-};

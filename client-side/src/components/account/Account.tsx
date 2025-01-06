@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Loading from "../Loading";
 import { CgProfile } from "react-icons/cg";
 import AppError from "../AppError";
-import { ApiStatus, IUser } from "../../utils/types";
 import { IoMenu } from "react-icons/io5";
 import SideBar from "../SideBar";
 import { apiService } from "../../api.service";
@@ -13,8 +12,11 @@ import Profile from "./Profile";
 import Recharge from "./recharge/Recharge";
 import Settings from "./Settings";
 import Transactions from "./Transactions";
-import { FineaseRoute } from "../../utils/constants";
+import { ApiStatus, FineaseRoute } from "../../utils/constants";
 import UserProvider from "../../providers/UserProvider";
+import Receipts from "./Receipts";
+import { getRoutePath } from "../../utils/helpers";
+import Features from "./Features";
 
 export default function Account() {
     const [user, setUser] = useState<IUser | null>(null);
@@ -127,13 +129,15 @@ type IState = {
 function Outlet() {
     return (
         <Routes>
-            <Route index element={<Navigate to='dashboard' />} />
-            <Route path='dashboard' element={<Dashboard />} />
-            <Route path='profile' element={<Profile />} />
-            <Route path='transactions' element={<Transactions />} />
-            <Route path='recharge/*' element={<Recharge />} />
-            <Route path='settings' element={<Settings />} />
-            <Route path='admin/*' element={<AdminApp />} />
+            <Route index element={<Navigate to={getRoutePath(FineaseRoute.DASHBOARD)} />} />
+            <Route path={getRoutePath(FineaseRoute.DASHBOARD)} element={<Dashboard />} />
+            <Route path={getRoutePath(FineaseRoute.PROFILE)} element={<Profile />} />
+            <Route path={getRoutePath(FineaseRoute.TRANSACTIONS)} element={<Transactions />} />
+            <Route path={getRoutePath(FineaseRoute.RECHARGE, true)} element={<Recharge />} />
+            <Route path={getRoutePath(FineaseRoute.SETTINGS)} element={<Settings />} />
+            <Route path={getRoutePath(FineaseRoute.ADMIN_AREA, true)} element={<AdminApp />} />
+            <Route path={getRoutePath(FineaseRoute.RECEIPTS)} element={<Receipts />} />
+            <Route path={getRoutePath(FineaseRoute.FEATURES, true)} element={<Features />} />
             <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
         </Routes>
     );

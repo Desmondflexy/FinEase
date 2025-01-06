@@ -5,12 +5,14 @@ import { apiService } from "../../api.service";
 import { useForm } from "react-hook-form";
 import { FineaseRoute } from "../../utils/constants";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../utils/hooks";
 
 function TransferWalletModal({ closeModal }: Prop) {
     const [state, setState] = useState<IState>({
         processing: false,
         feedback: '',
     });
+    const { user, setUser } = useUser();
 
     const { processing, feedback } = state;
     const { register, handleSubmit, setValue } = useForm<DataInputs>();
@@ -24,10 +26,9 @@ function TransferWalletModal({ closeModal }: Prop) {
     function transferFunds(data: DataInputs) {
         const { acctNoOrUsername, amount, password } = data;
         apiService.transferWallet(acctNoOrUsername, amount, password).then(res => {
-            // setUser({ ...user, balance: res.data.balance });
+            setUser({ ...user, balance: res.data.balance });
             setState(s => ({ ...s, balance: formatNumber(res.data.balance), processing: false, feedback: '' }));
             toast.success(res.data.message);
-            // setState(s => ({ ...s, processing: false, feedback: '' }));
             setValue('acctNoOrUsername', '');
             setValue('amount', '');
             setValue('password', '');

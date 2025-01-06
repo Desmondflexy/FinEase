@@ -27,26 +27,21 @@ export function Login() {
 
     function onSubmit(data: LoginInputs) {
         const { username_email, password } = data;
-        function login() {
-            apiService.login({ emailOrUsername: username_email, password })
-                .then((res) => {
-                    localStorage.setItem("token", res.data.token);
-                    navigate(FineaseRoute.DASHBOARD);
-                    setState((s) => ({ ...s, loading: false }));
-                })
-                .catch((err) => {
-                    if (err.response) {
-                        toastError(err, toast);
-                    } else {
-                        toast.error(err.message);
-                    }
-                    setState((s) => ({ ...s, loading: false }));
-                });
-            document.querySelector('button')?.focus();
-        }
+        apiService.login(username_email, password).then(res => {
+            localStorage.setItem("token", res.data.token);
+            navigate(FineaseRoute.DASHBOARD);
+            setState((s) => ({ ...s, loading: false }));
+        }).catch((err) => {
+            if (err.response) {
+                toastError(err, toast);
+            } else {
+                toast.error(err.message);
+            }
+            setState((s) => ({ ...s, loading: false }));
+        });
+        document.querySelector('button')?.focus();
 
         setState((s) => ({ ...s, loading: true }));
-        login();
     }
 
     return (

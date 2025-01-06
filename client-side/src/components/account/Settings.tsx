@@ -125,19 +125,19 @@ function PasswordEditForm() {
             <form className="form" onSubmit={handleSubmit(onSubmit)}>
                 <div className="input-group mb-3">
                     <div className="form-floating">
-                        <input {...register('newPassword')} placeholder="New Password" className="form-control" id="new-password" type="password" />
+                        <input {...register('newPassword')} placeholder="New Password" className="form-control" id="new-password" type="password" required />
                         <label htmlFor="new-password" >New Password</label>
                     </div>
                 </div>
                 <div className="input-group mb-3">
                     <div className="form-floating">
-                        <input {...register('confirmNewPassword')} placeholder="Confirm New Password" className="form-control" name="confirmNewPassword" id="confirm-new" type="password" />
+                        <input {...register('confirmNewPassword')} placeholder="Confirm New Password" className="form-control" name="confirmNewPassword" id="confirm-new" type="password" required />
                         <label htmlFor="confirn-new">Confirm New Password</label>
                     </div>
                 </div>
                 <div className="input-group mb-3">
                     <div className="form-floating">
-                        <input {...register('oldPassword')} placeholder="Old Password" className="form-control" name="oldPassword" id="old" type="password" />
+                        <input {...register('oldPassword')} placeholder="Old Password" className="form-control" name="oldPassword" id="old" type="password" required />
                         <label htmlFor="old">Old Password</label>
                     </div>
                 </div>

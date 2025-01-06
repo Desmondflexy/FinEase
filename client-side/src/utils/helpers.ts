@@ -1,17 +1,3 @@
-// PaystackPop is a global object from paystack.js
-declare const PaystackPop: {
-    setup: (options: {
-        key: string;
-        email: string;
-        amount: number;
-        onClose: () => void;
-        callback: (response: { reference: string }) => void;
-        ref?: string;
-    }) => {
-        openIframe: () => void;
-    };
-};
-
 /** Formats num from kobo to naira. */
 export function formatNumber(num: number) {
     num /= 100;
@@ -73,4 +59,17 @@ export function toastError(err: any, toast: any, warn: boolean = false) {
     } else {
         toast[xx](err.message);
     }
+}
+
+/**Utility function to get route path attribute dynamically instead of hardcoding */
+export function getRoutePath(route: string, isDeep: boolean = false) {
+    const paths = route.split('/');
+    const beforeLast = paths[paths.length - 2];
+    let lastElement = paths[paths.length - 1];
+    if (lastElement[0] === ':') {
+        lastElement = beforeLast + '/' + lastElement;
+    }
+    let result = lastElement;
+    if (isDeep) result = result + '/*';
+    return result;
 }

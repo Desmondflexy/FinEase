@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Operator } from "../../../utils/types";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { toastError } from "../../../utils/helpers";

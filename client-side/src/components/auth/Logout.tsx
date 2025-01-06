@@ -9,7 +9,7 @@ export function Logout() {
         apiService.logout();
         localStorage.removeItem('token');
         navigate(FineaseRoute.LOGIN);
-    });
+    }, [navigate]);
 
     return null;
 }

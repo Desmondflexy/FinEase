@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from "axios";
-import { CableTvPlan, Operator } from "./utils/types";
 
 class ApiService {
     private Api: AxiosInstance;
@@ -23,18 +22,18 @@ class ApiService {
         });
     }
 
-    login({ emailOrUsername, password }: { emailOrUsername: string, password: string }) {
-        return this.Api.post("/auth/login", { emailOrUsername, password })
+    login(emailOrUsername: string, password: string) {
+        return this.Api.post<{ token: string }>("auth/login", { emailOrUsername, password })
     }
 
     getMonthlyExpense() {
         return this.Api.get<{ total: number }>(`transaction/monthly-expense`);
     }
     getRecentTransactions() {
-        return this.Api.get(`transaction/recent`);
+        return this.Api.get<{ transactions: ITransaction[] }>(`transaction/recent`);
     }
-    getAllUsers(page: number, limit: number, search: string) {
-        return this.Api.get(`/admin/users?page=${page}&search=${search}&limit=${limit}`);
+    getAllUsers(page: number, limit: number, search: string = '') {
+        return this.Api.get<UsersResponse>(`admin/users?page=${page}&search=${search}&limit=${limit}`);
     }
 
     getAccountInfo() {
@@ -42,7 +41,7 @@ class ApiService {
     }
 
     fundWallet(response: { reference: string }) {
-        return this.Api.post('/transaction/fund-wallet', { reference: response.reference });
+        return this.Api.post('transaction/fund-wallet', { reference: response.reference });
     }
 
     transferWallet(acctNoOrUsername: string, amount: string, password: string) {
@@ -54,27 +53,27 @@ class ApiService {
     }
 
     verifyEmail(verifyId: string, email: string) {
-        return this.Api.patch<{ message: string }>(`/auth/email-verify/${verifyId}?email=${email}`);
+        return this.Api.patch<{ message: string }>(`auth/${verifyId}/verify-email?email=${email}`);
     }
 
     editUserDetails<T>(editData: T) {
         return this.Api.put('account', editData);
     }
 
-    resetPassword({ resetId, email, password, confirm }: { resetId: string | undefined; email: string | null; password: string; confirm: string; }) {
-        return this.Api.post(`/auth/reset-password/${resetId}?email=${email}`, { password, confirm });
+    resetPassword(resetId: string, email: string, password: string, confirm: string) {
+        return this.Api.post(`auth/${resetId}/reset-password?email=${email}`, { password, confirm });
     }
 
-    fetchTransactions(page: number, limit: number, search: string) {
-        return this.Api.get(`/transaction?page=${page}&search=${search}&limit=${limit}`);
+    fetchTransactions(page: number, limit: number, search: string = '') {
+        return this.Api.get<TransactionsResponse>(`transaction?page=${page}&search=${search}&limit=${limit}`);
     }
 
-    fetchAllTransactions(page: number, limit: number, search: string) {
-        return this.Api.get(`/admin/transactions?page=${page}&search=${search}&limit=${limit}`);
+    fetchAllTransactions(page: number, limit: number, search: string = '') {
+        return this.Api.get<TransactionsResponse>(`admin/transactions?page=${page}&search=${search}&limit=${limit}`);
     }
 
     forgotPassword(email: string) {
-        return this.Api.post("/auth/forgot-password", { email });
+        return this.Api.post("auth/forgot-password", { email });
     }
 
     signup<T>(url: string, data: T) {
@@ -131,11 +130,11 @@ class ApiService {
     }
 
     getDevices() {
-        return this.Api.get('admin/devices');
+        return this.Api.get<DevicesResponse>('admin/devices');
     }
 
     getDevice<T>(id: string) {
-        return this.Api.get<T>(`admin/device/${id}`);
+        return this.Api.get<T>(`admin/${id}/device-info`);
     }
 
     getOperatorTvPlans(operatorId: string) {
@@ -148,7 +147,11 @@ class ApiService {
 
     payCableTv(operatorId: string, smartCardNumber: string, productId: string) {
         const data = { operatorId, smartCardNumber, productId };
-        return this.Api.post('transaction/pay-tv', data);
+        return this.Api.post<{ message: string }>('transaction/pay-tv', data);
+    }
+
+    requestDeviceApproval(data: { fullName: string, operatorId: string, address?: string, phone?: string }) {
+        return this.Api.post<{ message: string }>('account/add-device', data);
     }
 }
 

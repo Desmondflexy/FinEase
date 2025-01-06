@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { apiService } from "../../../api.service";
 import { useEffect, useState } from "react";
-import { CableTvPlan, Operator } from "../../../utils/types";
 import { toast } from "react-toastify";
 import { toastError } from "../../../utils/helpers";
 import { useUser } from "../../../utils/hooks";

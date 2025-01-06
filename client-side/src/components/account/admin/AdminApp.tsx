@@ -5,16 +5,18 @@ import AppError from "../../AppError"
 import AddDevice from "./AddDevice";
 import Devices from "./Devices";
 import DeviceInfo from "./DeviceInfo";
+import { getRoutePath } from "../../../utils/helpers";
+import { FineaseRoute } from "../../../utils/constants";
 
 export default function AdminApp() {
     return (
         <section id="admin-app">
             <ul className="nav">
-                <li><Link to="users?page=1">Users</Link></li>
-                <li><Link to="transactions?page=1">Transactions</Link></li>
-                <li><Link to="devices">Devices</Link></li>
-                <li><Link to="add-device">Add Device</Link></li>
-                <li><Link to="approvals">Approvals</Link></li>
+                <li><Link to={FineaseRoute.ALL_USERS}>Users</Link></li>
+                <li><Link to={FineaseRoute.ALL_TRANSACTIONS}>Transactions</Link></li>
+                <li><Link to={FineaseRoute.DEVICES}>Devices</Link></li>
+                <li><Link to={FineaseRoute.ADD_DEVICE}>Add Device</Link></li>
+                <li><Link to={FineaseRoute.APPROVALS}>Approvals</Link></li>
             </ul>
 
             <Outlet />
@@ -25,13 +27,13 @@ export default function AdminApp() {
 function Outlet() {
     return (
         <Routes>
-            <Route index element={<Navigate to='users?page=1' />} />
-            <Route path='users' element={<AllUsers />} />
-            <Route path='transactions' element={<AllTransactions />} />
-            <Route path='devices' element={<Devices />} />
-            <Route path='add-device' element={<AddDevice />} />
-            <Route path='devices/:id' element={<DeviceInfo />} />
-            <Route path='approvals' element={<AdminApprovals />} />
+            <Route index element={<Navigate to={getRoutePath(FineaseRoute.ALL_USERS)} />} />
+            <Route path={getRoutePath(FineaseRoute.ALL_USERS)} element={<AllUsers />} />
+            <Route path={getRoutePath(FineaseRoute.ALL_TRANSACTIONS)} element={<AllTransactions />} />
+            <Route path={getRoutePath(FineaseRoute.DEVICES)} element={<Devices />} />
+            <Route path={getRoutePath(FineaseRoute.ADD_DEVICE)} element={<AddDevice isAdmin={true} />} />
+            <Route path={getRoutePath(FineaseRoute.DEVICE_INFO)} element={<DeviceInfo />} />
+            <Route path={getRoutePath(FineaseRoute.APPROVALS)} element={<AdminApprovals />} />
             <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
         </Routes>
     );

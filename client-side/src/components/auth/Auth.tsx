@@ -7,6 +7,8 @@ import { ResetPassword } from "./ResetPassword";
 import Signup from "./Signup";
 import VerifyEmail from "./VerifyEmail";
 import { FineaseRoute } from "../../utils/constants";
+import { getRoutePath } from "../../utils/helpers";
+import AppError from "../AppError";
 
 export default function Auth() {
     return (
@@ -56,15 +58,15 @@ export function Header() {
 function Outlet() {
     return (
         <Routes>
-            <Route index element={<Navigate to='login' />} />
-            <Route path='signup' element={<Signup admin={false} />} />
-            <Route path='admin-signup' element={<Signup admin={true} />} />
-            <Route path='login' element={<Login />} />
-            <Route path='logout' element={<Logout />} />
-            <Route path='forgot-password' element={<ForgotPassword />} />
-            <Route path='reset-password/:resetId' element={<ResetPassword />} />
-            <Route path='verify-email/:verifyId' element={<VerifyEmail />} />
-            <Route path='*' element={<Navigate to='login' />} />
+            <Route index element={<Navigate to={getRoutePath(FineaseRoute.LOGIN)} />} />
+            <Route path={getRoutePath(FineaseRoute.SIGNUP)} element={<Signup admin={false} />} />
+            <Route path={getRoutePath(FineaseRoute.ADMIN_SIGNUP)} element={<Signup admin={true} />} />
+            <Route path={getRoutePath(FineaseRoute.LOGIN)} element={<Login />} />
+            <Route path={getRoutePath(FineaseRoute.LOGOUT)} element={<Logout />} />
+            <Route path={getRoutePath(FineaseRoute.FORGOT_PASSWORD)} element={<ForgotPassword />} />
+            <Route path={getRoutePath(FineaseRoute.RESET_PASSWORD)} element={<ResetPassword />} />
+            <Route path={getRoutePath(FineaseRoute.VERIFY_EMAIL)} element={<VerifyEmail />} />
+            <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={FineaseRoute.LOGIN} />} />
         </Routes>
     );
 }
