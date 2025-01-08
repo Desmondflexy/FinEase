@@ -126,15 +126,11 @@ class ApiService {
     }
 
     registerDevice(data: { fullName: string, operatorId: string, address: string }) {
-        return this.Api.post('admin/add-device', data);
+        return this.Api.post('demo-devices/add', data);
     }
 
     getDevices() {
-        return this.Api.get<DevicesResponse>('admin/devices');
-    }
-
-    getDevice<T>(id: string) {
-        return this.Api.get<T>(`admin/${id}/device-info`);
+        return this.Api.get<DevicesResponse>('demo-devices');
     }
 
     getOperatorTvPlans(operatorId: string) {
@@ -152,6 +148,10 @@ class ApiService {
 
     requestDeviceApproval(data: { fullName: string, operatorId: string, address?: string, phone?: string }) {
         return this.Api.post<{ message: string }>('account/add-device', data);
+    }
+
+    getActiveOrm() {
+        return this.Api.get<{ message: string }>('admin/orm');
     }
 }
 

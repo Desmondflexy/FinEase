@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import { toastError } from "../../../utils/helpers";
 
 type DataInputs = {
-    deviceType: string;
     operatorId: string;
     fullName: string;
     address: string;
@@ -87,7 +86,7 @@ function RegisterMeterForm({ isAdmin }: { isAdmin: boolean }) {
                 setState(s => ({ ...s, loading: false }));
             })
     }
-    console.log(isAdmin);
+
     return (
         <form className="form" onSubmit={handleSubmit(isAdmin? onSubmitAdmin: onSubmitUser)}>
             <div className="input-group mb-3">
@@ -190,19 +189,12 @@ function RegisterDecoderForm({ isAdmin }: { isAdmin: boolean }) {
             </div>
             <div className="input-group mb-3">
                 <div className="form-floating">
-                    <input {...register('address')} disabled={!operatorId} className="form-control" id="customer-address" placeholder="Enter customer address" />
-                    <label htmlFor="customer-address">Customer Address</label>
-                </div>
-            </div>
-
-            <div className="input-group mb-3">
-                <div className="form-floating">
                     <input {...register('phone')} disabled={!operatorId} className="form-control" id="customer-phone" placeholder="Enter customer phone number" />
-                    <label htmlFor="customer-phone">Customer Phone Number</label>
+                    <label htmlFor="customer-phnoe">Customer Phone Number</label>
                 </div>
             </div>
 
-            <button className="w-100 btn btn-secondary" disabled={loading} >Submit</button>
+            <button className="w-100 btn btn-success" disabled={loading} >Submit</button>
         </form>
     )
 }

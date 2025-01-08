@@ -86,4 +86,5 @@ declare type Device = {
     operatorName: string;
     deviceNumber: string;
     createdAt: string;
+    operatorSector: string;
 }

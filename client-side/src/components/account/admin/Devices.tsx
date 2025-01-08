@@ -2,12 +2,8 @@ import { useState, useEffect } from "react";
 import { apiService } from "../../../api.service";
 import { toastError } from "../../../utils/helpers";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import { FineaseRoute } from "../../../utils/constants";
 
 export default function UsersList() {
-    const navigate = useNavigate();
-
     const [data, setData] = useState({
         devices: [] as Device[],
         isLoading: true,
@@ -38,8 +34,9 @@ export default function UsersList() {
                         <tr>
                             <th>S/N</th>
                             <th><span>Device Number</span></th>
-                            <th><span>Customer Name</span></th>
                             <th><span>Operator Name</span></th>
+                            <th><span>Operator Sector</span></th>
+                            <th><span>Customer Name</span></th>
                             <th><span>Date Added</span></th>
                         </tr>
                     </thead>
@@ -47,11 +44,12 @@ export default function UsersList() {
                         {isLoading ? <tr><td colSpan={6}>Loading...</td></tr> :
                             devices.length === 0 ? <tr><td colSpan={6}>No devices found</td></tr> :
                                 devices.map((device, index) => (
-                                    <tr key={device.id} className="naked-btn" onClick={() => navigate(`${FineaseRoute.DEVICES}/${device.id}`)}>
+                                    <tr key={device.id}>
                                         <td>{index + 1}</td>
                                         <td>{device.deviceNumber}</td>
-                                        <td>{device.fullName}</td>
                                         <td>{device.operatorName}</td>
+                                        <td>{device?.operatorSector}</td>
+                                        <td>{device.fullName}</td>
                                         <td>{device.createdAt.split('T')[0]}</td>
                                     </tr>
                                 ))}
