@@ -49,7 +49,7 @@ class ApiService {
     }
 
     confirmWalletRecipient(str: string) {
-        return this.Api.get(`account/confirm-user?acctNoOrUsername=${str}`);
+        return this.Api.get<{ message: string, user: IUser }>(`account/confirm-user?acctNoOrUsername=${str}`);
     }
 
     verifyEmail(verifyId: string, email: string) {

@@ -41,7 +41,7 @@ function TransferWalletModal({ closeModal }: Prop) {
 
     function confirmUser(e: React.FocusEvent<HTMLInputElement>) {
         apiService.confirmWalletRecipient(e.target.value).then(res => {
-            setState(s => ({ ...s, feedback: res.data.fullName }));
+            setState(s => ({ ...s, feedback: res.data.user.fullName }));
         }).catch(err => {
             if (err.status === 401) {
                 navigate(FineaseRoute.LOGIN);
