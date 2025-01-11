@@ -1,6 +1,7 @@
 import { UserContext } from "../utils/contexts";
 
-export default function UserProvider({ children, value }: Props) {
+export default function UserProvider(props: Props) {
+    const { children, value } = props;
     return (
         <UserContext.Provider value={value}>
             {children}

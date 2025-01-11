@@ -6,7 +6,7 @@ import AddDevice from "./AddDevice";
 import Devices from "./Devices";
 import { getRoutePath } from "../../../utils/helpers";
 import { FineaseRoute } from "../../../utils/constants";
-import { apiService } from "../../../api.service";
+import { AdminExtras } from "./Extras";
 
 export default function AdminApp() {
     return (
@@ -34,7 +34,7 @@ function Outlet() {
             <Route path={getRoutePath(FineaseRoute.DEVICES)} element={<Devices />} />
             <Route path={getRoutePath(FineaseRoute.ADD_DEVICE)} element={<AddDevice isAdmin={true} />} />
             <Route path={getRoutePath(FineaseRoute.APPROVALS)} element={<AdminApprovals />} />
-            <Route path={getRoutePath(FineaseRoute.ADMIN_EXTRAS)} element={<ActiveOrmButton />} />
+            <Route path={getRoutePath(FineaseRoute.ADMIN_EXTRAS)} element={<AdminExtras />} />
             <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
         </Routes>
     );
@@ -48,18 +48,6 @@ function AdminApprovals() {
             <li>New admin requests</li>
             <li>New devices registered by users</li>
             <p style={{ color: "red" }}>Coming soon...</p>
-        </div>
-    )
-}
-
-function ActiveOrmButton() {
-    const alertActiveOrm = () => {
-        apiService.getActiveOrm().then(res => alert(res.data.message)).catch(err => alert(err.response.data.message));
-    }
-
-    return (
-        <div className="my-4">
-            <button onClick={alertActiveOrm}>check active orm</button>
         </div>
     )
 }

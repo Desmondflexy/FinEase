@@ -150,8 +150,8 @@ class ApiService {
         return this.Api.post<{ message: string }>('account/add-device', data);
     }
 
-    getActiveOrm() {
-        return this.Api.get<{ message: string }>('admin/orm');
+    getAppInfo() {
+        return this.Api.get<{ orm: string }>('settings/app-info');
     }
 }
 
