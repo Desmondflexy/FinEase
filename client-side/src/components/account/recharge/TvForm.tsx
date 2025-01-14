@@ -10,20 +10,22 @@ export default function Tv() {
     const [state, setState] = useState({
         operators: [] as Operator[],
         products: [] as CableTvPlan[],
+        error: false,
     });
     const { user, setUser } = useUser();
 
     // const [customer, setCustomer] = useState<ICustomer | null>(null);
-    // const [isLoading, setIsLoading] = useState({
-    //     products: true,
-    //     customer: false,
-    //     submit: false,
-    // });
-    // const [feedbackText, setFeedbackText] = useState({
-    //     products: 'Fetching products...',
-    //     customer: '',
-    //     submit: 'Proceed',
-    // });
+    const [isLoading, setIsLoading] = useState({
+        products: true,
+        customer: false,
+        submit: false,
+    });
+    const [feedbackText, setFeedbackText] = useState({
+        products: 'Fetching cable tv operators...',
+        customer: '',
+        submit: 'Proceed',
+    });
+    // const x = 1;
 
     const operatorId = watch('operatorId');
 
@@ -43,6 +45,8 @@ export default function Tv() {
     }
 
     function onSubmit(data: InputData) {
+        setIsLoading(s => ({ ...s, submit: true }));
+        setFeedbackText(s => ({ ...s, submit: 'Processing...' }));
         const { operatorId, smartCardNumber, productId } = data;
         apiService.payCableTv(operatorId, smartCardNumber, productId).then(res => {
             toast.success(res.data.message);
@@ -51,24 +55,36 @@ export default function Tv() {
         }).catch(err => {
             toastError(err, toast);
         }).finally(() => {
+            setIsLoading(s => ({ ...s, submit: false }));
+            setFeedbackText(s => ({ ...s, submit: 'Proceed' }));
         })
     }
 
     function fetchTvPlans() {
-        setState(s => ({ ...s, products: [] }));
-        if (operatorId)
+        if (operatorId) {
+            setState(s => ({ ...s, products: [] }));
+            setIsLoading(s => ({ ...s, products: true }));
+            setFeedbackText(s => ({ ...s, products: 'Fetching tv plans...' }));
             apiService.getOperatorTvPlans(operatorId).then(res => {
                 setState(s => ({ ...s, products: res.data.products }));
+                setFeedbackText(s => ({ ...s, products: '' }));
             }).catch(err => {
-                console.log(err.response.data);
+                toastError(toast, err);
+                setFeedbackText(s => ({ ...s, products: 'Service unavailable. Please try again later.' }));
+            }).finally(() => {
+                setIsLoading(s => ({ ...s, products: false }));
             });
+        }
     }
 
     function fetchCableOperators() {
+        setFeedbackText(s => ({ ...s, products: 'Fetching cable tv operators...' }));
         apiService.getTvOperators().then(res => {
             setState(s => ({ ...s, operators: res.data.operators }));
         }).catch(err => {
             console.log(err.response.data);
+        }).finally(() => {
+            setFeedbackText(s => ({ ...s, products: '' }));
         });
     }
 
@@ -100,13 +116,14 @@ export default function Tv() {
                         <label htmlFor="iuc-number">IUC Number</label>
                     </div>
                 </div>
-                <button className="btn btn-warning w-100">submit</button>
+                <button disabled={isLoading.submit} className="btn btn-warning w-100">{feedbackText.submit}</button>
             </form>
+            {<i className="text-danger">{feedbackText.products}</i>}
 
             {/* {true &&
                 <div className="details">
                     <div className="my-4 bg-info-subtle">
-                        {feedbackText.customer && <i className={`text-${true ? 'danger' : 'primary'}`}>{feedbackText.customer}</i>}
+                        {feedbackText.customer && <i className={`text-${x === 1 ? 'danger' : 'primary'}`}>{feedbackText.customer}</i>}
                         {customer && (
                             <div>
                                 <p>Name: {customer.name}</p>

@@ -143,7 +143,7 @@ class ApiService {
 
     payCableTv(operatorId: string, smartCardNumber: string, productId: string) {
         const data = { operatorId, smartCardNumber, productId };
-        return this.Api.post<{ message: string }>('transaction/pay-tv', data);
+        return this.Api.post<{ message: string, balance: number }>('transaction/pay-tv', data);
     }
 
     requestDeviceApproval(data: { fullName: string, operatorId: string, address?: string, phone?: string }) {
