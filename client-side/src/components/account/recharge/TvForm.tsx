@@ -14,7 +14,7 @@ export default function Tv() {
     });
     const { user, setUser } = useUser();
 
-    // const [customer, setCustomer] = useState<ICustomer | null>(null);
+    const [customer, setCustomer] = useState<ICustomer | null>(null);
     const [isLoading, setIsLoading] = useState({
         products: true,
         customer: false,
@@ -25,7 +25,6 @@ export default function Tv() {
         customer: '',
         submit: 'Proceed',
     });
-    // const x = 1;
 
     const operatorId = watch('operatorId');
 
@@ -41,7 +40,15 @@ export default function Tv() {
     });
 
     function confirmUser() {
-
+        setIsLoading(s => ({ ...s, customer: true }));
+        apiService.validateTvSmartCard(operatorId, watch('smartCardNumber')).then(res => {
+            setCustomer(res.data.customer);
+        }).catch(() => {
+            setFeedbackText(s => ({ ...s, customer: 'Customer not found' }));
+            setState(s => ({ ...s, error: true }));
+        }).finally(() => {
+            setIsLoading(s => ({ ...s, customer: false }));
+        });
     }
 
     function onSubmit(data: InputData) {
@@ -88,6 +95,8 @@ export default function Tv() {
         });
     }
 
+    console.log(customer);
+
     return (
         <div id="tv-recharge">
             <h2>Cable Tv</h2>
@@ -120,10 +129,10 @@ export default function Tv() {
             </form>
             {<i className="text-danger">{feedbackText.products}</i>}
 
-            {/* {true &&
+            {customer &&
                 <div className="details">
                     <div className="my-4 bg-info-subtle">
-                        {feedbackText.customer && <i className={`text-${x === 1 ? 'danger' : 'primary'}`}>{feedbackText.customer}</i>}
+                        {feedbackText.customer && <i className={`text-${state.error ? 'danger' : 'primary'}`}>{feedbackText.customer}</i>}
                         {customer && (
                             <div>
                                 <p>Name: {customer.name}</p>
@@ -131,7 +140,7 @@ export default function Tv() {
                         )}
                     </div>
                 </div>
-            } */}
+            }
         </div>
     )
 }

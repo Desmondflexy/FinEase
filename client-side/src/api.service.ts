@@ -108,6 +108,10 @@ class ApiService {
         return this.Api.get(`transaction/customer-validate?operatorId=${operatorId}&bill=electricity&deviceNumber=${meterNumber}`)
     }
 
+    validateTvSmartCard(operatorId: string, smartCardNumber: string) {
+        return this.Api.get(`transaction/customer-validate?operatorId=${operatorId}&bill=television&deviceNumber=${smartCardNumber}`)
+    }
+
     buyElectricity(operatorId: string, amount: string, meterNumber: string, meterType: string) {
         return this.Api.post('transaction/electricity', { amount: +amount, operatorId, meterType, meterNumber })
     }
@@ -126,11 +130,11 @@ class ApiService {
     }
 
     registerDevice(data: { fullName: string, operatorId: string, address: string }) {
-        return this.Api.post('demo-devices/add', data);
+        return this.Api.post('devices/add', data);
     }
 
     getDevices() {
-        return this.Api.get<DevicesResponse>('demo-devices');
+        return this.Api.get<DevicesResponse>('devices');
     }
 
     getOperatorTvPlans(operatorId: string) {
