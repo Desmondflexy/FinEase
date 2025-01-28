@@ -1,17 +1,28 @@
-import { Link, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FineaseRoute } from "../utils/constants";
 import { useUser } from "../utils/hooks";
 
 function SideBar() {
-    const location = useLocation().pathname.split('/')[2];
     const { user } = useUser();
 
-    function getClassName(route: string) {
-        const linkClassName = 'list-group-item list-group-item-action list-group-item-dark';
-        const paths = route.split('/');
-        const last = paths[paths.length - 1];
-        return `${linkClassName} ${location === last ? 'active' : ''}`;
+    function handleLinkClick() {
+        const offcanvasElement = document.getElementById("offcanvasWithBothOptions");
+        if (offcanvasElement) {
+            const offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasElement);
+            offcanvasInstance?.hide(); // Close the sidebar
+        }
     }
+
+    const makeNavLink = (to: string, text: string) => {
+        const inactive = "list-group-item list-group-item-action list-group-item-dark";
+        const active = `${inactive} active`;
+
+        return (
+            <NavLink to={to} className={({ isActive }) => isActive ? active : inactive} onClick={handleLinkClick} >
+                {text}
+            </NavLink>
+        );
+    };
 
     return (
         <div className="offcanvas offcanvas-start" data-bs-scroll="true" tabIndex={-1} id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
@@ -21,26 +32,19 @@ function SideBar() {
             </div>
             <div className="offcanvas-body">
                 <ul className="list-group list-group-flush m-0">
-                    <Link to={FineaseRoute.DASHBOARD} className={getClassName(FineaseRoute.DASHBOARD)} >Dashboard</Link>
-                    <Link to={FineaseRoute.RECHARGE} className={getClassName(FineaseRoute.RECHARGE)} >Recharge</Link>
-                    <Link to={FineaseRoute.RECEIPTS} className={getClassName(FineaseRoute.RECEIPTS)}>Receipts</Link>
-                    <Link to={FineaseRoute.TRANSACTIONS + '?page=1'} className={getClassName(FineaseRoute.TRANSACTIONS)}>Transactions</Link>
-                    <Link to={FineaseRoute.PROFILE} className={getClassName(FineaseRoute.PROFILE)}>Profile</Link>
-                    <Link to={FineaseRoute.SETTINGS} className={getClassName(FineaseRoute.SETTINGS)} >Settings</Link>
-                    <AdminAreaLink isAdmin={user.isAdmin} className={getClassName(FineaseRoute.ADMIN_AREA)} />
-                    <Link to={FineaseRoute.FEATURES} className={getClassName(FineaseRoute.FEATURES)}>Features</Link>
-                    <Link to={FineaseRoute.LOGOUT} className="btn btn-danger mt-2">Logout</Link>
+                    {makeNavLink(FineaseRoute.DASHBOARD, 'Dashboard')}
+                    {makeNavLink(FineaseRoute.RECHARGE, 'Recharge')}
+                    {makeNavLink(FineaseRoute.RECEIPTS, 'Receipts')}
+                    {makeNavLink(FineaseRoute.TRANSACTIONS, 'Transactions')}
+                    {makeNavLink(FineaseRoute.PROFILE, 'Profile')}
+                    {makeNavLink(FineaseRoute.SETTINGS, 'Settings')}
+                    {makeNavLink(FineaseRoute.FEATURES, 'Features')}
+                    {user.isAdmin && makeNavLink(FineaseRoute.ADMIN_AREA, 'Admin Area')}
+                    <NavLink to={FineaseRoute.LOGOUT} className="btn btn-danger mt-2">Logout</NavLink>
                 </ul>
             </div>
         </div>
     )
-}
-
-function AdminAreaLink({ isAdmin, className }: { isAdmin: boolean; className: string }) {
-    if (!isAdmin) return null;
-    return (
-        <Link to={FineaseRoute.ADMIN_AREA} className={className}>Admin Area</Link>
-    );
 }
 
 export default SideBar;

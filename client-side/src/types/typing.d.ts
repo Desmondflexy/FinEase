@@ -73,8 +73,16 @@ declare class Modal {
     hide(): void;
 }
 
+declare class Offcanvas {
+    constructor(element: HTMLElement);
+    static getInstance(element: HTMLElement): Offcanvas;
+    show(): void;
+    hide(): void;
+}
+
 declare const bootstrap: {
     Modal: typeof Modal;
+    Offcanvas: typeof Offcanvas;
 };
 
 declare type Device = {

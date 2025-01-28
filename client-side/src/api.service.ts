@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 
 class ApiService {
-    private Api: AxiosInstance;
+    private readonly Api: AxiosInstance;
     constructor() {
         let baseURL = "http://localhost:8080/api/v2";
         if (import.meta.env.VITE_NODE_ENV !== "development") {
@@ -29,6 +29,7 @@ class ApiService {
     getMonthlyExpense() {
         return this.Api.get<{ total: number }>(`transaction/monthly-expense`);
     }
+
     getRecentTransactions() {
         return this.Api.get<{ transactions: ITransaction[] }>(`transaction/recent`);
     }
