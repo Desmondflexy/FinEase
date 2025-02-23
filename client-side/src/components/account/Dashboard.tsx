@@ -34,7 +34,7 @@ export default function Dashboard() {
 
     function getRecentTransactions() {
         apiService.getRecentTransactions().then(res => {
-            setState(s => ({ ...s, recent10: res.data.transactions }));
+            setState(s => ({ ...s, recent10: res.data }));
         }).catch(err => {
             console.error(err.response.data);
         });

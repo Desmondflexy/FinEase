@@ -61,7 +61,7 @@ export function toastError(err: any, toast: any, warn: boolean = false) {
     }
 }
 
-/**Utility function to get route path attribute dynamically instead of hardcoding */
+/**Utility function to get route path attribute dynamically */
 export function getRoutePath(route: string, isDeep: boolean = false) {
     const paths = route.split('/');
     const beforeLast = paths[paths.length - 2];
