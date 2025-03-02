@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { apiService } from "../../api.service";
-import { formatDateTime, toastError } from "../../utils/helpers";
+import { formatDateTime, formatNumber, toastError } from "../../utils/helpers";
 import { toast } from "react-toastify";
 
 export default function Receipts() {
@@ -27,7 +27,9 @@ export default function Receipts() {
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
-        }).catch((error) => console.error("Error downloading receipt:", error));
+        }).catch((error) => {
+            toastError(error, toast);
+        });
     }
 
     const receiptTableRows = transactions.map((trx, index) => (
@@ -35,7 +37,7 @@ export default function Receipts() {
             <td>{index + 1}</td>
             <td>{trx.description}</td>
             <td><button onClick={() => downloadReceipt(trx.id)}>Download</button></td>
-            <td>{trx.amount}</td>
+            <td>{formatNumber(+trx.amount).slice(3)}</td>
             <td>{formatDateTime(trx.createdAt)}</td>
         </tr>
     ));

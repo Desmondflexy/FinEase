@@ -3,7 +3,7 @@ import { apiService } from "../../../api.service";
 import { toastError } from "../../../utils/helpers";
 import { toast } from "react-toastify";
 
-export default function UsersList() {
+export default function DeviceList() {
     const [data, setData] = useState({
         devices: [] as Device[],
         isLoading: true,
@@ -15,8 +15,7 @@ export default function UsersList() {
     function fetchDevices() {
         setData(s => ({ ...s, isLoading: true }));
         apiService.getDevices().then(res => {
-            const { devices, meta, links } = res.data;
-            setData(s => ({ ...s, devices, meta, links }));
+            setData(s => ({ ...s, devices: res.data }));
         }).catch(err => {
             toastError(err, toast);
         }).finally(() => {

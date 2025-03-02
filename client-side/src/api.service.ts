@@ -85,7 +85,7 @@ class ApiService {
 
 
     fetchUserBillTransactions(page: number, limit: number, search: string = '') {
-        return this.Api.get<TransactionsResponse>(`transaction?page=${page}&search=${search}&limit=${limit}&bill=true`);
+        return this.Api.get<TransactionsResponse>(`transaction?page=${page}&search=${search}&limit=${limit}&service=BILL_PAYMENT`);
     }
 
 
@@ -170,7 +170,7 @@ class ApiService {
 
 
     getDevices() {
-        return this.Api.get<DevicesResponse>('devices');
+        return this.Api.get('devices');
     }
 
 
