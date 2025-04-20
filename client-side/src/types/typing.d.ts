@@ -34,6 +34,10 @@ declare type ITransaction = {
     reference: string;
     createdAt: string;
     user?: IUser;
+    meta: null | {
+        customerAddress: string;
+        customerName: string;
+    };
 }
 
 // shape for [user, setUser] context

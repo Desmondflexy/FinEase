@@ -36,7 +36,7 @@ export default function Receipts() {
         <tr key={trx.id}>
             <td>{index + 1}</td>
             <td>{trx.description}</td>
-            <td><button onClick={() => downloadReceipt(trx.id)}>Download</button></td>
+            <td><button disabled={!trx.meta} onClick={() => downloadReceipt(trx.id)}>Download</button></td>
             <td>{formatNumber(+trx.amount).slice(3)}</td>
             <td>{formatDateTime(trx.createdAt)}</td>
         </tr>
