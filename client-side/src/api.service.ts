@@ -191,7 +191,7 @@ class ApiService {
 
 
     requestDeviceApproval(data: { fullName: string, operatorId: string, address?: string, phone?: string }) {
-        return this.Api.post<{ message: string }>('account/add-device', data);
+        return this.Api.post<{ message: string }>('devices/temp', data);
     }
 
 
@@ -202,6 +202,10 @@ class ApiService {
 
     generateReceipt(id: number | string) {
         return this.Api.get(`transaction/${id}/receipt`, { responseType: 'blob' });
+    }
+
+    getApprovals(page: number, limit: number) {
+        return this.Api.get(`admin/approvals?page=${page}&limit=${limit}`);
     }
 }
 

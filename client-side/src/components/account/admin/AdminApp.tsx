@@ -7,6 +7,8 @@ import Devices from "./Devices";
 import { getRoutePath } from "../../../utils/helpers";
 import { FineaseRoute } from "../../../utils/constants";
 import { AdminExtras } from "./Extras";
+import { useEffect } from "react";
+import { apiService } from "../../../api.service";
 
 export default function AdminApp() {
     return (
@@ -41,6 +43,14 @@ function Outlet() {
 }
 
 function AdminApprovals() {
+    useEffect(() => {
+        apiService.getApprovals(1, 100)
+        .then(res => {
+            console.log(res.data.approvals);
+        })
+        .catch(err => console.log(err));
+    }, []);
+
     return (
         <div>
             <h3>Applications</h3>
