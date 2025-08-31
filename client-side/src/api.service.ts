@@ -165,7 +165,7 @@ class ApiService {
 
 
     registerDevice(data: { fullName: string, operatorId: string, address: string }) {
-        return this.Api.post('devices/add', data);
+        return this.Api.post('devices', data);
     }
 
 
@@ -206,6 +206,18 @@ class ApiService {
 
     getApprovals(page: number, limit: number) {
         return this.Api.get(`admin/approvals?page=${page}&limit=${limit}`);
+    }
+
+    approveDevice(approvalId: string) {
+        return this.Api.put(`devices/${approvalId}/approve`)
+    }
+
+    getPasswordPolicies() {
+        return this.Api.get('settings/password-policy');
+    }
+
+    updatePasswordPolicy(id: number, value: string) {
+        return this.Api.put(`settings/${id}/password-policy`, { value });
     }
 }
 

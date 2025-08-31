@@ -43,9 +43,11 @@ export default function Tv() {
         setIsLoading(s => ({ ...s, customer: true }));
         apiService.validateTvSmartCard(operatorId, watch('smartCardNumber')).then(res => {
             setCustomer(res.data.customer);
+            setFeedbackText(s => ({ ...s, customer: '' }));
         }).catch(() => {
             setFeedbackText(s => ({ ...s, customer: 'Customer not found' }));
             setState(s => ({ ...s, error: true }));
+            setCustomer(null);
         }).finally(() => {
             setIsLoading(s => ({ ...s, customer: false }));
         });
@@ -95,8 +97,6 @@ export default function Tv() {
         });
     }
 
-    console.log(customer);
-
     return (
         <div id="tv-recharge">
             <h2>Cable Tv</h2>
@@ -129,7 +129,7 @@ export default function Tv() {
             </form>
             {<i className="text-danger">{feedbackText.products}</i>}
 
-            {customer &&
+            {(customer || feedbackText.customer) &&
                 <div className="details">
                     <div className="my-4 bg-info-subtle">
                         {feedbackText.customer && <i className={`text-${state.error ? 'danger' : 'primary'}`}>{feedbackText.customer}</i>}

@@ -11,8 +11,8 @@ function AirtimeForm() {
         networks: [],
         processing: false,
         logoUrl: '',
-        errorFeedback: 'Fetching networks...',
     });
+    const [errorFeedback, setErrorFeedback] = useState('Fetching networks...');
     const { user, setUser } = useUser()
     const { register, reset, watch, handleSubmit } = useForm<DataInputs>();
     const networkOptions = state.networks.map(network => {
@@ -28,14 +28,11 @@ function AirtimeForm() {
             setState(s => ({
                 ...s,
                 networks: res.data.operators,
-                errorFeedback: ''
             }));
-        }).catch(err => {
-            toastError(err, toast);
-            setState(s => ({
-                ...s,
-                errorFeedback: 'Service unavailable. Please try again later.'
-            }));
+            setErrorFeedback('');
+        }).catch(e => {
+            const {status, statusText} = e.response;
+            setErrorFeedback(`Unable to fetch network operators. ${status} error (${statusText})`);
         });
     }
 
@@ -105,7 +102,7 @@ function AirtimeForm() {
                 </div>
                 <button className="w-100 btn btn-success" disabled={state.processing}>{state.processing ? 'Transaction processing! Please wait...' : 'Proceed'}</button>
             </form>
-            {state.errorFeedback && <i className="text-danger">{state.errorFeedback}</i>}
+            {errorFeedback && <i className="text-danger">{errorFeedback}</i>}
         </div>
     );
 }
@@ -119,7 +116,6 @@ type IState = {
     }[];
     processing: boolean;
     logoUrl: string;
-    errorFeedback: string;
 }
 
 type DataInputs = {

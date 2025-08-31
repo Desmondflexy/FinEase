@@ -6,9 +6,7 @@ import AddDevice from "./AddDevice";
 import Devices from "./Devices";
 import { getRoutePath } from "../../../utils/helpers";
 import { FineaseRoute } from "../../../utils/constants";
-import { AdminExtras } from "./Extras";
-import { useEffect } from "react";
-import { apiService } from "../../../api.service";
+import { AdminExtras, PasswordComplexity } from "./Extras";
 
 export default function AdminApp() {
     return (
@@ -18,7 +16,6 @@ export default function AdminApp() {
                 <li><Link to={FineaseRoute.ALL_TRANSACTIONS}>Transactions</Link></li>
                 <li><Link to={FineaseRoute.DEVICES}>Devices</Link></li>
                 <li><Link to={FineaseRoute.ADD_DEVICE}>Add Device</Link></li>
-                <li><Link to={FineaseRoute.APPROVALS}>Approvals</Link></li>
                 <li><Link to={FineaseRoute.ADMIN_EXTRAS}>Extras</Link></li>
             </ul>
 
@@ -35,29 +32,10 @@ function Outlet() {
             <Route path={getRoutePath(FineaseRoute.ALL_TRANSACTIONS)} element={<AllTransactions />} />
             <Route path={getRoutePath(FineaseRoute.DEVICES)} element={<Devices />} />
             <Route path={getRoutePath(FineaseRoute.ADD_DEVICE)} element={<AddDevice isAdmin={true} />} />
-            <Route path={getRoutePath(FineaseRoute.APPROVALS)} element={<AdminApprovals />} />
             <Route path={getRoutePath(FineaseRoute.ADMIN_EXTRAS)} element={<AdminExtras />} />
+            <Route path={getRoutePath(FineaseRoute.PASSWORD_COMPLEXITY)} element={<PasswordComplexity />} />
             <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
         </Routes>
     );
 }
 
-function AdminApprovals() {
-    useEffect(() => {
-        apiService.getApprovals(1, 100)
-        .then(res => {
-            console.log(res.data.approvals);
-        })
-        .catch(err => console.log(err));
-    }, []);
-
-    return (
-        <div>
-            <h3>Applications</h3>
-            <li>List of applications</li>
-            <li>New admin requests</li>
-            <li>New devices registered by users</li>
-            <p style={{ color: "red" }}>Coming soon...</p>
-        </div>
-    )
-}

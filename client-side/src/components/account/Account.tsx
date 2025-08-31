@@ -16,7 +16,7 @@ import { ApiStatus, FineaseRoute } from "../../utils/constants";
 import UserProvider from "../../providers/UserProvider";
 import Receipts from "./Receipts";
 import { getRoutePath } from "../../utils/helpers";
-import Features from "./Features";
+// import Features from "./Features";
 
 export default function Account() {
     const [user, setUser] = useState<IUser | null>(null);
@@ -26,7 +26,6 @@ export default function Account() {
     const [state, setState] = useState<IState>({
         apiStatus: ApiStatus.LOADING,
         error: { status: 0, statusText: '', goto: FineaseRoute.HOME },
-        isVisible: { sideBar: false },
     });
 
     const { apiStatus, error } = state;
@@ -56,7 +55,7 @@ export default function Account() {
                 const { status, statusText } = err.response;
                 setState(s => ({
                     ...s,
-                    error: { status, statusText, goto: status >= 400 && status <= 499 ? FineaseRoute.LOGIN : s.error.goto }
+                    error: { status, statusText, goto: status >= 400 && status < 500 ? FineaseRoute.LOGIN : s.error.goto }
                 }));
             } else {
                 setState(s => ({ ...s, error: { ...s.error, status: 500, statusText: err.message } }));
@@ -121,9 +120,6 @@ type IState = {
         statusText: string;
         goto: string;
     };
-    isVisible: {
-        sideBar: boolean;
-    }
 }
 
 function Outlet() {
@@ -137,7 +133,7 @@ function Outlet() {
             <Route path={getRoutePath(FineaseRoute.SETTINGS)} element={<Settings />} />
             <Route path={getRoutePath(FineaseRoute.ADMIN_AREA, true)} element={<AdminApp />} />
             <Route path={getRoutePath(FineaseRoute.RECEIPTS)} element={<Receipts />} />
-            <Route path={getRoutePath(FineaseRoute.FEATURES, true)} element={<Features />} />
+            {/* <Route path={getRoutePath(FineaseRoute.FEATURES, true)} element={<Features />} /> */}
             <Route path='*' element={<AppError message={'Page Not Found'} code={404} goto={''} />} />
         </Routes>
     );
