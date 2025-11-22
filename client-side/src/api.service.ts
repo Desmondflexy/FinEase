@@ -164,11 +164,6 @@ class ApiService {
     }
 
 
-    registerDevice(data: { fullName: string, operatorId: string, address: string }) {
-        return this.Api.post('devices', data);
-    }
-
-
     getDevices() {
         return this.Api.get('devices');
     }
@@ -189,12 +184,7 @@ class ApiService {
         return this.Api.post<{ message: string, balance: number }>('transaction/pay-tv', data);
     }
 
-
-    requestDeviceApproval(data: { fullName: string, operatorId: string, address?: string, phone?: string }) {
-        return this.Api.post<{ message: string }>('devices/temp', data);
-    }
-
-
+    
     getAppInfo() {
         return this.Api.get<{ orm: string }>('settings/app-info');
     }
@@ -202,22 +192,6 @@ class ApiService {
 
     generateReceipt(id: number | string) {
         return this.Api.get(`transaction/${id}/receipt`, { responseType: 'blob' });
-    }
-
-    getApprovals(page: number, limit: number) {
-        return this.Api.get(`admin/approvals?page=${page}&limit=${limit}`);
-    }
-
-    approveDevice(approvalId: string) {
-        return this.Api.put(`devices/${approvalId}/approve`)
-    }
-
-    getPasswordPolicies() {
-        return this.Api.get('settings/password-policy');
-    }
-
-    updatePasswordPolicy(id: number, value: string) {
-        return this.Api.put(`settings/${id}/password-policy`, { value });
     }
 }
 

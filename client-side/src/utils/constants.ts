@@ -35,9 +35,6 @@ export enum FineaseRoute {
     APPROVALS = '/account/admin/approvals',
     ADMIN_EXTRAS = '/account/admin/extras',
     RECEIPTS = '/account/receipts',
-    FEATURES = '/account/features',
-    ADD_DEVICE_FEATURES = '/account/features/add-device',
-    PASSWORD_COMPLEXITY = '/account/admin/password-complexity',
 }
 
 export enum ApiStatus {
