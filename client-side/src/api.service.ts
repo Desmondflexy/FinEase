@@ -34,8 +34,8 @@ class ApiService {
     }
 
 
-    getRecentTransactions() {
-        return this.Api.get(`transaction/recent`);
+    getRecentTransactions(n: number) {
+        return this.Api.get(`transaction/recent/${n}`);
     }
 
 
