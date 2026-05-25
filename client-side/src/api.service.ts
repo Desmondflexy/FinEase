@@ -49,8 +49,8 @@ class ApiService {
     }
 
 
-    fundWallet(response: { reference: string }) {
-        return this.Api.post('transaction/fund-wallet', { reference: response.reference });
+    verifyPayment(response: { reference: string }) {
+        return this.Api.post('transaction/verify-payment', { reference: response.reference });
     }
 
 

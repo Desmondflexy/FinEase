@@ -18,11 +18,9 @@ export function FundWalletModal({ closeModal }: Props) {
     function onSubmit(data: DataInputs) {
         setIsSubmitting(true);
         try {
-            // todo -- call payment initialize endpoint
             apiService.initializePayment(+data.fundAmount).then(res => {
-                // do something
                 const { reference } = res.data;
-                payWithPaystack(user.email, +data.fundAmount * 100, reference, fundWalletApi);
+                payWithPaystack(user.email, +data.fundAmount * 100, reference, verifyPaymentApi);
             })
         } catch {
             toast.error('Paystack could not initiate')
@@ -30,8 +28,8 @@ export function FundWalletModal({ closeModal }: Props) {
     }
 
     // rename to verifyPaymentApi
-    function fundWalletApi(response: { reference: string }) {
-        apiService.fundWallet(response).then(res => {
+    function verifyPaymentApi(response: { reference: string }) {
+        apiService.verifyPayment(response).then(res => {
             setUser({ ...user, balance: res.data.balance });
             closeModal();
             toast.success('Wallet funded successfully!');
