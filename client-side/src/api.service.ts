@@ -149,13 +149,13 @@ class ApiService {
     }
 
 
-    initializePayment(amount: string) {
+    initializePayment(amount: number) {
         type response = {
             access_code: string;
             reference: string;
             authorization_url: string;
         }
-        return this.Api.post<response>('transaction/initialize-payment', { amount: +amount })
+        return this.Api.post<response>('transaction/initialize-payment', { amount })
     }
 
 

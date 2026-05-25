@@ -12,13 +12,14 @@ export function formatNumber(num: number) {
 }
 
 /**Show paystack payment window */
-export function payWithPaystack(email: string, amount: number, callback: (response: { reference: string }) => void) {
+export function payWithPaystack(email: string, amount: number, reference: string, callback: (response: { reference: string }) => void) {
     const handler = PaystackPop.setup({
         key: import.meta.env.VITE_APP_PAYSTACK_PUBLIC,
         email,
         amount,
+        ref: reference,
+        callback,
         onClose: () => console.log('window closed!'),
-        callback
     });
     handler.openIframe();
 }

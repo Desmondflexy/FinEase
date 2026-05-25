@@ -18,12 +18,18 @@ export function FundWalletModal({ closeModal }: Props) {
     function onSubmit(data: DataInputs) {
         setIsSubmitting(true);
         try {
-            payWithPaystack(user.email, +data.fundAmount * 100, fundWalletApi);
+            // todo -- call payment initialize endpoint
+            apiService.initializePayment(+data.fundAmount).then(res => {
+                // do something
+                const { reference } = res.data;
+                payWithPaystack(user.email, +data.fundAmount * 100, reference, fundWalletApi);
+            })
         } catch {
             toast.error('Paystack could not initiate')
         }
     }
 
+    // rename to verifyPaymentApi
     function fundWalletApi(response: { reference: string }) {
         apiService.fundWallet(response).then(res => {
             setUser({ ...user, balance: res.data.balance });
